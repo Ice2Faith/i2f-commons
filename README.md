@@ -44,6 +44,74 @@ commons util package project for java devlop
 # How to use it?
 - just include the jar i2f-core.jar
 
+# update log
+- 2021-10-23 16h
+    - add simple generator 
+        - which base on Regex Patten and Reflect
+        - none third dependencies
+        - location: i2f-core > i2f.commons.core.utils.generator.RegexGenerator
+        - simple usage: i2f-component > test.TestPatten
+        - you just have an template string and an object of for binding the template
+        - then the template will render for you,and return
+        - key code has some chinese comments might help you use it
+        - but,that's not important
+        - you just know the thrid expression 
+            - get value : ${ObjectRoutingExpression}
+                - ObjectRoutingExpression: 
+                - such ${data.args[2].str@Integer.parseInt}
+                - mean's that:
+                     - guess binding object name is obj
+                     - this expression equals then:
+                     - return Integer.parseInt(obj.data.args[2].str)
+                     - say, it's simple to learn
+                     - it's like js lang grammer
+                - and other form:
+                - ${_root}
+                - ${_root.val}
+                - ${vals[2]}
+                - ${val@Math.abs}
+                - ${val@java.lang.BigInteger.instanceof}
+                - etc.
+            - for expression :${[for,ObjectRoutingExpression],separator="",prefix="",suffix="",blank="true",jump="true",template="${_item}",ref=""}
+                - in here,the ObjectRoutingExpression formed object need is iterable
+                - such :
+                        - implements Iterable interface as Collection<?>
+                        - a Map
+                        - an Array
+                - and template mean's you can define the render template
+                - at the time ,ref mean's the template from binding object's ObjectRoutingExpression value
+                - when ref and template both exist,ref valid
+            - if expression: ${[if,ObjectRoutingExpression],test="_item!=null && item>0",template="${_item}'s abs is ${_item@Math.abs}"}
+                - test : you can do some boolean calc ,when the calc result is true will render it
+                - template and ref same as for expression
+            - cation:
+                - if and for expression have some builtin object
+                    - _item: it's ObjectRoutingExpression form value
+                    - _root: it's binding object
+                    - _ctx: when is for expression,have some value in:
+                        - first: boolean value form whether is first render elem
+                        - last:boolean value form whether is last render elem
+                        - index: int value form current render index,not iterable index
+            - when you need for and if embed
+            - you cloud by template and builtin object implements
+    - add easyexcel asyn export util
+        - which base on alibaba easyexcel
+        - support asyn export
+        - self defined data provider design
+        - default thread pool support
+        - and , with an controller interface help you fast add into your project
+        - auto page or none page interface support
+        - direct list data adapter support
+        - location: i2f-component > i2f.commons.component.excel.util.ExportUtil
+        - usage: none
+        - just invoke ExportUtil.writeExcelFile(...) method with a data provider is enough
+        - and return a WebExcelRespData 
+        - it's includes file relative Path, check export done url, download export excel url
+        - on web side, just post export request and setInterval to check whether export done
+        - when export done,you can download it.
+        - every export excel file single sheet max rows is 65535
+        - if more,which will be part into another sheet
+
 # preview usage
 ## list to tree
 ```java
