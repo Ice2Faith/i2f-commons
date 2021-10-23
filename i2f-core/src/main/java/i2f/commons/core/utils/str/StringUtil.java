@@ -3,9 +3,15 @@ package i2f.commons.core.utils.str;
 
 import i2f.commons.core.utils.data.DataUtil;
 import i2f.commons.core.utils.safe.CheckUtil;
+import i2f.commons.core.utils.str.data.RegexMatchItem;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringUtil {
     public static String subMore(String str,int maxLen){
@@ -307,6 +313,25 @@ public class StringUtil {
             }
         }
         return buffer.toString();
+    }
+
+    public static List<RegexMatchItem> regexFinds(String str,String regex){
+        List<RegexMatchItem> ret=new ArrayList<>();
+        Pattern patten=Pattern.compile(regex);
+        Matcher matcher=patten.matcher(str);
+        while (matcher.find()){
+            MatchResult result=matcher.toMatchResult();
+
+            RegexMatchItem item=new RegexMatchItem();
+            item.srcStr=str;
+            item.regexStr=regex;
+            item.matchStr=matcher.group();
+            item.idxStart= result.start();
+            item.idxEnd= result.end();
+
+            ret.add(item);
+        }
+        return ret;
     }
 
 }

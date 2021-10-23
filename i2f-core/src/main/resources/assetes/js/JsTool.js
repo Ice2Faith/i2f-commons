@@ -90,6 +90,147 @@ window.$jtl={
 
         // 以上述配置开始观察目标节点
         observer.observe(targetNode, config);
+    },
+    parseDate(date){
+        let ret=new Date();
+        let year=ret.getFullYear();
+        let month=ret.getMonth();
+        let day=ret.getDate();
+        let hour=ret.getHours();
+        let min=ret.getMinutes();
+        let sec=ret.getSeconds();
+        let msec=ret.getMilliseconds();
+        if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \d{3}$/.test(date)){
+            year=date.substring(0,4);
+            month=date.substring(5,7)-1;
+            day=date.substring(8,10);
+            hour=date.substring(11,13);
+            min=date.substring(14,16);
+            sec=date.substring(17,19);
+            msec=date.substring(20,23);
+        }else if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(date)){
+            year=date.substring(0,4);
+            month=date.substring(5,7)-1;
+            day=date.substring(8,10);
+            hour=date.substring(11,13);
+            min=date.substring(14,16);
+            sec=date.substring(17,19);
+            msec=0;
+        }else if(/^\d{4}-\d{2}-\d{2}$/.test(date)){
+            year=date.substring(0,4);
+            month=date.substring(5,7)-1;
+            day=date.substring(8,10);
+            hour=0;
+            min=0;
+            sec=0;
+            msec=0;
+        }else if(/^\d{4}-\d{2}$/.test(date)){
+            year=date.substring(0,4);
+            month=date.substring(5,7)-1;
+            day=1;
+            hour=0;
+            min=0;
+            sec=0;
+            msec=0;
+        }else if(/^\d{4}$/.test(date)){
+            year=date.substring(0,4);
+            month=1-1;
+            day=1;
+            hour=0;
+            min=0;
+            sec=0;
+            msec=0;
+        }else if(/^\d{4}\d{2}\d{2}$/.test(date)){
+            year=date.substring(0,4);
+            month=date.substring(4,6)-1;
+            day=date.substring(6,8);
+            hour=0;
+            min=0;
+            sec=0;
+            msec=0;
+        }else if(/^\d{4}\d{2}$/.test(date)){
+            year=date.substring(0,4);
+            month=date.substring(4,6)-1;
+            day=1;
+            hour=0;
+            min=0;
+            sec=0;
+            msec=0;
+        }
+        return new Date(year,month,day,hour,min,sec,msec);
+    },
+    formatDate(date,patten){
+        let year=date.getFullYear();
+        let month=date.getMonth()+1;
+        let day=date.getDate();
+        let hour=date.getHours();
+        let min=date.getMinutes();
+        let sec=date.getSeconds();
+        let msec=date.getMilliseconds();
+
+        let phour=hour%12;
+        if(year<10){
+            year='000'+year;
+        }else if(year<100){
+            year='00'+year;
+        }else if(year<1000){
+            year='0'+year;
+        }
+        if(month<10){
+            month='0'+month;
+        }
+        if(day<10){
+            day='0'+day;
+        }
+        if(hour<10){
+            hour='0'+hour;
+        }
+        if(min<10){
+            min='0'+min;
+        }
+        if(sec<10){
+            sec='0'+sec;
+        }
+        if(msec<10){
+            msec='00'+msec;
+        }else if(msec<100){
+            msec='0'+msec;
+        }
+        if(phour<10){
+            phour='0'+phour;
+        }
+        patten=this.replaceAll(patten,'yyyy',year);
+        patten=this.replaceAll(patten,'MM',month);
+        patten=this.replaceAll(patten,'dd',day);
+        patten=this.replaceAll(patten,'HH',hour);
+        patten=this.replaceAll(patten,'mm',min);
+        patten=this.replaceAll(patten,'ss',sec);
+        patten=this.replaceAll(patten,'SSS',msec);
+        patten=this.replaceAll(patten,'hh',phour);
+
+        return patten;
+    },
+    replaceAll(str,reg,rep){
+        let ret='';
+        let arr=str.split(reg);
+        let isFirst=true;
+        for(let item in arr){
+            if(!isFirst){
+                ret+=rep;
+            }
+            ret+=item;
+            isFirst=false;
+        }
+    },
+    notNull(obj){
+        return obj!=null && obj!=undefined;
+    },
+    notBlank(str){
+        return this.notBlank(str) && str!='';
+    },
+    notEmpty(obj){
+        let js=JSON.stringify(obj);
+        return this.notNull(obj) && js!='' && js!='{}' && js!='[]';
     }
 
 }

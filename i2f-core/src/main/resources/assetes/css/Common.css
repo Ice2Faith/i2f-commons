@@ -424,4 +424,13 @@ button:hover,input[type='button']:hover,input[type='submit']:hover,.button:hover
     border-radius: 5px;
     margin: 5px;
 }
+.line-slide-overflow{
+    white-space: nowrap;
+    overflow-x: auto;
+}
+.line-slide-overflow::-webkit-scrollbar{
+    display: none;
+    height: 0 !important;
+    width:0 !important;
+}
 

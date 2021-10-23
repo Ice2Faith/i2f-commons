@@ -102,6 +102,48 @@ public class DateUtil {
         long fac=unit.toMillis(times);
         return new Date(time+fac);
     }
+    public static Date lastDayOfMonth(Date date){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH,1);
+        calendar.add(Calendar.MONTH,+1);
+        calendar.add(Calendar.DAY_OF_MONTH,-1);
+        return calendar.getTime();
+    }
+    public static Date firstDayOfMonth(Date date){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH,1);
+        return calendar.getTime();
+    }
+    public static Date lastDayOfYear(Date date){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH,1);
+        calendar.set(Calendar.MONTH,1);
+        calendar.add(Calendar.YEAR,1);
+        calendar.add(Calendar.DAY_OF_MONTH,-1);
+        return calendar.getTime();
+    }
+    public static Date firstDayOfYear(Date date){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH,1);
+        calendar.set(Calendar.MONTH,1);
+        return calendar.getTime();
+    }
+    public static Date add(Date date, int fieldOfCalendar,int amount){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(fieldOfCalendar,amount);
+        return calendar.getTime();
+    }
+    public static Date set(Date date,int fieldOfCalendar,int value){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(fieldOfCalendar,value);
+        return calendar.getTime();
+    }
     public static long diff(Date date1,Date date2){
         return (date1.getTime()-date2.getTime());
     }

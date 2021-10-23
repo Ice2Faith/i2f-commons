@@ -5,6 +5,8 @@ import i2f.commons.core.utils.safe.CheckUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ClassResolver {
     public static Class getClazz(String className) {
@@ -24,10 +26,21 @@ public class ClassResolver {
         Class<T> clazz = (Class<T>) obj.getClass();
         return clazz;
     }
-
+    public static<T> Set<Constructor<T>> getConstructors(Class<T> clazz){
+        Constructor<T>[] cons=(Constructor<T>[]) clazz.getConstructors();
+        Constructor<T>[] dcons=(Constructor<T>[])clazz.getDeclaredConstructors();
+        Set<Constructor<T>> set=new HashSet<>();
+        for(Constructor<T> item : cons){
+            set.add(item);
+        }
+        for(Constructor<T> item : dcons){
+            set.add(item);
+        }
+        return set;
+    }
     public static<T> T instance(Class<T> clazz,Object ... args){
-        Constructor<T>[] constructors=(Constructor<T>[]) clazz.getConstructors();
-        if(CheckUtil.isEmptyArray(constructors)){
+        Set<Constructor<T>> constructors=getConstructors(clazz);
+        if(CheckUtil.isEmptyCollection(constructors)){
             try {
                 return clazz.newInstance();
             } catch (InstantiationException e) {

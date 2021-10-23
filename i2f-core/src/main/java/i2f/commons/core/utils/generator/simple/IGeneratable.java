@@ -1,4 +1,4 @@
-package i2f.commons.core.utils.generator;
+package i2f.commons.core.utils.generator.simple;
 
 /**
  * @author ltb

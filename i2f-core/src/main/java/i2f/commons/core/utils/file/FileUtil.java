@@ -11,9 +11,8 @@ import i2f.commons.core.utils.str.AppendUtil;
 import i2f.commons.core.utils.str.StringUtil;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.nio.charset.Charset;
+import java.util.*;
 
 public class FileUtil {
     public static String getSpecies(String fileName) {
@@ -34,6 +33,26 @@ public class FileUtil {
             path.mkdirs();
         }
         return path;
+    }
+
+    /**
+     * 获取可由多级路径联合的可写文件对象，如果多级路径不存在，则自动建立
+     * @param path 至少一级路径
+     * @param subPaths 可多加后续路径
+     * @return
+     */
+    public static File getWritableFile(String path,String ... subPaths){
+        File file=new File(path);
+        if(subPaths!=null && subPaths.length>0){
+            for(String item : subPaths){
+                file=new File(file,item);
+            }
+        }
+        File parent=file.getParentFile();
+        if(parent!=null && !parent.exists()){
+            parent.mkdirs();
+        }
+        return file;
     }
 
     public static File getFile(String path, String subPath) {
@@ -352,5 +371,57 @@ public class FileUtil {
 
         reader.close();
         return ret;
+    }
+
+    public static<T> List<T> readCvsFile(File file, String sepRegex, boolean hasHeadLine, Charset charset,IMap<Map<String,String>,T> mapper) throws IOException {
+        List<Map<String,String>> data=readCvsFile(file, sepRegex, hasHeadLine, charset);
+        List<T> ret=new LinkedList<>();
+        for(Map<String,String> item : data){
+            T val= mapper.map(item);
+            ret.add(val);
+        }
+        return ret;
+    }
+
+    public static List<Map<String,String>> readCvsFile(File file, String sepRegex, boolean hasHeadLine, Charset charset) throws IOException {
+        List<Map<String,String>> ret=new LinkedList<>();
+        BufferedReader reader=new BufferedReader(new InputStreamReader(new FileInputStream(file),charset));
+        String[] heads=new String[0];
+        String line="";
+        boolean isFirst=true;
+        while((line=reader.readLine())!=null){
+            String[] elems=line.split(sepRegex);
+            if(isFirst){
+                isFirst=false;
+                if(hasHeadLine){
+                    heads=elems;
+
+                    continue;
+                }else{
+                    heads=new String[elems.length];
+                    for (int i = 0; i < elems.length; i++) {
+                        heads[i]=String.valueOf(i);
+                    }
+                }
+            }
+            Map<String,String> record=new HashMap<>((int)(heads.length/0.7));
+            for (int i = 0; i < heads.length; i++) {
+                record.put(heads[i],elems[i]);
+            }
+            ret.add(record);
+
+        }
+        reader.close();
+        return ret;
+    }
+
+    public static File convertByteStream(File inFile,File outFile,IMap<Byte,Byte> mapper) throws IOException {
+        InputStream is=new FileInputStream(inFile);
+        File uoutFile=useParentDir(outFile);
+        OutputStream os=new FileOutputStream(uoutFile);
+        DataUtil.convertByteStream(is,os,mapper);
+        is.close();
+        os.close();
+        return uoutFile;
     }
 }

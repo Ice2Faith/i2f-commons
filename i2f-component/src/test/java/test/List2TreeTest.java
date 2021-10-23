@@ -45,6 +45,8 @@ public class List2TreeTest {
 
         List<TreeItem> tree= ConvertUtil.list2Tree(list);
 
-        System.out.println(tree);
+
     }
+
+
 }

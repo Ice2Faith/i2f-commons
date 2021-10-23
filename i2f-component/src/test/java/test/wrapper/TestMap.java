@@ -1,12 +1,9 @@
 package test.wrapper;
 
-import i2f.commons.core.utils.jdbc.core.IJdbcMeta;
-import i2f.commons.core.utils.jdbc.core.JdbcDao;
-import i2f.commons.core.utils.jdbc.generate.DbGenerator;
-import i2f.commons.core.utils.jdbc.generate.core.DbResolver;
-import i2f.commons.core.utils.jdbc.generate.data.DbGenType;
-import i2f.commons.core.utils.jdbc.generate.data.GenerateContext;
-import i2f.commons.core.utils.jdbc.generate.data.TableMeta;
+import i2f.commons.core.data.BinTreeNode;
+import i2f.commons.core.data.Pair;
+import i2f.commons.core.data.Triple;
+import i2f.commons.core.utils.db.DBClassUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -28,29 +25,30 @@ public class TestMap {
 //            System.out.println(item);
 //        }
 
-        IJdbcMeta meta=TestWrapperJdbc.getJdbcMeta();
-        JdbcDao dao=new JdbcDao(meta);
-        TableMeta tm= DbResolver.getTableMeta(dao.getTransactionManager().getConnection(),"NoteT");
 
-        GenerateContext ctx= GenerateContext.build()
-                .basePackage("com.i2f")
-                .author("Ugex.Savelar")
-                .table(tm).types(DbGenType.ALL)
-                .save2File(true)
-                .savePath("D:\\IDEA_ROOT\\i2f-commons\\i2f-component\\src\\test\\java")
-                .done();
-
-        ctx= DbGenerator.genCodeFiles(ctx);
-
-
-//        String sql=DBClassUtil.genCreateTableByBean(UserBean.class);
-//        System.out.println(sql);
+//        IJdbcMeta meta=TestWrapperJdbc.getJdbcMeta();
+//        JdbcDao dao=new JdbcDao(meta);
+//        TableMeta tm= DbResolver.getTableMeta(dao.getTransactionManager().getConnection(),"NoteT");
 //
-//        sql=DBClassUtil.genDropTableByBean(UserBean.class,true);
-//        System.out.println(sql);
+//        GenerateContext ctx= GenerateContext.build()
+//                .basePackage("com.i2f")
+//                .author("Ugex.Savelar")
+//                .table(tm).types(DbGenType.ALL)
+//                .save2File(true)
+//                .savePath("D:\\IDEA_ROOT\\i2f-commons\\i2f-component\\src\\test\\java")
+//                .done();
 //
-//        System.out.println("-----------------------");
-//        sql=DBClassUtil.genTablesByBean(true,UserBean.class, BinTreeNode.class, Pair.class, Triple.class);
-//        System.out.println(sql);
+//        ctx= DbGenerator.genCodeFiles(ctx);
+
+
+        String sql= DBClassUtil.genCreateTableByBean(UserBean.class);
+        System.out.println(sql);
+
+        sql=DBClassUtil.genDropTableByBean(UserBean.class,true);
+        System.out.println(sql);
+
+        System.out.println("-----------------------");
+        sql=DBClassUtil.genTablesByBean(true,UserBean.class, BinTreeNode.class, Pair.class, Triple.class);
+        System.out.println(sql);
     }
 }

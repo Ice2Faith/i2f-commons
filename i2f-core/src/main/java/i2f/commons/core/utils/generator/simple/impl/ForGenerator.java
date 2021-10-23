@@ -1,6 +1,6 @@
-package i2f.commons.core.utils.generator.impl;
+package i2f.commons.core.utils.generator.simple.impl;
 
-import i2f.commons.core.utils.generator.IGeneratable;
+import i2f.commons.core.utils.generator.simple.IGeneratable;
 import lombok.Data;
 
 import java.lang.reflect.Array;
