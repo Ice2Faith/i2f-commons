@@ -31,6 +31,9 @@ public class ObjectFinder {
      * @return
      */
     public static Object getObjectByDotKeyWithReference(Object obj, String dotKey){
+        return getObjectByDotKeyWithReference(obj, dotKey,null);
+    }
+    public static Object getObjectByDotKeyWithReference(Object obj, String dotKey,List<String> baseRefPackages){
         String simpleDotKey=dotKey;
         String referenceDotKey=null;
         if(dotKey!=null){
@@ -43,7 +46,7 @@ public class ObjectFinder {
 
 
         Object val=getObjectByDotKey(obj,simpleDotKey);
-        val= ObjectFinder.referenceDotKeyConvert(val,referenceDotKey);
+        val= ObjectFinder.referenceDotKeyConvert(val,referenceDotKey,baseRefPackages);
         return val;
     }
 
@@ -63,12 +66,10 @@ public class ObjectFinder {
         if(dotKey==null || "".equals(dotKey)){
             return obj;
         }
+        dotKey=dotKey.trim();
         String[] keys=dotKey.split("\\.",2);
         Class clazz=obj.getClass();
         if(keys.length==0){
-            return obj;
-        }
-        if(clazz.getName().startsWith("java.lang.")){
             return obj;
         }
         String curKey=keys[0];
@@ -76,6 +77,22 @@ public class ObjectFinder {
         if(keys.length>1){
             nextKey=keys[1];
         }
+        if("null".equals(curKey)){
+            return null;
+        }
+        if("true".equals(curKey)){
+            return true;
+        }
+        if("false".equals(curKey)){
+            return false;
+        }
+        if("class".equals(curKey)){
+            return obj.getClass();
+        }
+        if(clazz.getName().startsWith("java.lang.")){
+            return obj;
+        }
+
         if(clazz.isArray()){
             if(curKey.matches("\\[.+\\]")){
                 int idx=Integer.parseInt(curKey.substring(1,curKey.length()-1));
@@ -143,9 +160,17 @@ public class ObjectFinder {
      * @return
      */
     public static Object referenceDotKeyConvert(Object obj,String dotKey){
-        if(obj==null){
-            return obj;
-        }
+        return referenceDotKeyConvert(obj, dotKey,null);
+    }
+
+    /**
+     * 是上个函数的底层依赖，支持@方法指定包名前缀，以减少模板中全类名的书写
+     * @param obj
+     * @param dotKey
+     * @param basePackages
+     * @return
+     */
+    public static Object referenceDotKeyConvert(Object obj,String dotKey,List<String> basePackages){
         if(dotKey==null ||"".equals(dotKey)){
             return obj;
         }
@@ -153,6 +178,18 @@ public class ObjectFinder {
         if(dotKey==null || "".equals(dotKey)){
             return obj;
         }
+        if(basePackages==null){
+            basePackages=new ArrayList<>();
+        }
+        /**
+         * 添加默认java的基本包
+         */
+        basePackages.add(0,"java.io");
+        basePackages.add(0,"java.time");
+        basePackages.add(0,"java.math");
+        basePackages.add(0,"java.util");
+        basePackages.add(0,"java.lang");
+
         String refClassName=null;
         String refMethodName=dotKey;
         int idx=dotKey.lastIndexOf(".");
@@ -164,28 +201,22 @@ public class ObjectFinder {
         if(refClassName!=null && !"".equals(refClassName)){
             refClass= ClassResolver.getClazz(refClassName);
         }
-        if(refClass==null){
-            String langRefCLass="java.lang."+refClassName;
-            refClass=ClassResolver.getClazz(langRefCLass);
+        if(basePackages!=null){
+            for(String item : basePackages){
+                if(refClass!=null){
+                    break;
+                }
+                String langRefCLass=item+"."+refClassName;
+                refClass=ClassResolver.getClazz(langRefCLass);
+            }
         }
         if(refClass==null){
-            String utilRefClass="java.util."+refClassName;
-            refClass=ClassResolver.getClazz(utilRefClass);
+            if(obj!=null) {
+                refClass = obj.getClass();
+            }
         }
-        if(refClass==null){
-            String mathRefClass="java.math."+refClassName;
-            refClass=ClassResolver.getClazz(mathRefClass);
-        }
-        if(refClass==null){
-            String timeRefClass="java.time."+refClassName;
-            refClass=ClassResolver.getClazz(timeRefClass);
-        }
-        if(refClass==null){
-            String ioRefClass="java.io."+refClassName;
-            refClass=ClassResolver.getClazz(ioRefClass);
-        }
-        if(refClass==null){
-            refClass=obj.getClass();
+        if("class".equals(refMethodName)){
+            return getConvertObjectByClass(obj,refClass);
         }
         if("instanceof".equals(refMethodName)){
             return getConvertObjectByConstructor(obj, refClass);
@@ -232,6 +263,12 @@ public class ObjectFinder {
         return null;
     }
 
+    public static Object getConvertObjectByClass(Object obj,Class refClass){
+        if(obj!=null){
+            return obj.getClass();
+        }
+        return refClass;
+    }
     public static Object getConvertObjectByMethodName(Object obj, Class refClass, String refMethodName) {
         List<Method> methods= MethodResolver.getMethods(refClass,false, refMethodName);
         if(methods.size()==0){

@@ -54,7 +54,6 @@ public class SimpleGenerator {
                             if(pch=='}'){
                                 idx+=i+1;
                                 String param=argBuilder.toString();
-                                System.out.println("param find:"+param);
                                 appendParam(builder,param,params);
                             }else{
                                 int k=0;

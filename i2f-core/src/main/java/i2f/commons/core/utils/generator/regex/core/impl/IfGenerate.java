@@ -26,6 +26,7 @@ public class IfGenerate implements IGenerate {
     public Object data;
     public String template;
     public String test;
+    public List<String> basePackages;
 
     @Override
     public String gen() {
@@ -49,7 +50,7 @@ public class IfGenerate implements IGenerate {
             Map<String,Object> ctx=new HashMap<>();
 
             param.put("_ctx",ctx);
-            String str= RegexGenerator.render(template,param,mapper);
+            String str= RegexGenerator.render(template,param,mapper,basePackages);
             builder.append(str);
         }else{
             String str= mapper.map(data);
@@ -81,7 +82,6 @@ public class IfGenerate implements IGenerate {
             Pair<String,String> pair=new Pair<>(lastGroup,cond);
             lastGroup=group;
             conds.add(pair);
-            System.out.println("cond:"+pair);
         }
         String cond=test.substring(lidx);
         if(!"".equals(cond)){
@@ -133,8 +133,6 @@ public class IfGenerate implements IGenerate {
         if(!"".equals(bexp)){
             bexp=bexp.substring(2);
         }
-
-        System.out.println("bexpress:"+bexp);
 
         boolean retVal = calcBooleanResult(bconds);
 
@@ -403,6 +401,23 @@ public class IfGenerate implements IGenerate {
                 }
             }
             return false;
+        }else if("instanceof".equals(ope)){
+            if(left==null){
+                return false;
+            }
+            if(right==null){
+                return false;
+            }
+            if(!(right instanceof Class)){
+                return false;
+            }
+            Class lclazz=left.getClass();
+            Class rclazz=(Class)right;
+            return rclazz.isInstance(left);
+        }else if("match".equals(ope)){
+            String sleft=String.valueOf(left);
+            String sright=String.valueOf(right);
+            return sleft.matches(sright);
         }
 
         return false;
@@ -414,15 +429,6 @@ public class IfGenerate implements IGenerate {
         }else if(str.matches(RegexGenerator.SINGLE_QUOTE_STRING_REGEX)){
             return str.substring(1,str.length()-1);
         }else if(str.matches(RegexGenerator.OBJECT_FIELD_ROUTE_REGEX)){
-            if("null".equals(str)){
-                return null;
-            }
-            if("true".equals(str)){
-                return true;
-            }
-            if("false".equals(str)){
-                return false;
-            }
             return ObjectFinder.getObjectByDotKeyWithReference(param,str);
         }
         return null;
@@ -435,15 +441,15 @@ public class IfGenerate implements IGenerate {
         if(matcher.find()){
             MatchResult result=matcher.toMatchResult();
             String group=matcher.group();
-            trp.sec=group;
-            trp.fst=cond.substring(0, result.start());
-            trp.trd=cond.substring(result.end());
+            trp.sec=group.trim();
+            trp.fst=cond.substring(0, result.start()).trim();
+            trp.trd=cond.substring(result.end()).trim();
         }
 
         return trp;
     }
 
     public static final String NUMBER_REGEX ="[+|-]?(0|[1-9][0-9]*(.[0-9]+)?)";
-    public static final String OPERATOR_REGEX ="==|\\!=|\\>=|\\<=|\\>|\\<";
+    public static final String OPERATOR_REGEX ="==|\\!=|\\>=|\\<=|\\>|\\<|instanceof|match";
     public static final String CONDITION_REGEX=RegexGenerator.OBJECT_FIELD_ROUTE_REGEX+"\\s*("+ OPERATOR_REGEX +")\\s*(("+RegexGenerator.OBJECT_FIELD_ROUTE_REGEX+")|("+ NUMBER_REGEX +")|("+RegexGenerator.SINGLE_QUOTE_STRING_REGEX+"))";
 }

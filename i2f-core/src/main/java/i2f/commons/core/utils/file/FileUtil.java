@@ -11,6 +11,7 @@ import i2f.commons.core.utils.str.AppendUtil;
 import i2f.commons.core.utils.str.StringUtil;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -306,6 +307,22 @@ public class FileUtil {
         fos.close();
     }
 
+    public static String loadTxtFile(File file,Charset charset) throws IOException {
+        StringBuilder builder=new StringBuilder();
+        InputStream is=new FileInputStream(file);
+        InputStreamReader reader=new InputStreamReader(is,charset);
+        char[] cbuf=new char[2048];
+        int len=0;
+        while((len=reader.read(cbuf))>0){
+            builder.append(cbuf,0,len);
+        }
+        reader.close();
+        return builder.toString();
+    }
+    public static String loadTxtFile(File file) throws IOException {
+        Charset charset=Charset.forName("UTF-8");
+        return loadTxtFile(file,charset);
+    }
     public static List<String> readTxtFile(File file) throws IOException {
         return readTxtFile(file, 0, -1, false, false);
     }
@@ -423,5 +440,24 @@ public class FileUtil {
         is.close();
         os.close();
         return uoutFile;
+    }
+
+    /**
+     * 支持classpath写法
+     * @param fileName
+     * @return
+     */
+    public static File getFileWithClasspath(String fileName){
+        if(fileName==null){
+            return null;
+        }
+        fileName=fileName.trim();
+        if(fileName.startsWith("classpath:")){
+            String fname=fileName.substring("classpath:".length());
+            URL url=Thread.currentThread().getContextClassLoader().getResource(fname);
+            return new File(url.getFile());
+        }else{
+            return new File(fileName);
+        }
     }
 }

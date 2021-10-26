@@ -24,6 +24,7 @@ public class ForGenerate implements IGenerate {
     public String template;
     public String blank;
     public String jump;
+    public List<String> basePackages;
 
     @Override
     public String gen() {
@@ -102,7 +103,7 @@ public class ForGenerate implements IGenerate {
                 ctx.put("index",idx);
 
                 param.put("_ctx",ctx);
-                str= RegexGenerator.render(template,param,mapper);
+                str= RegexGenerator.render(template,param,mapper,basePackages);
             }else{
                 str= mapper.map(val);
             }

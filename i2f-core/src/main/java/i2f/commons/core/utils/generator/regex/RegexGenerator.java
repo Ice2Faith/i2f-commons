@@ -6,8 +6,11 @@ import i2f.commons.core.utils.generator.regex.core.impl.ForGenerate;
 import i2f.commons.core.utils.generator.regex.core.impl.IfGenerate;
 import i2f.commons.core.utils.generator.regex.data.JsonControlMeta;
 import i2f.commons.core.utils.generator.regex.impl.DefaultValueMapper;
+import i2f.commons.core.utils.generator.regex.impl.FileTemplateLoader;
+import i2f.commons.core.utils.reflect.core.resolver.base.ClassResolver;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -128,8 +131,11 @@ public class RegexGenerator {
     }
 
     public static String render(String template,Map<String,Object> param){
+        return render(template, param,null);
+    }
+    public static String render(String template, Map<String,Object> param, List<String> basePackages){
         IMap<Object,String> mapper=new DefaultValueMapper();
-        return render(template, param,mapper);
+        return render(template, param,mapper,basePackages);
     }
     /**
      * 在generate基础之上，前置一层进行支持for解析
@@ -167,11 +173,21 @@ public class RegexGenerator {
      * 左右值支持true、false、null三个特殊值，以及数值和单引号包含的字符串，当然JSON表达式对应对象也行
      * template部分，和for解析部分一致,但是没有_ctx环境变量(_ctx变量为空对象)
      *
+     * tpl表达式
+     * #{[tpl,templateId],template="",load="",key=""}
+     * tpl必填
+     * templateId必填，将用于管理所有模板的ID，
+     * 这个ID可用于其他表达式使用ref时指定，取值方式：_tpl.templateId
+     * 也就是说会添加一个模板的收纳根_tpl
+     * template值即为模板字符串
+     * load可以指定一个模板加载器类，IMap<String,String>的实现类，
+     *  key的值就作为load这个接口实现类的入参
+     *  load可以不指定，默认会使用默认的文件加载类，key指定文件路径即可
      * @param template
      * @param param
      * @return
      */
-    public static String render(String template,Map<String,Object> param,IMap<Object,String> mapper){
+    public static String render(String template,Map<String,Object> param,IMap<Object,String> mapper,List<String> basePackages){
         Map<String,Object> preparedParam=new HashMap<>();
         for(Map.Entry<String, Object> item : param.entrySet()){
             preparedParam.put(item.getKey(),item.getValue());
@@ -208,13 +224,14 @@ public class RegexGenerator {
 
                 String tplId=meta.parameters.get("ref");
                 if(tplId!=null){
-                    if(param.containsKey(tplId)){
-                        Object val=param.get(tplId);
+                    Object optp=ObjectFinder.getObjectByDotKeyWithReference(param,tplId);
+                    if(optp!=null){
+                        Object val=optp;
                         tpl= mapper.map(val);
                     }
                 }
 
-                Object obj= ObjectFinder.getObjectByDotKeyWithReference(param,meta.routeExpression);
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(param,meta.routeExpression,basePackages);
 
                 ForGenerate genFor=new ForGenerate();
                 genFor.template=tpl;
@@ -226,8 +243,7 @@ public class RegexGenerator {
                 genFor.suffix=suffix;
                 genFor.blank=blank;
                 genFor.jump=jump;
-
-                System.out.println("genFor:"+genFor);
+                genFor.basePackages=basePackages;
 
                 String key="_for_tmp_"+tmpIdx;
                 builder.append("${").append(key).append("}");
@@ -243,13 +259,14 @@ public class RegexGenerator {
 
                 String tplId=meta.parameters.get("ref");
                 if(tplId!=null){
-                    if(param.containsKey(tplId)){
-                        Object val=param.get(tplId);
+                    Object optp=ObjectFinder.getObjectByDotKeyWithReference(param,tplId);
+                    if(optp!=null){
+                        Object val=optp;
                         tpl= mapper.map(val);
                     }
                 }
 
-                Object obj= ObjectFinder.getObjectByDotKeyWithReference(param,meta.routeExpression);
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(param,meta.routeExpression,basePackages);
 
                 IfGenerate genIf=new IfGenerate();
                 genIf.root=param;
@@ -257,11 +274,28 @@ public class RegexGenerator {
                 genIf.mapper=mapper;
                 genIf.template=tpl;
                 genIf.test=test;
+                genIf.basePackages=basePackages;
 
-                System.out.println("genIf:"+genIf);
                 String key="_if_tmp_"+tmpIdx;
                 builder.append("${").append(key).append("}");
                 preparedParam.put(key,genIf);
+            }else if("tpl".equals(meta.action)){
+                String tplId=meta.routeExpression;
+                String tpl=meta.parameters.get("template");
+
+                String key=meta.parameters.get("key");
+                if(key!=null && !"".equals(key)) {
+                    String load = meta.parameters.get("load");
+                    String ltpl = loadTemplate(load, key);
+                    if(ltpl!=null && !"".equals(ltpl)){
+                        tpl=ltpl;
+                    }
+                }
+                if(!param.containsKey("_tpl")){
+                    param.put("_tpl",new HashMap<String,String>());
+                }
+                Map<String,String> tpls=(Map<String,String>)param.get("_tpl");
+                tpls.put(tplId,tpl);
             }
 
             tmpIdx++;
@@ -269,8 +303,23 @@ public class RegexGenerator {
         builder.append(template.substring(lidx));
 
         String preparedTemplate=builder.toString();
-System.out.println("prepare:"+preparedTemplate);
-        return generate(preparedTemplate,preparedParam,mapper);
+        return generate(preparedTemplate,preparedParam,mapper,basePackages);
+    }
+
+    private static String loadTemplate(String loaderClass,String loadKey){
+        IMap<String,String> loader=null;
+        if(loaderClass!=null && !"".equals(loaderClass)){
+            Class clazz= ClassResolver.getClazz(loaderClass);
+            if(clazz!=null){
+                loader=(IMap<String,String>)ClassResolver.instance(clazz);
+            }
+        }else{
+            loader=new FileTemplateLoader();
+        }
+        if(loader!=null){
+            return loader.map(loadKey);
+        }
+        return null;
     }
 
     /**
@@ -281,7 +330,7 @@ System.out.println("prepare:"+preparedTemplate);
      */
     public static String generate(String template,Object param){
         IMap<Object,String> mapper=new DefaultValueMapper();
-        return generate(template, param,mapper);
+        return generate(template, param,mapper,null);
     }
 
     /**
@@ -292,7 +341,7 @@ System.out.println("prepare:"+preparedTemplate);
      * @param mapper 参数映射器
      * @return 模板渲染结果
      */
-    public static String generate(String template, Object param, IMap<Object,String> mapper){
+    public static String generate(String template, Object param, IMap<Object,String> mapper,List<String> basePackages){
         StringBuilder builder=new StringBuilder((int)(template.length()*1.5));
         Pattern pattern=Pattern.compile(JSON_PARAM_REGEX);
         Matcher matcher=pattern.matcher(template);
@@ -304,7 +353,7 @@ System.out.println("prepare:"+preparedTemplate);
             lidx=result.end();
             String group=matcher.group();
             String regItem= group.substring(2,group.length()-1);
-            Object val= ObjectFinder.getObjectByDotKeyWithReference(param,regItem);
+            Object val= ObjectFinder.getObjectByDotKeyWithReference(param,regItem,basePackages);
             String part=mapper.map(val);
             builder.append(part);
         }

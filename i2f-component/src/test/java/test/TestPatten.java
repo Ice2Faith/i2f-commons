@@ -3,16 +3,18 @@ package test;
 import i2f.commons.core.data.Pair;
 import i2f.commons.core.data.interfaces.IMap;
 import i2f.commons.core.utils.data.ContainerUtil;
-import i2f.commons.core.utils.generator.regex.core.ObjectFinder;
+import i2f.commons.core.utils.generator.regex.RegexGenerator;
 import i2f.commons.core.utils.generator.regex.core.impl.IfGenerate;
 import i2f.commons.core.utils.generator.simple.IGeneratable;
-import i2f.commons.core.utils.generator.regex.RegexGenerator;
 import i2f.commons.core.utils.generator.simple.impl.ForGenerator;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author ltb
@@ -20,12 +22,19 @@ import java.util.*;
  */
 public class TestPatten {
     public static void main(String[] args2){
-        testEmbedGen();
+//        testEmbedGen();
+//
+//
+//        Object val= ObjectFinder.referenceDotKeyConvert(1,"Math.exp");
+//
+//        System.out.println("val:"+val);
+
+//        Map<String, Object> param=new HashMap<>();
+//        param.put("obj",1);
+//        boolean rs=IfGenerate.getCondResult(new Triple<String,String,String>(
+//                "obj","instanceof","_@Integer.class"),param);
 
 
-        Object val= ObjectFinder.referenceDotKeyConvert(1,"Math.exp");
-
-        System.out.println("val:"+val);
     }
 
 
@@ -167,7 +176,7 @@ public class TestPatten {
             public String map(Object val) {
                 return String.valueOf(val);
             }
-        });
+        },null);
         System.out.println(rs);
     }
 
