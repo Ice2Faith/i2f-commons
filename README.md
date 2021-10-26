@@ -45,6 +45,56 @@ commons util package project for java devlop
 - just include the jar i2f-core.jar
 
 # update log
+- 2021-10-26 17h
+    - add generator grammer tpl
+        - tpl expression: #{[tpl,tplId],template="",load="",key=""}
+        - it mean's that
+        - load a template name as tplId add into binding param obj's _tpl root
+        - template: this template str
+        - load: define the template loader which implements IMap<String,String> interface
+        - key: define the template loader load from where ,the same as loader.map method's in param
+        - when key is declared,template will be rewrite
+        - when load not declared,use default file loader which support classpath path
+        - what is it support?
+            - to implement more complex template to render
+            - to support multi-template file use
+            - to simplify template embed
+            - to subtract quote string and long template string direct write into template argument space
+        - how to create myself template file?
+            - you can see i2f-core/resources/tpl
+            - and try to build yourself template   
+    - add database table generate java files for spring+mybatis
+        - it's base on generator and jdbc meta info
+        - you can edit yourself template file
+        - and give it the binding param
+        - your code will auto bulding
+        - how to generate code files
+```java
+        //get the jdbc connection
+        JdbcDao dao=getDao();
+        Connection conn=dao.getTransactionManager().getConnection();
+        //get table info from connection
+        TableMeta meta= DbResolver.getTableMeta(conn,"student_course");
+
+        //setting binding param
+        GenerateContext ctx=new GenerateContext();
+        //which table info
+        ctx.meta=meta;
+        //which base package
+        ctx.basePackage="com.i2f";
+        //who is the author
+        ctx.author="ltb";
+
+        //result save as file
+        ctx.save2File=true;
+        //build all type
+        ctx.genType= DbGenType.ALL.getCode();
+        //file save root dir
+        ctx.savePath="D:\\i2f-component\\src\\test\\java";
+
+        //do the task
+        DbTplGenerator.genCodeFiles(ctx);
+```
 - 2021-10-23 16h
     - add simple generator 
         - which base on Regex Patten and Reflect
