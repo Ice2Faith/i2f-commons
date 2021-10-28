@@ -2,9 +2,12 @@ window.$jtl={
     // 重新加载JS文件
     // 示例：
     // reloadJs('jsDataId','/static/data.js');
+    dom(name){
+        return document.createElement(name);
+    },
     reloadJs(id,src){
         document.getElementById(id).remove();
-        var scriptObj = document.createElement("script");
+        var scriptObj = this.dom("script");
         scriptObj.src = src;
         scriptObj.type = "text/javascript";
         scriptObj.id = id;
@@ -91,75 +94,96 @@ window.$jtl={
         // 以上述配置开始观察目标节点
         observer.observe(targetNode, config);
     },
-    parseDate(date){
-        let ret=new Date();
-        let year=ret.getFullYear();
-        let month=ret.getMonth();
-        let day=ret.getDate();
-        let hour=ret.getHours();
-        let min=ret.getMinutes();
-        let sec=ret.getSeconds();
-        let msec=ret.getMilliseconds();
-        if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \d{3}$/.test(date)){
-            year=date.substring(0,4);
-            month=date.substring(5,7)-1;
-            day=date.substring(8,10);
-            hour=date.substring(11,13);
-            min=date.substring(14,16);
-            sec=date.substring(17,19);
-            msec=date.substring(20,23);
-        }else if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(date)){
-            year=date.substring(0,4);
-            month=date.substring(5,7)-1;
-            day=date.substring(8,10);
-            hour=date.substring(11,13);
-            min=date.substring(14,16);
-            sec=date.substring(17,19);
-            msec=0;
-        }else if(/^\d{4}-\d{2}-\d{2}$/.test(date)){
-            year=date.substring(0,4);
-            month=date.substring(5,7)-1;
-            day=date.substring(8,10);
-            hour=0;
-            min=0;
-            sec=0;
-            msec=0;
-        }else if(/^\d{4}-\d{2}$/.test(date)){
-            year=date.substring(0,4);
-            month=date.substring(5,7)-1;
-            day=1;
-            hour=0;
-            min=0;
-            sec=0;
-            msec=0;
-        }else if(/^\d{4}$/.test(date)){
-            year=date.substring(0,4);
-            month=1-1;
-            day=1;
-            hour=0;
-            min=0;
-            sec=0;
-            msec=0;
-        }else if(/^\d{4}\d{2}\d{2}$/.test(date)){
-            year=date.substring(0,4);
-            month=date.substring(4,6)-1;
-            day=date.substring(6,8);
-            hour=0;
-            min=0;
-            sec=0;
-            msec=0;
-        }else if(/^\d{4}\d{2}$/.test(date)){
-            year=date.substring(0,4);
-            month=date.substring(4,6)-1;
-            day=1;
-            hour=0;
-            min=0;
-            sec=0;
-            msec=0;
+    firstDayOfYear:function(date){
+        if(!date){
+            date=new Date();
         }
-        return new Date(year,month,day,hour,min,sec,msec);
+        date.setMonth(0);
+        date.setDate(1);
+        return date;
     },
-    formatDate(date,patten){
+    firstDayOfMonth:function(date){
+        if(!date){
+            date=new Date();
+        }
+        date.setDate(1);
+        return date;
+    },
+    lastDayOfYear:function(date){
+        if(!date){
+            date=new Date();
+        }
+        date.setMonth(0);
+        date.setDate(1);
+        date.setFullYear(date.getFullYear()+1);
+        date.setMonth(0);
+        date.setDate(1);
+        date.setDate(date.getDate()-1);
+        return date;
+    },
+    lastDayOfMonth:function (date){
+        if(!date){
+            date=new Date();
+        }
+        date.setDate(1);
+        date.setMonth(date.getMonth()+1);
+        date.setDate(1);
+        date.setDate(date.getDate()-1);
+        return date;
+    },
+    lastDayOfPreviousMonth:function(date){
+        date=this.firstDayOfMonth(date);
+        date.setDate(1);
+        date.setDate(date.getDate()-1);
+        return date;
+    },
+    firstDayOfNextMonth:function(date){
+        date=this.firstDayOfMonth(date);
+        date.setMonth(date.getMonth()+1);
+        return date;
+    },
+    mondayOfDate:function(date){
+        if(!date){
+            date=new Date(0);
+        }
+        let day=date.getDate();
+        let week=date.getDay();
+        date.setDate(day-week+1);
+        return date;
+    },
+    sundayOfDate:function(date){
+        if(!date){
+            date=new Date();
+        }
+        let day=date.getDate();
+        let week=date.getDay();
+        date.setDate(day+(7-week));
+        return date;
+    },
+    nextMonday:function(date){
+        date=this.mondayOfDate(date);
+        date.setDate(date.getDate()+7);
+        return date;
+    },
+    previousSunday:function(date){
+        date=this.sundayOfDate(date);
+        date.setDate(date.getDate()-7);
+        return date;
+    },
+    /**
+     * 将日期date按照patten进行格式化为字符串
+     * 支持的格式段：yyyy,MM,dd,HH,mm,ss,SSS,hh,y,M,d,H,m,s,S,h
+     * @param date
+     * @param patten
+     * @returns {string}
+     */
+    formatDate:function(date,patten){
+        if(!date){
+            date=new Date();
+        }
+        if(!patten || patten==''){
+            patten='yyyy-MM-dd HH:mm:ss SSS';
+        }
         let year=date.getFullYear();
         let month=date.getMonth()+1;
         let day=date.getDate();
@@ -168,48 +192,91 @@ window.$jtl={
         let sec=date.getSeconds();
         let msec=date.getMilliseconds();
 
-        let phour=hour%12;
-        if(year<10){
-            year='000'+year;
-        }else if(year<100){
-            year='00'+year;
-        }else if(year<1000){
-            year='0'+year;
-        }
-        if(month<10){
-            month='0'+month;
-        }
-        if(day<10){
-            day='0'+day;
-        }
-        if(hour<10){
-            hour='0'+hour;
-        }
-        if(min<10){
-            min='0'+min;
-        }
-        if(sec<10){
-            sec='0'+sec;
-        }
-        if(msec<10){
-            msec='00'+msec;
-        }else if(msec<100){
-            msec='0'+msec;
-        }
-        if(phour<10){
-            phour='0'+phour;
-        }
-        patten=this.replaceAll(patten,'yyyy',year);
-        patten=this.replaceAll(patten,'MM',month);
-        patten=this.replaceAll(patten,'dd',day);
-        patten=this.replaceAll(patten,'HH',hour);
-        patten=this.replaceAll(patten,'mm',min);
-        patten=this.replaceAll(patten,'ss',sec);
-        patten=this.replaceAll(patten,'SSS',msec);
-        patten=this.replaceAll(patten,'hh',phour);
+        let hour12=hour>12?(hour-12):hour;
+        let isAm=hour<12;
 
-        return patten;
+        let ret=patten;
+        ret=this.replaceAll(ret,'yyyy',this.paddingString(year,4,'0'));
+        ret=this.replaceAll(ret,'MM',this.paddingString(month,2,'0'));
+        ret=this.replaceAll(ret,'dd',this.paddingString(day,2,'0'));
+        ret=this.replaceAll(ret,'HH',this.paddingString(hour,2,'0'));
+        ret=this.replaceAll(ret,'mm',this.paddingString(min,2,'0'));
+        ret=this.replaceAll(ret,'ss',this.paddingString(sec,2,'0'));
+        ret=this.replaceAll(ret,'SSS',this.paddingString(msec,3,'0'));
+        ret=this.replaceAll(ret,'hh',this.paddingString(hour12,2,'0'));
+
+        ret=this.replaceAll(ret,'y',this.paddingString(year,0));
+        ret=this.replaceAll(ret,'M',this.paddingString(month,0));
+        ret=this.replaceAll(ret,'d',this.paddingString(day,0));
+        ret=this.replaceAll(ret,'H',this.paddingString(hour,0));
+        ret=this.replaceAll(ret,'m',this.paddingString(min,0));
+        ret=this.replaceAll(ret,'s',this.paddingString(sec,0));
+        ret=this.replaceAll(ret,'S',this.paddingString(msec,0));
+        ret=this.replaceAll(ret,'h',this.paddingString(hour12,0));
+
+        return ret;
+
     },
+    /**
+     * 支持将字符串str按照patten格式解析为日期Date对象
+     * 支持的格式段：yyyy,MM,dd,HH,mm,ss,SSS
+     * 也就是标准Java格式
+     * @param str
+     * @param patten
+     * @returns {Date}
+     */
+    parseDate:function(str,patten){
+        str=str+'';
+        if(!patten){
+            patten='yyyy-MM-dd HH:mm:ss SSS';
+        }
+        let idxYear4=patten.indexOf('yyyy');
+        let idxMonth2=patten.indexOf('MM');
+        let idxDay2=patten.indexOf('dd');
+        let idxHour2=patten.indexOf('HH');
+        let idxMin2=patten.indexOf('mm');
+        let idxSec2=patten.indexOf('ss');
+        let idxMsec3=patten.indexOf('SSS');
+        let idxHour122=patten.indexOf('hh');
+
+        let year=1980;
+        let month=undefined;
+        let day=undefined;
+        let hour=undefined;
+        let min=undefined;
+        let sec=undefined;
+        let msec=undefined;
+
+        if(idxYear4>=0){
+            year=parseInt(str.substring(idxYear4,idxYear4+4));
+        }
+        if(idxMonth2>=0){
+            month=parseInt(str.substring(idxMonth2,idxMonth2+2));
+        }
+        if(idxDay2>=0){
+            day=parseInt(str.substring(idxDay2,idxDay2+2));
+        }
+        if(idxHour2>=0){
+            hour=parseInt(str.substring(idxHour2,idxHour2+2));
+        }
+        if(idxMin2>=0){
+            min=parseInt(str.substring(idxMin2,idxMin2+2));
+        }
+        if(idxSec2>=0){
+            sec=parseInt(str.substring(idxSec2,idxSec2+2));
+        }
+        if(idxMsec3>=0){
+            msec=parseInt(str.substring(idxMsec3,idxMsec3+3));
+        }
+        return new Date(year,month-1,day,hour,min,sec,msec);
+    },
+    /**
+     * 使用split&join方式实现replaceAll,
+     * 由于部分浏览器不支持replaceAll函数
+     * @param str
+     * @param reg
+     * @param rep
+     */
     replaceAll(str,reg,rep){
         let ret='';
         let arr=str.split(reg);
@@ -221,6 +288,35 @@ window.$jtl={
             ret+=item;
             isFirst=false;
         }
+    },
+    /**
+     * 对str字符串填充到指定长度使用pad字符串进行填充
+     * pad长度不足以填充时，pad将会重复用来填充
+     * @param str
+     * @param len
+     * @param pad
+     * @returns {string}
+     */
+    paddingString:function(str,len,pad){
+        str=str+'';
+        pad=pad+'';
+        len=parseInt(len);
+        if(str.length>=len){
+            return str;
+        }
+        if(pad==''){
+            pad=' ';
+        }
+        let diffLen=len-str.length;
+        let padStr='';
+        let padLen=pad.length;
+        let times=Math.floor(diffLen/padLen);
+        for(let i=0;i<times;i++){
+            padStr=padStr+pad;
+        }
+        let moreLen=len-padStr.length;
+        padStr=padStr+pad.substring(0,moreLen);
+        return padStr+str;
     },
     notNull(obj){
         return obj!=null && obj!=undefined;
