@@ -34,7 +34,7 @@ public class FmtGenerate implements IGenerate {
 
     private Object[] getFormatValues(){
         if(values==null || "".equals(values)){
-            return new Object[0];
+            return new Object[]{data};
         }
 
         String[] keys=values.split(",");

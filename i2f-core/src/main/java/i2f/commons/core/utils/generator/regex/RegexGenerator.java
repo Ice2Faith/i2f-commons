@@ -200,7 +200,7 @@ public class RegexGenerator {
      * 用于对传入JSON表达式对象进行格式化模板
      * 参照String.format方法
      * format即为格式化字符串
-     * values即为取值
+     * values即为取值，可以不指定，则表达式的取值作为参数
      * 举例：
      * #{[fmt,env.args[2]],format="%02x-%02x",values="_item[0],_item[1]"}
      * 所以函数等价于：
@@ -215,7 +215,17 @@ public class RegexGenerator {
      * 举例：
      * ${[datefmt,env.date],format="yyyy-MM-DD HH:mm:ss SSS"}
      *
-     *
+     * trim表达式
+     * #{[trim,env.data],prefix="",suffix="",sensible="",trimBefore="",trimAfter="",template="",ref=""}
+     * 作用是去除env.data在渲染之后的字符串结果，去除前缀和后缀，并且可以设置是否大小写敏感
+     * prefix:要去除的前缀，可以是多个，多个用|分隔
+     * suffix:要去除的后缀，同prefix
+     * sensible:是否对前后缀的大小写敏感，true时区分大小写，false不区分，默认区分
+     * trimBefore:是否在去除前后缀之前进行trim，true去除，false不去除，默认不去除
+     * trimAfter:是否在去除前后缀之后进行trim，同trimBefore
+     * template和ref参数参考for或if表达式，不指定时直接是接入对象
+     * 举例：
+     * #{[trim,env.data],prefix="and|or",suffix=",",sensible="false",trimBefore="true"}
      * @param template
      * @param param
      * @return
@@ -395,6 +405,39 @@ public class RegexGenerator {
                 gen.format=format;
 
                 String key="_datefmt_tmp_"+tmpIdx;
+                builder.append("${").append(key).append("}");
+                preparedParam.put(key,gen);
+            }else if("trim".equals(meta.action)){
+                String prefix=meta.parameters.get("prefix");
+                String suffix=meta.parameters.get("suffix");
+                String sensible=meta.parameters.get("sensible");
+                String trimBefore=meta.parameters.get("trimBefore");
+                String trimAfter=meta.parameters.get("trimAfter");
+                String tpl=meta.parameters.get("template");
+
+                String tplId=meta.parameters.get("ref");
+                if(tplId!=null){
+                    Object optp=ObjectFinder.getObjectByDotKeyWithReference(preparedParam,tplId);
+                    if(optp!=null){
+                        Object val=optp;
+                        tpl= mapper.map(val);
+                    }
+                }
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,meta.routeExpression,basePackages);
+
+                TrimGenerate gen=new TrimGenerate();
+                gen.basePackages=basePackages;
+                gen.root=preparedParam;
+                gen.mapper=mapper;
+                gen.data=obj;
+                gen.prefix=prefix;
+                gen.suffix=suffix;
+                gen.sensible=sensible;
+                gen.trimBefore=trimBefore;
+                gen.trimAfter=trimAfter;
+                gen.template=tpl;
+
+                String key="_trim_tmp_"+tmpIdx;
                 builder.append("${").append(key).append("}");
                 preparedParam.put(key,gen);
             }

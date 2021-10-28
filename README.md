@@ -45,6 +45,19 @@ commons util package project for java devlop
 - just include the jar i2f-core.jar
 
 # update log
+- 2021-10-28 16h
+    - add generator grammer trim
+        - trim expression: #{[trim,ObjectRoutingExpression],prefix="",suffix="",sensible="",trimBefore="",trimAfter="",template="",ref=""}
+        - it means that:
+        - trim prefix and suffix from the result of ObjectRoutingExpression or form template/ref
+        - prefix: point trim prefix(s) ,multi value split by '|'
+        - suffix: point trim suffix(s), same as prefix
+        - sensible: whether case sensible for prefix and suffix
+        - trimBefore: whether do trim result before process
+        - trimAfter: whether do trim result after process
+        - template and ref arg,please refrence the introduce form for or if expression
+        - such:
+        - trim 'and,or' prefix and ',' (dot) suffix :#{[trim,env.data],prefix="and|or",suffix=",",sensible="false",trimBefore="true"}
 - 2021-10-28 15h
     - add generator grammer fmt
         - fmt expression: #{[fmt,ObjectRoutingExpression],format="",values=""}
