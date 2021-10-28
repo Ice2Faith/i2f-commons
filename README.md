@@ -45,6 +45,23 @@ commons util package project for java devlop
 - just include the jar i2f-core.jar
 
 # update log
+- 2021-10-28 15h
+    - add generator grammer fmt
+        - fmt expression: #{[fmt,ObjectRoutingExpression],format="",values=""}
+        - it means that:
+        - use values formed objects to according to format string to format string
+        - such:
+        - format a simple: #{[fmt,env.args[2]],format="%02d,%.2f",values="_item.ival,_item.dval"}
+        - it equals:
+        - String.format("%02d,%.2f",env.args[2].ival,env.args[2].dval)
+    - add generator grammer datefmt
+        - datefmt expression: #{[datefmt,ObjectRoutingExpression],format=""}
+        - it means that:
+        - use format arg string to format a date object
+        - such:
+        - format date: #{[datefmt,args.date],format="yyyy-MM-dd HH:mm:ss"}
+        - it equals:
+        - new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(args.date)  
 - 2021-10-28 09h
     - add generator grammer include
         - include expression: #{[include,ObjectRoutingExpression],ref=""}

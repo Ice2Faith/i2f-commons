@@ -2,10 +2,7 @@ package i2f.commons.core.utils.generator.regex;
 
 import i2f.commons.core.data.interfaces.IMap;
 import i2f.commons.core.utils.generator.regex.core.ObjectFinder;
-import i2f.commons.core.utils.generator.regex.core.impl.ForGenerate;
-import i2f.commons.core.utils.generator.regex.core.impl.IfGenerate;
-import i2f.commons.core.utils.generator.regex.core.impl.IncludeGenerate;
-import i2f.commons.core.utils.generator.regex.core.impl.ValGenerate;
+import i2f.commons.core.utils.generator.regex.core.impl.*;
 import i2f.commons.core.utils.generator.regex.data.JsonControlMeta;
 import i2f.commons.core.utils.generator.regex.impl.DefaultValueMapper;
 import i2f.commons.core.utils.generator.regex.impl.FileTemplateLoader;
@@ -198,6 +195,27 @@ public class RegexGenerator {
      * 如果不指定mapper，将使用继承的mapper进行转换，也就是说可以使用此表达式规避一些现有框架对${}表达式的冲突
      * mapper是一个IMap<Object,String>接口的实现类
      *
+     * fmt表达式
+     * #{[fmt,env.args[2]],format="",values=""}
+     * 用于对传入JSON表达式对象进行格式化模板
+     * 参照String.format方法
+     * format即为格式化字符串
+     * values即为取值
+     * 举例：
+     * #{[fmt,env.args[2]],format="%02x-%02x",values="_item[0],_item[1]"}
+     * 所以函数等价于：
+     * String.format("%02x-%02x",env.args[2][0],env.args[2][1])
+     * 而实际也是这样运行的
+     * 特别注意的是，参数之间用逗号分隔，参数直接是路由表达式，不需要添加${}包裹
+     *
+     * datefmt表达式
+     * #{[datefmt,env.args[2]],format=""}
+     * 类似fmt表达式，但是只针对时间类型，应用SimpleDateFormat进行格式化
+     * format参数即为合法的SimpleDataFormat格式化参数
+     * 举例：
+     * ${[datefmt,env.date],format="yyyy-MM-DD HH:mm:ss SSS"}
+     *
+     *
      * @param template
      * @param param
      * @return
@@ -346,6 +364,37 @@ public class RegexGenerator {
                 gen.userMapper=userMapper;
 
                 String key="_val_tmp_"+tmpIdx;
+                builder.append("${").append(key).append("}");
+                preparedParam.put(key,gen);
+            }else if("fmt".equals(meta.action)){
+                String format=meta.parameters.get("format");
+                String values=meta.parameters.get("values");
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,meta.routeExpression,basePackages);
+
+
+                FmtGenerate gen=new FmtGenerate();
+                gen.basePackages=basePackages;
+                gen.root=preparedParam;
+                gen.mapper=mapper;
+                gen.data=obj;
+                gen.format=format;
+                gen.values=values;
+
+                String key="_fmt_tmp_"+tmpIdx;
+                builder.append("${").append(key).append("}");
+                preparedParam.put(key,gen);
+            }else if("datefmt".equals(meta.action)){
+                String format=meta.parameters.get("format");
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,meta.routeExpression,basePackages);
+
+                DatefmtGenerate gen=new DatefmtGenerate();
+                gen.basePackages=basePackages;
+                gen.root=preparedParam;
+                gen.mapper=mapper;
+                gen.data=obj;
+                gen.format=format;
+
+                String key="_datefmt_tmp_"+tmpIdx;
                 builder.append("${").append(key).append("}");
                 preparedParam.put(key,gen);
             }
