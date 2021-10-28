@@ -4,6 +4,8 @@ import i2f.commons.core.data.interfaces.IMap;
 import i2f.commons.core.utils.generator.regex.core.ObjectFinder;
 import i2f.commons.core.utils.generator.regex.core.impl.ForGenerate;
 import i2f.commons.core.utils.generator.regex.core.impl.IfGenerate;
+import i2f.commons.core.utils.generator.regex.core.impl.IncludeGenerate;
+import i2f.commons.core.utils.generator.regex.core.impl.ValGenerate;
 import i2f.commons.core.utils.generator.regex.data.JsonControlMeta;
 import i2f.commons.core.utils.generator.regex.impl.DefaultValueMapper;
 import i2f.commons.core.utils.generator.regex.impl.FileTemplateLoader;
@@ -183,12 +185,25 @@ public class RegexGenerator {
      * load可以指定一个模板加载器类，IMap<String,String>的实现类，
      *  key的值就作为load这个接口实现类的入参
      *  load可以不指定，默认会使用默认的文件加载类，key指定文件路径即可
+     *
+     * include表达式
+     * #{[include,env.args[2]],ref=""}
+     * 类似tpl表达式，tpl表达式是声明一个模板
+     * 而include表达式是引入一个模板，因此include表达式用于引入tpl表达式声明的模板
+     * 使用env.args[2]作为该模板的_item参数，_root参数依旧保留
+     *
+     * val表达式
+     * #{[val,env.args[2]],mapper=""}
+     * 用于使用自定义的转换器转换传入的JSON表达式值
+     * 如果不指定mapper，将使用继承的mapper进行转换，也就是说可以使用此表达式规避一些现有框架对${}表达式的冲突
+     * mapper是一个IMap<Object,String>接口的实现类
+     *
      * @param template
      * @param param
      * @return
      */
     public static String render(String template,Map<String,Object> param,IMap<Object,String> mapper,List<String> basePackages){
-        Map<String,Object> preparedParam=new HashMap<>();
+        Map<String,Object> preparedParam=new HashMap<>((int)(param.size()*1.5));
         for(Map.Entry<String, Object> item : param.entrySet()){
             preparedParam.put(item.getKey(),item.getValue());
         }
@@ -224,18 +239,18 @@ public class RegexGenerator {
 
                 String tplId=meta.parameters.get("ref");
                 if(tplId!=null){
-                    Object optp=ObjectFinder.getObjectByDotKeyWithReference(param,tplId);
+                    Object optp=ObjectFinder.getObjectByDotKeyWithReference(preparedParam,tplId);
                     if(optp!=null){
                         Object val=optp;
                         tpl= mapper.map(val);
                     }
                 }
 
-                Object obj= ObjectFinder.getObjectByDotKeyWithReference(param,meta.routeExpression,basePackages);
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,meta.routeExpression,basePackages);
 
                 ForGenerate genFor=new ForGenerate();
                 genFor.template=tpl;
-                genFor.root=param;
+                genFor.root=preparedParam;
                 genFor.data=obj;
                 genFor.mapper=mapper;
                 genFor.separator=separator;
@@ -259,17 +274,17 @@ public class RegexGenerator {
 
                 String tplId=meta.parameters.get("ref");
                 if(tplId!=null){
-                    Object optp=ObjectFinder.getObjectByDotKeyWithReference(param,tplId);
+                    Object optp=ObjectFinder.getObjectByDotKeyWithReference(preparedParam,tplId);
                     if(optp!=null){
                         Object val=optp;
                         tpl= mapper.map(val);
                     }
                 }
 
-                Object obj= ObjectFinder.getObjectByDotKeyWithReference(param,meta.routeExpression,basePackages);
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,meta.routeExpression,basePackages);
 
                 IfGenerate genIf=new IfGenerate();
-                genIf.root=param;
+                genIf.root=preparedParam;
                 genIf.data=obj;
                 genIf.mapper=mapper;
                 genIf.template=tpl;
@@ -291,11 +306,48 @@ public class RegexGenerator {
                         tpl=ltpl;
                     }
                 }
-                if(!param.containsKey("_tpl")){
-                    param.put("_tpl",new HashMap<String,String>());
+                if(!preparedParam.containsKey("_tpl")){
+                    preparedParam.put("_tpl",new HashMap<String,String>());
                 }
-                Map<String,String> tpls=(Map<String,String>)param.get("_tpl");
+                Map<String,String> tpls=(Map<String,String>)preparedParam.get("_tpl");
                 tpls.put(tplId,tpl);
+            }else if("include".equals(meta.action)){
+                String ref=meta.parameters.get("ref");
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,meta.routeExpression,basePackages);
+
+                String tpl=null;
+                Map<String,String> tpls=(Map<String,String>)preparedParam.get("_tpl");
+                if(tpls!=null){
+                    if(ref!=null && !"".equals(ref)){
+                        tpl=tpls.get(ref);
+                    }
+                }
+
+                IncludeGenerate gen=new IncludeGenerate();
+                gen.basePackages=basePackages;
+                gen.root=preparedParam;
+                gen.mapper=mapper;
+                gen.data=obj;
+                gen.template=tpl;
+
+                String key="_include_tmp_"+tmpIdx;
+                builder.append("${").append(key).append("}");
+                preparedParam.put(key,gen);
+            }else if("val".equals(meta.action)){
+                String userMapper=meta.parameters.get("mapper");
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,meta.routeExpression,basePackages);
+
+
+                ValGenerate gen=new ValGenerate();
+                gen.basePackages=basePackages;
+                gen.root=preparedParam;
+                gen.mapper=mapper;
+                gen.data=obj;
+                gen.userMapper=userMapper;
+
+                String key="_val_tmp_"+tmpIdx;
+                builder.append("${").append(key).append("}");
+                preparedParam.put(key,gen);
             }
 
             tmpIdx++;

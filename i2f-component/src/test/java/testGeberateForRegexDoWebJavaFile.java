@@ -24,11 +24,11 @@ public class testGeberateForRegexDoWebJavaFile {
 
         JdbcDao dao=getDao();
         Connection conn=dao.getTransactionManager().getConnection();
-        TableMeta meta= DbResolver.getTableMeta(conn,"ads_ast_zccblhpt_cw_cost_equi_task_ana_mf");
+        TableMeta meta= DbResolver.getTableMeta(conn,"student_course");
 
         GenerateContext ctx=new GenerateContext();
         ctx.meta=meta;
-        ctx.basePackage="com.cgcc.edm";
+        ctx.basePackage="com.i2f";
         ctx.author="ltb";
 
         ctx.save2File=true;

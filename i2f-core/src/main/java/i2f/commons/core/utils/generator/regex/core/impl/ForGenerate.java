@@ -70,7 +70,7 @@ public class ForGenerate implements IGenerate {
 
         }
 
-        StringBuilder builder=new StringBuilder();
+        StringBuilder builder=new StringBuilder(256);
         if(prefix!=null){
             builder.append(prefix);
         }
@@ -94,10 +94,10 @@ public class ForGenerate implements IGenerate {
             Object val=it.next();
             String str="";
             if(template!=null){
-                Map<String,Object> param=new HashMap<>();
+                Map<String,Object> param=new HashMap<>(16);
                 param.put("_item",val);
                 param.put("_root",root);
-                Map<String,Object> ctx=new HashMap<>();
+                Map<String,Object> ctx=new HashMap<>(16);
                 ctx.put("first",isFirst);
                 ctx.put("last",!it.hasNext());
                 ctx.put("index",idx);

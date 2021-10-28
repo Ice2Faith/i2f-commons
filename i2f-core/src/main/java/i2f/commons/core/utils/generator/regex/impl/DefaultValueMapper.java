@@ -161,7 +161,7 @@ public class DefaultValueMapper implements IMap<Object,String> {
 
     protected String onArray(Object val) {
         int len=Array.getLength(val);
-        List list=new ArrayList<>();
+        List list=new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             list.add(Array.get(val,i));
         }
@@ -177,7 +177,7 @@ public class DefaultValueMapper implements IMap<Object,String> {
     }
 
     protected String onIterable(Iterable val) {
-        StringBuilder builder=new StringBuilder();
+        StringBuilder builder=new StringBuilder(256);
         builder.append(BEGIN_ITERABLE);
         boolean isFirst=true;
         Iterator it=val.iterator();

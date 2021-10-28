@@ -41,13 +41,14 @@ public class IfGenerate implements IGenerate {
                 template=null;
             }
         }
+        int slen=template==null?64:Math.max(template.length(),64);
 
-        StringBuilder builder=new StringBuilder();
+        StringBuilder builder=new StringBuilder(slen);
         if(template!=null){
-            Map<String,Object> param=new HashMap<>();
+            Map<String,Object> param=new HashMap<>(16);
             param.put("_item",data);
             param.put("_root",root);
-            Map<String,Object> ctx=new HashMap<>();
+            Map<String,Object> ctx=new HashMap<>(16);
 
             param.put("_ctx",ctx);
             String str= RegexGenerator.render(template,param,mapper,basePackages);
@@ -68,7 +69,7 @@ public class IfGenerate implements IGenerate {
             return true;
         }
 
-        List<Pair<String,String>> conds=new ArrayList<>();
+        List<Pair<String,String>> conds=new ArrayList<>(6);
 
         Pattern pattern=Pattern.compile("\\s+(&&|\\|\\|)\\s+");
         Matcher matcher=pattern.matcher(test);
@@ -90,7 +91,7 @@ public class IfGenerate implements IGenerate {
         }
 
         String regex="";
-        List<Pair<String, Triple<String,String,String>>> legalConds=new ArrayList<>();
+        List<Pair<String, Triple<String,String,String>>> legalConds=new ArrayList<>(conds.size());
         for(Pair<String,String> item : conds){
             String cnd=item.getVal();
             cnd=cnd.trim();
@@ -110,32 +111,24 @@ public class IfGenerate implements IGenerate {
             legalConds.add(pair);
         }
 
-        Map<String,Object> param=new HashMap<>();
+        Map<String,Object> param=new HashMap<>(16);
         param.put("_item",data);
         param.put("_root",root);
-        Map<String,Object> ctx=new HashMap<>();
+        Map<String,Object> ctx=new HashMap<>(16);
 
         param.put("_ctx",ctx);
         return runCond(legalConds,param);
     }
 
     public static boolean runCond(List<Pair<String, Triple<String,String,String>>> conds,Object item){
-        List<Pair<String,Boolean>> bconds=new ArrayList<>();
-        StringBuilder builder=new StringBuilder();
+        List<Pair<String,Boolean>> bconds=new ArrayList<>(conds.size());
         for(Pair<String,Triple<String,String,String>> cur : conds){
             boolean brs=getCondResult(cur.val,item);
             Pair<String,Boolean> bcur=new Pair<>(cur.key,brs);
             bconds.add(bcur);
-            builder.append(bcur.key).append(bcur.val);
-        }
-
-        String bexp=builder.toString();
-        if(!"".equals(bexp)){
-            bexp=bexp.substring(2);
         }
 
         boolean retVal = calcBooleanResult(bconds);
-
 
         return retVal;
 

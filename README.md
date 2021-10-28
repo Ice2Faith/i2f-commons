@@ -45,6 +45,24 @@ commons util package project for java devlop
 - just include the jar i2f-core.jar
 
 # update log
+- 2021-10-28 09h
+    - add generator grammer include
+        - include expression: #{[include,ObjectRoutingExpression],ref=""}
+        - it means that:
+        - include and render a template use the ref point template Id (from tpl expression defined or binding param)
+        - such:
+        - declare a template: #{[tpl,tplArgValue],template="value:${_item}"}
+        - include the template: #{[include,arg.value],ref="_tpl.tplArgValue"}
+    - add generator grammer val
+        - val expression : #{[val,ObjectRoutingExpression],mapper=""}
+        - it meas that:
+        - use custom mapper which implements IMap<Object,String> interface class to mapping the value.
+        - when mapper is not declared,the mapper will use from generate give.
+        - so,it can instead of ${} expression used on mybatis mapper xml 
+        - avoid conflict with other grammer.
+        - such:
+        - use custom mapper: #{[val,arg.value],mapper="com.i2f.mapper.StringMapper"}
+        - use generate mapper: #{[val,arg.value]}
 - 2021-10-26 17h
     - add generator grammer tpl
         - tpl expression: #{[tpl,tplId],template="",load="",key=""}
