@@ -94,6 +94,22 @@ window.$jtl={
         // 以上述配置开始观察目标节点
         observer.observe(targetNode, config);
     },
+    objCopy:function(obj,attrArray){
+        if (!obj) {
+            return obj;
+        }
+        let ret = {};
+
+        for (let field in obj) {
+            for(let attr in attrArray){
+                if(field==attr){
+                    ret[field]=obj[field];
+                }
+            }
+        }
+        return ret;
+    },
+
     firstDayOfYear:function(date){
         if(!date){
             date=new Date();
@@ -269,6 +285,55 @@ window.$jtl={
             msec=parseInt(str.substring(idxMsec3,idxMsec3+3));
         }
         return new Date(year,month-1,day,hour,min,sec,msec);
+    },
+    /**
+     * 转换日期格式，给定原始日期串，源格式串，新格式串
+     * @param str
+     * @param srcPatten
+     * @param dstPatten
+     * @returns {string}
+     */
+    convertDateFmt:function(str,srcPatten,dstPatten){
+        let date=this.parse(str,srcPatten);
+        return this.formatDate(date,dstPatten);
+    },
+    /**
+     * 转换日期为一个结构对象
+     * @param date
+     * @returns {{month: number, hour: number, year: number, millisecond: number, day: number, minute: number, second: number}}
+     */
+    toDateObj(date){
+        if(!date){
+            date=new Date();
+        }
+        let obj={
+            year:date.getFullYear(),
+            month:date.getMonth()+1,
+            day:date.getDate(),
+            hour:date.getHours(),
+            minute:date.getMinutes(),
+            second:date.getSeconds(),
+            millisecond:date.getMilliseconds()
+        };
+        return obj;
+    },
+    /**
+     * 将日期结构对象转换为日期
+     * @param obj
+     * @returns {Date}
+     */
+    parseDateObj(obj){
+        if(!obj){
+            return new Date();
+        }
+        return new Date(obj.year?obj.year:1980,
+            obj.month?obj.month-1:0,
+            obj.day?obj.day:undefined,
+            obj.hour?obj.hour:undefined,
+            obj.minute?obj.minute:undefined,
+            obj.second?obj.second:undefined,
+            obj.millisecond?obj.millisecond:undefined
+        );
     },
     /**
      * 使用split&join方式实现replaceAll,
