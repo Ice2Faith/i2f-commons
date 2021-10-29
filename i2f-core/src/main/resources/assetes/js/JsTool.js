@@ -1,12 +1,35 @@
 window.$jtl={
-    // 重新加载JS文件
-    // 示例：
-    // reloadJs('jsDataId','/static/data.js');
     dom(name){
         return document.createElement(name);
     },
+    /**
+     * 设置标题
+     * @param title
+     */
+    resetTitle(title){
+        let tar=document.getElementsByTagName("title")[0];
+        tar.innerHTML=title;
+    },
+    /**
+     * 重新加载CSS
+     * @param id
+     * @param src
+     */
+    reloadCss(id,src){
+        let tar=document.getElementById(id);
+        tar.parentNode.removeChild(tar);
+        var domObj = this.dom("link");
+        domObj.href = src;
+        domObj.rel = "stylesheet";
+        domObj.id = id;
+        document.getElementsByTagName("head")[0].appendChild(domObj);
+    },
+    // 重新加载JS文件
+    // 示例：
+    // reloadJs('jsDataId','/static/data.js');
     reloadJs(id,src){
-        document.getElementById(id).remove();
+        let tar=document.getElementById(id);
+        tar.parentNode.removeChild(tar);
         var scriptObj = this.dom("script");
         scriptObj.src = src;
         scriptObj.type = "text/javascript";
@@ -94,22 +117,6 @@ window.$jtl={
         // 以上述配置开始观察目标节点
         observer.observe(targetNode, config);
     },
-    objCopy:function(obj,attrArray){
-        if (!obj) {
-            return obj;
-        }
-        let ret = {};
-
-        for (let field in obj) {
-            for(let attr in attrArray){
-                if(field==attr){
-                    ret[field]=obj[field];
-                }
-            }
-        }
-        return ret;
-    },
-
     firstDayOfYear:function(date){
         if(!date){
             date=new Date();
@@ -256,7 +263,7 @@ window.$jtl={
         let idxHour122=patten.indexOf('hh');
 
         let year=1980;
-        let month=undefined;
+        let month=1;
         let day=undefined;
         let hour=undefined;
         let min=undefined;
@@ -383,6 +390,77 @@ window.$jtl={
         padStr=padStr+pad.substring(0,moreLen);
         return padStr+str;
     },
+    /**
+     * 清空对象的所有属性，用val进行填充属性
+     * @param obj
+     * @param val
+     * @returns {*}
+     */
+    emptyObj(obj,val=''){
+        if(!obj){
+            return obj;
+        }
+        for(let attr in obj){
+            obj[attr]=val;
+        }
+        return obj;
+    },
+    /**
+     * 拷贝obj的在attrArray数组中指明的属性列表到新的对象
+     * @param obj
+     * @param attrArray
+     * @returns {{}|*}
+     */
+    copyObj(obj,attrArray){
+        if(!obj){
+            return obj;
+        }
+        let ret={};
+        let len=attrArray.length;
+        for(let field in obj){
+            for(let i=0;i<len;i++){
+                let attr=attrArray[i];
+                if(field==attr){
+                    ret[field]=obj[field];
+                    break;
+                }
+            }
+        }
+        return ret;
+    },
+    /**
+     * 拷贝srcObj中的属性到dstObj中，仅拷贝二者共有的属性
+     * @param srcObj
+     * @param dstObj
+     * @returns {*}
+     */
+    copyObj2(srcObj,dstObj){
+        if(!dstObj){
+            return dstObj;
+        }
+        if(!srcObj){
+            return srcObj;
+        }
+        let ret=dstObj;
+
+        for(let field in dstObj){
+            for(let attr in srcObj){
+                if(field==attr){
+                    ret[field]=srcObj[field];
+                    break;
+                }
+            }
+        }
+        return ret;
+    },
+    copyArr(arr,offset,len){
+        let arrLen=arr.length;
+        let ret=[];
+        for(let i=offset;i<arrLen && i<(offset+len);i++){
+            ret.push(arr[i]);
+        }
+        return ret;
+    },
     notNull(obj){
         return obj!=null && obj!=undefined;
     },
@@ -393,5 +471,168 @@ window.$jtl={
         let js=JSON.stringify(obj);
         return this.notNull(obj) && js!='' && js!='{}' && js!='[]';
     }
+}
 
+Date.prototype.$addDay=function(num){
+    this.setDate(this.getDate()+num);
+    return this;
+}
+Date.prototype.$addMonth=function(num){
+    this.setMonth(this.getMonth()+num);
+    return this;
+}
+Date.prototype.$addYear=function(num){
+    this.setFullYear(this.getFullYear()+num);
+    return this;
+}
+Date.prototype.$addHour=function(num){
+    this.setHours(this.getHours()+num);
+    return this;
+}
+Date.prototype.$addMinute=function(num){
+    this.setMinutes(this.getMinutes()+num);
+    return this;
+}
+Date.prototype.$addSecond=function(num){
+    this.setSeconds(this.getSeconds()+num);
+    return this;
+}
+Date.prototype.$addMillSecond=function(num){
+    this.setMilliseconds(this.getMilliseconds()+num);
+    return this;
+}
+
+String.prototype.$toInt=function(radix=10){
+    return parseInt(this,radix);
+}
+String.prototype.$toFloat=function(){
+    return parseFloat(this);
+}
+String.prototype.$toBoolean=function(){
+    if(this=='true'){
+        return true;
+    }else if(this=='false'){
+        return false;
+    }
+    return false;
+}
+String.prototype.$parseJson=function(){
+    return JSON.parse(this);
+}
+String.prototype.$trunc=function(maxLen=-1){
+    let mlen=parseInt(maxLen);
+    if(mlen<=3){
+        return this;
+    }
+    return this.substring(0,maxLen-3)+'...';
+}
+String.prototype.$firstLower=function(){
+    if(this.length>=1){
+        return this.substring(0,1).toLowerCase()+this.substring(1);
+    }
+    return this;
+}
+String.prototype.$firstUpper=function(){
+    if(this.length>=1){
+        return this.substring(0,1).toUpperCase()+this.substring(1);
+    }
+    return this;
+}
+String.prototype.$toCamel=function(){
+    let ret='';
+    let arr=this.split(/-|_/);
+    for(let i=0;i<arr.length;i++){
+        let item=arr[i].toLowerCase();
+        if(i==0){
+            ret=ret+item.$firstLower();
+        }else{
+            ret=ret+item.$firstUpper();
+        }
+    }
+    return ret;
+}
+String.prototype.$toPascal=function(){
+    let ret='';
+    let arr=this.split(/-|_/);
+    for(let i=0;i<arr.length;i++){
+        let item=arr[i].toLowerCase();
+        ret=ret+item.$firstUpper();
+    }
+    return ret;
+}
+Object.prototype.$toJson=function(){
+    return JSON.stringify(this);
+}
+
+Object.prototype.$fields=function(){
+    let arr=[];
+    for(let key in this){
+        if(this[key] instanceof Function){
+            continue;
+        }
+        arr.push(key);
+    }
+    return arr;
+}
+Object.prototype.$methods=function(){
+    let arr=[];
+    for(let key in this){
+        if(this[key] instanceof Function){
+            arr.push(key);
+        }
+    }
+    return arr;
+}
+/**
+ * 深层次获取值，找不到不报错
+ * 例如：
+ * route=arg.vals[2].key
+ * 那就等价于：
+ * obj.arg.vals[2].key
+ * @param route
+ * @returns {Object}
+ */
+Object.prototype.$deepVal=function(route){
+    if(!route || route==''){
+        return this;
+    }
+    let arr=route.split('.');
+    let ret=this;
+    for(let i=0;i<arr.length;i++){
+        if(!ret){
+            break;
+        }
+        let cur=arr[i];
+        let idx=cur.indexOf('[');
+        if(idx>=0){
+            let av=cur.substring(0,idx);
+            let nv=cur.substring(idx+1);
+            if(av!=''){
+                ret=ret[av];
+            }
+            if(nv!=''){
+                nv=nv.substring(0,nv.length-1);
+                if(nv!=''){
+                    ret=ret[parseInt(nv)];
+                }
+            }
+        }else{
+            ret=ret[cur];
+        }
+    }
+    return ret;
+}
+
+HTMLElement.prototype.$remove=function(){
+    let parent=this.parentNode;
+    let ret=this;
+    parent.removeChild(ret);
+    return ret;
+}
+HTMLElement.prototype.$style=function(sylObj){
+    for(let att in sylObj){
+        let name=att.$toCamel();
+        this.style[name]=sylObj[att];
+    }
+    return this;
 }
