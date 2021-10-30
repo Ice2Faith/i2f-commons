@@ -9,6 +9,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ClassResolver {
+    public static String getClassName(Class clazz){
+        return clazz.getSimpleName();
+    }
+    public static String getFullClassName(Class clazz){
+        return clazz.getName();
+    }
+    public static String getPackage(Class clazz){
+        String name=getFullClassName(clazz);
+        int idx=name.lastIndexOf(".");
+        if(idx>=0){
+            return name.substring(0,idx);
+        }
+        return "";
+    }
     public static Class getClazz(String className) {
         Class clazz = null;
         try {

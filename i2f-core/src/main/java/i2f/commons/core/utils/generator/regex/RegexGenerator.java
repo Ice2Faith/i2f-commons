@@ -226,6 +226,23 @@ public class RegexGenerator {
      * template和ref参数参考for或if表达式，不指定时直接是接入对象
      * 举例：
      * #{[trim,env.data],prefix="and|or",suffix=",",sensible="false",trimBefore="true"}
+     *
+     * cmd表达式
+     * #{[cmd,env.data],command="",show="",charset=""}
+     * 用于执行CMD命令行，基于Process调用
+     * 将command命令进行渲染之后得到的命令，交给Process执行，当show为true时，
+     * 将执行的回显作为结果渲染到模板中，否则只执行
+     * command命令，可进行渲染
+     * show是否捕获结果渲染到模板中
+     * charset指定命令行输出的字符编码，不指定则使用UTF-8
+     *
+     * define表达式
+     * #{[define,valueId],value=""}
+     * 用于在模板中定义模板变量，以供之后模板渲染使用
+     * 将在_def节点下，因此你需要这样取值：${_def.valueId}
+     * valueId，就作为你之后JSON表达式取值的属性KEY
+     * value,执行表达式的值，可进行渲染
+     *
      * @param template
      * @param param
      * @return
@@ -438,6 +455,36 @@ public class RegexGenerator {
                 gen.template=tpl;
 
                 String key="_trim_tmp_"+tmpIdx;
+                builder.append("${").append(key).append("}");
+                preparedParam.put(key,gen);
+            }else if("define".equals(meta.action)){
+                String objId=meta.routeExpression;
+                String value=meta.parameters.get("value");
+
+                value=render(value,preparedParam,mapper,basePackages);
+
+                if(!preparedParam.containsKey("_def")){
+                    preparedParam.put("_def",new HashMap<String,String>());
+                }
+                Map<String,String> vals=(Map<String,String>)preparedParam.get("_def");
+                vals.put(objId,value);
+            }else if("cmd".equals(meta.action)){
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,meta.routeExpression,basePackages);
+                String command=meta.parameters.get("command");
+                String show=meta.parameters.get("show");
+                String charset=meta.parameters.get("charset");
+
+                CmdGenerate gen=new CmdGenerate();
+                gen.basePackages=basePackages;
+                gen.root=preparedParam;
+                gen.mapper=mapper;
+                gen.data=obj;
+                gen.command=command;
+                gen.show=show;
+                gen.charset=charset;
+
+
+                String key="_cmd_tmp_"+tmpIdx;
                 builder.append("${").append(key).append("}");
                 preparedParam.put(key,gen);
             }

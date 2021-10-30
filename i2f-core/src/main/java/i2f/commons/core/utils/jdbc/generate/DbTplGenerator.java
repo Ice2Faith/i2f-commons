@@ -2,11 +2,13 @@ package i2f.commons.core.utils.jdbc.generate;
 
 
 import i2f.commons.core.utils.data.ContainerUtil;
+import i2f.commons.core.utils.data.DateUtil;
 import i2f.commons.core.utils.file.FileUtil;
 import i2f.commons.core.utils.generator.regex.RegexGenerator;
 import i2f.commons.core.utils.jdbc.generate.data.DbGenType;
 import i2f.commons.core.utils.jdbc.generate.data.GenerateContext;
 import i2f.commons.core.utils.jdbc.generate.data.TableMeta;
+import i2f.commons.core.utils.reflect.core.resolver.base.ClassResolver;
 import lombok.Data;
 
 import java.io.File;
@@ -32,8 +34,8 @@ public class DbTplGenerator {
         File tplFile=getResourceFile(tplPath);
         String tpl= FileUtil.loadTxtFile(tplFile);
         List basePackages= ContainerUtil.arrList(
-                "i2f.commons.core.utils.jdbc.generate.data",
-                "i2f.commons.core.utils.data");
+                ClassResolver.getPackage(GenerateContext.class),
+                ClassResolver.getPackage(DateUtil.class));
         Map<String, Object> params=new HashMap<>();
         params.put("ctx",ctx);
         params.put("now",new Date());

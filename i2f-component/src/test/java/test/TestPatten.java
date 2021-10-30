@@ -34,6 +34,13 @@ public class TestPatten {
 //        boolean rs=IfGenerate.getCondResult(new Triple<String,String,String>(
 //                "obj","instanceof","_@Integer.class"),param);
 
+        String template="#{[define,cmd],value=\"cmd /c \"}\n" +
+                "#{[cmd,data],command=\"${_root._def.cmd} ping 114.114.114.114\",show=\"true\",charset=\"GBK\"}\n" +
+                "#{[cmd,data],command=\"${_root._def.cmd} dir\",show=\"true\",charset=\"GBK\"}";
+        Map<String, Object> param=ContainerUtil.hashMapKvs("data",1);
+        String rs=RegexGenerator.render(template,param);
+        System.out.println("rs:\n"+rs);
+
 
     }
 
