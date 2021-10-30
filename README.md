@@ -45,6 +45,67 @@ commons util package project for java devlop
 - just include the jar i2f-core.jar
 
 # update log
+- 2021-10-30 22h
+    - add generator grammer fori
+        - fori expression: #{[fori,ObjectRoutingExpression],begin="",end="",step="",condition="",format="",separator="",prefix="",suffix="",template="",blank="",jump="",ref=""}
+        - it means that:
+        - do a for loop i begin "begin" util condition "condition" is false to end "end"
+        - it equals:
+        - for(long i=begin;i condition end;i+=step)
+        - begin: begin for number,default is 0
+        - end: end for number,must set it
+        - step: i once step number length,default is 1
+        - condition: what's conditon make for run,default is "!=",it support double number of long.
+        - format: you can set your format for var i,and then you can get the format i string.
+        - and, in _ctx var,add "fmti" and "i" base on for expression _ctx
+        - _ctx.fmti: it's a string var i according your defined "format" formatted "i".
+        - _ctx.i: it's the for i
+        - such:
+        - do full args for i: #{[fori,data],begin="100",end="-100",step="-10",condition=">=",format="%02x",separator="|",prefix="[",suffix="]",template="${_item},${_ctx.index},${_ctx.first},${_ctx.last},${_ctx.fmti},${_ctx.i}"}
+        - simple code&result is:
+```java
+        String template="#{[fori,data]," +
+                "begin=\"100\"," +
+                "end=\"-100\"," +
+                "step=\"-10\"," +
+                "condition=\">=\"," +
+                "format=\"%02x\"," +
+                "separator=\"\n\"," +
+                "prefix=\"[\"," +
+                "suffix=\"]\"," +
+                "template=\"${_item},${_ctx.index},${_ctx.first},${_ctx.last},${_ctx.fmti},${_ctx.i}\"}";
+        Map<String,Object> params=ContainerUtil.hashMapKvs("data","fori");
+        String rs=RegexGenerator.render(template,params);
+        System.out.println("tpl:"+template);
+        System.out.println("rs:\n"+rs);
+```
+
+```bash
+        tpl:#{[fori,data],begin="100",end="-100",step="-10",condition=">=",format="%02x",separator="
+        ",prefix="[",suffix="]",template="${_item},${_ctx.index},${_ctx.first},${_ctx.last},${_ctx.fmti},${_ctx.i}"}
+        rs:
+        [fori,0,true,false,64,100
+        fori,1,false,false,5a,90
+        fori,2,false,false,50,80
+        fori,3,false,false,46,70
+        fori,4,false,false,3c,60
+        fori,5,false,false,32,50
+        fori,6,false,false,28,40
+        fori,7,false,false,1e,30
+        fori,8,false,false,14,20
+        fori,9,false,false,0a,10
+        fori,10,false,false,00,0
+        fori,11,false,false,fffffffffffffff6,-10
+        fori,12,false,false,ffffffffffffffec,-20
+        fori,13,false,false,ffffffffffffffe2,-30
+        fori,14,false,false,ffffffffffffffd8,-40
+        fori,15,false,false,ffffffffffffffce,-50
+        fori,16,false,false,ffffffffffffffc4,-60
+        fori,17,false,false,ffffffffffffffba,-70
+        fori,18,false,false,ffffffffffffffb0,-80
+        fori,19,false,false,ffffffffffffffa6,-90
+        fori,20,false,true,ffffffffffffff9c,-100]
+```
 - 2021-10-30 13h
     - add generator grammer define
         - define expression: #{[define,valueId],value=""}

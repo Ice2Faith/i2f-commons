@@ -243,6 +243,24 @@ public class RegexGenerator {
      * valueId，就作为你之后JSON表达式取值的属性KEY
      * value,执行表达式的值，可进行渲染
      *
+     * fori表达式
+     * #{[fori,env.data],begin="",end="",step="",condition="",format="",separator="",prefix="",suffix="",template="",blank="",jump="",ref=""}
+     * for表达式对应的是遍历一个可迭代对象
+     * 而fori表达式是一个循环
+     * 由数值（long）begin开始以步长step向end进行变化，以condition指定的逻辑比较符进行比较是否结束循环
+     * 其余参数和for表达式含义一致
+     * 表达式表达含义等价于：
+     * for(long i=begin;i condition end;i+=step)
+     * begin:指定开始数值，不指定时为0
+     * end:指定结束数值，必须指定
+     * step:指定循环的步长，不指定时为1
+     * condition:指定循环判定条件运算符，默认为 !=
+     * format:指定i的格式化模式，默认为直接转换为String，针对fori循环来说，对于这个i可能对于你来说是有意义的，且可能有格式化需求，比如固定长度补0的需求，因此使用format进行控制
+     * 在_ctx变量中，在for的基础上，新增如下参数可用：
+     * _ctx.fmti: 是一个String类型的值，也就是把i按照给定的format进行格式化之后的String
+     * _ctx.i:是一个long类型的值，也就是当前循环下的i直接值，特别注意和_ctx.index的区别
+     * -ctx.i是fori的循环变量i,而_ctx.index则是逻辑上实际渲染的第几个的索引
+     *
      * @param template
      * @param param
      * @return
@@ -487,6 +505,59 @@ public class RegexGenerator {
                 String key="_cmd_tmp_"+tmpIdx;
                 builder.append("${").append(key).append("}");
                 preparedParam.put(key,gen);
+            }if("fori".equals(meta.action)){
+                String begin=meta.parameters.get("begin");
+                String end=meta.parameters.get("end");
+                String step=meta.parameters.get("step");
+                String condition=meta.parameters.get("condition");
+                String format=meta.parameters.get("format");
+                String separator=meta.parameters.get("separator");
+                if(separator==null){
+                    separator="";
+                }
+                String prefix=meta.parameters.get("prefix");
+                if(prefix==null){
+                    prefix="";
+                }
+                String suffix=meta.parameters.get("suffix");
+                if(suffix==null){
+                    suffix="";
+                }
+                String jump=meta.parameters.get("jump");
+                String tpl=meta.parameters.get("template");
+                String blank=meta.parameters.get("blank");
+
+                String tplId=meta.parameters.get("ref");
+                if(tplId!=null){
+                    Object optp=ObjectFinder.getObjectByDotKeyWithReference(preparedParam,tplId);
+                    if(optp!=null){
+                        Object val=optp;
+                        tpl= mapper.map(val);
+                    }
+                }
+
+                Object obj= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,meta.routeExpression,basePackages);
+
+                ForiGenerate genFor=new ForiGenerate();
+                genFor.template=tpl;
+                genFor.root=preparedParam;
+                genFor.data=obj;
+                genFor.mapper=mapper;
+                genFor.begin=begin;
+                genFor.end=end;
+                genFor.step=step;
+                genFor.condition=condition;
+                genFor.format=format;
+                genFor.separator=separator;
+                genFor.prefix=prefix;
+                genFor.suffix=suffix;
+                genFor.blank=blank;
+                genFor.jump=jump;
+                genFor.basePackages=basePackages;
+
+                String key="_fori_tmp_"+tmpIdx;
+                builder.append("${").append(key).append("}");
+                preparedParam.put(key,genFor);
             }
 
             tmpIdx++;

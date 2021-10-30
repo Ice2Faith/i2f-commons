@@ -34,11 +34,26 @@ public class TestPatten {
 //        boolean rs=IfGenerate.getCondResult(new Triple<String,String,String>(
 //                "obj","instanceof","_@Integer.class"),param);
 
-        String template="#{[define,cmd],value=\"cmd /c \"}\n" +
-                "#{[cmd,data],command=\"${_root._def.cmd} ping 114.114.114.114\",show=\"true\",charset=\"GBK\"}\n" +
-                "#{[cmd,data],command=\"${_root._def.cmd} dir\",show=\"true\",charset=\"GBK\"}";
-        Map<String, Object> param=ContainerUtil.hashMapKvs("data",1);
-        String rs=RegexGenerator.render(template,param);
+//        String template="#{[define,cmd],value=\"cmd /c \"}\n" +
+//                "#{[cmd,data],command=\"${_root._def.cmd} ping 114.114.114.114\",show=\"true\",charset=\"GBK\"}\n" +
+//                "#{[cmd,data],command=\"${_root._def.cmd} dir\",show=\"true\",charset=\"GBK\"}";
+//        Map<String, Object> param=ContainerUtil.hashMapKvs("data",1);
+//        String rs=RegexGenerator.render(template,param);
+//        System.out.println("rs:\n"+rs);
+
+        String template="#{[fori,data]," +
+                "begin=\"100\"," +
+                "end=\"-100\"," +
+                "step=\"-10\"," +
+                "condition=\">=\"," +
+                "format=\"%02x\"," +
+                "separator=\"\n\"," +
+                "prefix=\"[\"," +
+                "suffix=\"]\"," +
+                "template=\"${_item},${_ctx.index},${_ctx.first},${_ctx.last},${_ctx.fmti},${_ctx.i}\"}";
+        Map<String,Object> params=ContainerUtil.hashMapKvs("data","fori");
+        String rs=RegexGenerator.render(template,params);
+        System.out.println("tpl:"+template);
         System.out.println("rs:\n"+rs);
 
 
