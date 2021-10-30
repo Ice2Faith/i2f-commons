@@ -45,7 +45,31 @@ commons util package project for java devlop
 - just include the jar i2f-core.jar
 
 # update log
-- 2021-10-28 16h
+- 2021-10-30 13h
+    - add generator grammer define
+        - define expression: #{[define,valueId],value=""}
+        - it means that:
+        - in current context define a value named valueId to give template use.
+        - valueId: your define value ID ,it's collect into _def node,${_def.valueId} to get it
+        - value: your value , it can be a template 
+        - such:
+        - define a value: #{[define,lowerNameBean],value="${data.name@toLowerCase}Bean"}
+        - it equals:
+        - _def.lowerNameBean=data.name.toLowerCase()
+    - add generator grammer cmd
+        - cmd expression: #{[cmd,env.data],command="",show="",charset=""}
+        - it means that:
+        - execute command "command",if show is true,get the execute result as return value according charset.
+        - command: your command line
+        - show: whether need echo return
+        - charset: echo charset
+        - such:
+        - set cmd: #{[define,cmd],value="cmd /c "}
+        - do ping: #{[cmd,env.data],command="${_root._def.cmd} ping 8.8.8.8",show="true",charset="GBK"}
+        - it equlas:
+        - Runtime.getRuntime().execute("cmd /c ping 8.8.8.8");
+        - and command echo as result fill into template .
+- 2021-10-28 16h 
     - add generator grammer trim
         - trim expression: #{[trim,ObjectRoutingExpression],prefix="",suffix="",sensible="",trimBefore="",trimAfter="",template="",ref=""}
         - it means that:
