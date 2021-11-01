@@ -273,6 +273,17 @@
         </dependency>
 
 
+        <!-- hdfs -->
+        <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+
+
+
+
     </dependencies>
 
     <build>
