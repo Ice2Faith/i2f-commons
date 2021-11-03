@@ -1,8 +1,10 @@
 package i2f.commons.core.utils.str;
 
 
+import i2f.commons.core.data.Pair;
 import i2f.commons.core.utils.data.DataUtil;
 import i2f.commons.core.utils.safe.CheckUtil;
+import i2f.commons.core.utils.str.data.RegexFindPartMeta;
 import i2f.commons.core.utils.str.data.RegexMatchItem;
 
 import java.io.File;
@@ -334,4 +336,120 @@ public class StringUtil {
         return ret;
     }
 
+    /**
+     * 将字符串分解为描述的有序对象，对象中包含匹配串或者非匹配串部分，为有序ArrayList
+     * 以便根据此List分别对匹配和非匹配部分提取或者重新构造字符串
+     * @param str
+     * @param regex
+     * @return
+     */
+    public static List<RegexFindPartMeta> regexFindParts(String str, String regex){
+        List<RegexFindPartMeta> ret=new ArrayList<>(64);
+        Pattern patten=Pattern.compile(regex);
+        Matcher matcher=patten.matcher(str);
+        int lidx=0;
+        while (matcher.find()){
+            MatchResult result=matcher.toMatchResult();
+
+            RegexFindPartMeta oth=new RegexFindPartMeta();
+            oth.part=str.substring(lidx,result.start());
+            oth.isMatch=false;
+            ret.add(oth);
+
+            lidx=result.end();
+            String group=matcher.group();
+
+            RegexFindPartMeta mth=new RegexFindPartMeta();
+            mth.part=group;
+            mth.isMatch=true;
+            ret.add(mth);
+
+        }
+
+        RegexFindPartMeta oth=new RegexFindPartMeta();
+        oth.part=str.substring(lidx);
+        oth.isMatch=false;
+        ret.add(oth);
+
+        return ret;
+    }
+
+    /**
+     * 示例：
+     * 文件大小：
+     * (size,true,0,"byte",1024,"kb",1024,"mb",1024,"gb")
+     * 数值：
+     * (num,true,0,"分",10,"角",10,"元",10,"百",10,"千",10,"万")
+     * @param num
+     * @param fullMode
+     * @param sizeUnits
+     * @return
+     */
+    public static String number2VisualStringKvs(long num,boolean fullMode, Object ... sizeUnits){
+        int len=sizeUnits.length/2;
+        Pair<Long,String>[] pairs=new Pair[len];
+        for(int i=0,j=0;(i+2)<= sizeUnits.length;i+=2,j++){
+            long size=Long.parseLong(String.valueOf(sizeUnits[i]));
+            String unit=String.valueOf(sizeUnits[i+1]);
+            pairs[j]=new Pair<>(size,unit);
+        }
+        return number2VisualString(num,fullMode,pairs);
+    }
+    /**
+     * 将传入的num根据指定的分档和单位输出可视化的结果
+     * 例如：
+     * 169，传入分档：
+     * 0：毫秒，1000：秒，60：分，60：小时，24：天
+     * 分档也就是每个分档之间的换算尺度，也就是换算进制
+     * 则返回结果为：169毫秒
+     * fullMode指定是否全部单位显示还是以最大单位档小数显示
+     * @param num
+     * @param segmentSizeUnitPairs
+     * @return
+     */
+    public static String number2VisualString(long num,boolean fullMode, Pair<Long,String>... segmentSizeUnitPairs){
+        if(segmentSizeUnitPairs==null || segmentSizeUnitPairs.length==0){
+            return String.valueOf(num);
+        }
+        Pair<Long,String>[] segments=new Pair[segmentSizeUnitPairs.length];
+        long psize=1;
+        segments[0]=segmentSizeUnitPairs[0];
+        for (int i = 1; i < segmentSizeUnitPairs.length; i++) {
+            psize*=segmentSizeUnitPairs[i].key;
+            segments[i]=new Pair<>(psize,segmentSizeUnitPairs[i].val);
+        }
+        if(num>=segments[segments.length-1].key){
+            long lsize=segments[segments.length-1].key;
+            if(lsize==0){
+                return String.format("%d%s",num,segments[segments.length - 1].val);
+            }
+            if(fullMode){
+                if(num%lsize==0) {
+                    return String.format("%d%s", (num / lsize), segments[segments.length - 1].val);
+                }else{
+                    return String.format("%d%s", (num / lsize), segments[segments.length - 1].val)+number2VisualString(num%lsize,fullMode,segmentSizeUnitPairs);
+                }
+            }else{
+                return String.format("%.04f%s",(num*1.0/segments[segments.length-1].key),segments[segments.length-1].val);
+            }
+        }
+        for (int i = segments.length-1; i >=0 ; i--) {
+            if(num>=segments[i-1].key && num<segments[i].key){
+                long lsize=segments[i-1].key;
+                if(lsize==0){
+                    return String.format("%d%s",num,segments[i - 1].val);
+                }
+                if(fullMode){
+                    if(num%lsize==0) {
+                        return String.format("%d%s", (num / lsize), segments[i - 1].val);
+                    }else{
+                        return String.format("%d%s", (num / lsize), segments[i - 1].val)+number2VisualString(num%lsize,fullMode,segmentSizeUnitPairs);
+                    }
+                }else{
+                    return String.format("%.04f%s",(num*1.0/segments[i-1].key),segments[i-1].val);
+                }
+            }
+        }
+        return String.valueOf(num);
+    }
 }

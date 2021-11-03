@@ -45,6 +45,23 @@ commons util package project for java devlop
 - just include the jar i2f-core.jar
 
 # update log
+- 2021-11-03 23h
+    - add  number to visual string static method in StringUtil
+    - example use case and result:
+```java
+        String rs= StringUtil.number2VisualStringKvs(1024L*1024*1024*1024+128,true,0,"byte",1024,"kb",1024,"mb",1024,"gb");
+        System.out.println(rs);
+
+        rs=StringUtil.number2VisualStringKvs(16684452,true,0,"分",10,"角",10,"元",10,"百",10,"千",10,"万");
+        System.out.println(rs);
+```
+```bash
+1024gb128byte
+166万8千4百4元5角2分
+```
+- 2021-11-03 15h
+    - add sftp,ftp,hdfs file system util
+    
 - 2021-10-30 22h
     - add generator grammer fori
         - fori expression: #{[fori,ObjectRoutingExpression],begin="",end="",step="",condition="",format="",separator="",prefix="",suffix="",template="",blank="",jump="",ref=""}

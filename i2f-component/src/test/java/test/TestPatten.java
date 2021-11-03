@@ -7,6 +7,7 @@ import i2f.commons.core.utils.generator.regex.RegexGenerator;
 import i2f.commons.core.utils.generator.regex.core.impl.IfGenerate;
 import i2f.commons.core.utils.generator.simple.IGeneratable;
 import i2f.commons.core.utils.generator.simple.impl.ForGenerator;
+import i2f.commons.core.utils.str.StringUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -41,7 +42,7 @@ public class TestPatten {
 //        String rs=RegexGenerator.render(template,param);
 //        System.out.println("rs:\n"+rs);
 
-        String template="#{[fori,data]," +
+       /* String template="#{[fori,data]," +
                 "begin=\"100\"," +
                 "end=\"-100\"," +
                 "step=\"-10\"," +
@@ -54,8 +55,13 @@ public class TestPatten {
         Map<String,Object> params=ContainerUtil.hashMapKvs("data","fori");
         String rs=RegexGenerator.render(template,params);
         System.out.println("tpl:"+template);
-        System.out.println("rs:\n"+rs);
+        System.out.println("rs:\n"+rs);*/
 
+        String rs= StringUtil.number2VisualStringKvs(1024L*1024*1024*1024+128,true,0,"byte",1024,"kb",1024,"mb",1024,"gb");
+        System.out.println(rs);
+
+        rs=StringUtil.number2VisualStringKvs(16684452,true,0,"分",10,"角",10,"元",10,"百",10,"千",10,"万");
+        System.out.println(rs);
 
     }
 
