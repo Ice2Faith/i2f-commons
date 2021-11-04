@@ -2,12 +2,13 @@ package test;
 
 import i2f.commons.core.data.Pair;
 import i2f.commons.core.data.interfaces.IMap;
+import i2f.commons.core.utils.data.CalendarUtil;
 import i2f.commons.core.utils.data.ContainerUtil;
+import i2f.commons.core.utils.data.DateMeta;
 import i2f.commons.core.utils.generator.regex.RegexGenerator;
 import i2f.commons.core.utils.generator.regex.core.impl.IfGenerate;
 import i2f.commons.core.utils.generator.simple.IGeneratable;
 import i2f.commons.core.utils.generator.simple.impl.ForGenerator;
-import i2f.commons.core.utils.str.StringUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -57,12 +58,55 @@ public class TestPatten {
         System.out.println("tpl:"+template);
         System.out.println("rs:\n"+rs);*/
 
-        String rs= StringUtil.number2VisualStringKvs(1024L*1024*1024*1024+128,true,0,"byte",1024,"kb",1024,"mb",1024,"gb");
-        System.out.println(rs);
+//        String rs= StringUtil.toVsSizeByByte(66253476485L);
+//        System.out.println(rs);
+//
+//        rs=StringUtil.toVsCnYuanByFen(16684452578L);
+//        System.out.println(rs);
+//
+//        rs=StringUtil.toVsCnNum(16684452578L);
+//        System.out.println(rs);
+//
+//        rs=StringUtil.toVsCnDateByMilliSecond(69547886966L);
+//        System.out.println(rs);
 
-        rs=StringUtil.number2VisualStringKvs(16684452,true,0,"分",10,"角",10,"元",10,"百",10,"千",10,"万");
-        System.out.println(rs);
+        DateMeta date= CalendarUtil.getDate(1999,4,12);
+        System.out.println(date);
 
+        System.out.println("---------------");
+
+        DateMeta now=CalendarUtil.getDate(2021,1,31);
+        now=CalendarUtil.nextMonth(now);
+        System.out.println(now);
+        now=CalendarUtil.getDate(2020,3,31);
+        now=CalendarUtil.previousMonth(now);
+        System.out.println(now);
+
+        now=CalendarUtil.getDate(2023,2,28);
+        now=CalendarUtil.addYears(now,1);
+        System.out.println(now);
+
+        System.out.println("----------------");
+
+        now=CalendarUtil.inflateDate(2021,0,12);
+        System.out.println(now);
+
+        now=CalendarUtil.inflateDate(2021,4,-1);
+        System.out.println(now);
+
+        now=CalendarUtil.inflateDate(2021,2,29);
+        System.out.println(now);
+
+        System.out.println("----------------");
+
+        now=CalendarUtil.inflateDate(2021,11,4);
+        System.out.println(now);
+
+        now=CalendarUtil.inflateDate(2021,11,3);
+        System.out.println(now);
+
+        now=CalendarUtil.inflateDate(2021,11,5);
+        System.out.println(now);
     }
 
 

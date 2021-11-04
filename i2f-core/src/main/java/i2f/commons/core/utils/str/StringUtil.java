@@ -452,4 +452,41 @@ public class StringUtil {
         }
         return String.valueOf(num);
     }
+
+    /**
+     * 以分为单位的中国元转换为可视化串
+     * @param fen
+     * @return
+     */
+    public static String toVsCnYuanByFen(long fen){
+        return number2VisualStringKvs(fen,true,0,"分",10,"角",10,"元",10,"百",10,"千",10,"万",10,"十万",10,"百万",10,"千万",10,"亿",10,"十亿",10,"百亿",10,"千亿");
+    }
+
+    /**
+     * 以个为单位的计数转换为可视化串
+     * @param num
+     * @return
+     */
+    public static String toVsCnNum(long num){
+        return number2VisualStringKvs(num,true,0,"个",10,"十",10,"百",10,"千",10,"万",10,"十万",10,"百万",10,"千万",10,"亿",10,"十亿",10,"百亿",10,"千亿");
+    }
+
+    /**
+     * 以字节为单位的大小转换为可视化串
+     * @param bt
+     * @return
+     */
+    public static String toVsSizeByByte(long bt){
+        return number2VisualStringKvs(bt,true,0,"Byte",1024,"KB",1024,"MB",1024,"GB",1024,"TB");
+    }
+
+    /**
+     * 以毫秒为单位的时间转换为可视化串
+     * @param milliSecond
+     * @return
+     */
+    public static String toVsCnDateByMilliSecond(long milliSecond){
+        return number2VisualStringKvs(milliSecond,true,0,"毫秒",1000,"秒",60,"分",60,"时",24,"天");
+    }
+
 }
