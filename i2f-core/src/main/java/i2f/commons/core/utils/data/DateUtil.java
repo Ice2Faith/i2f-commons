@@ -61,6 +61,13 @@ public class DateUtil {
         SimpleDateFormat fmt=new SimpleDateFormat(patten);
         return fmt.format(date);
     }
+    public static String convertFormat(String date,String srcFmt,String dstFmt){
+        Date sdate=from(date,srcFmt);
+        if(sdate!=null){
+            return format(sdate,dstFmt);
+        }
+        return null;
+    }
     public static Date addMillSeconds(Date date,long millSeconds){
         long time=date.getTime();
         return new Date(time+millSeconds);
@@ -116,11 +123,19 @@ public class DateUtil {
         calendar.set(Calendar.DAY_OF_MONTH,1);
         return calendar.getTime();
     }
+    public static Date lastDayOfPreviousMonth(Date date){
+        Date ndate=firstDayOfMonth(date);
+        return addDays(ndate,-1);
+    }
+    public static Date firstDayOfNextMonth(Date date){
+        Date ndate=lastDayOfMonth(date);
+        return addDays(ndate,1);
+    }
     public static Date lastDayOfYear(Date date){
         Calendar calendar=Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.DAY_OF_MONTH,1);
-        calendar.set(Calendar.MONTH,1);
+        calendar.set(Calendar.MONTH,0);
         calendar.add(Calendar.YEAR,1);
         calendar.add(Calendar.DAY_OF_MONTH,-1);
         return calendar.getTime();
@@ -129,7 +144,7 @@ public class DateUtil {
         Calendar calendar=Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.DAY_OF_MONTH,1);
-        calendar.set(Calendar.MONTH,1);
+        calendar.set(Calendar.MONTH,0);
         return calendar.getTime();
     }
     public static Date add(Date date, int fieldOfCalendar,int amount){
@@ -143,6 +158,38 @@ public class DateUtil {
         calendar.setTime(date);
         calendar.set(fieldOfCalendar,value);
         return calendar.getTime();
+    }
+    public static int season(Date date){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        int mon=calendar.get(Calendar.MONTH);
+        return mon/3;
+    }
+    public static Date firstDayOfSeason(Date date){
+        int season=season(date);
+        int mon=season*3;
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH,1);
+        calendar.set(Calendar.MONTH,mon);
+        return calendar.getTime();
+    }
+    public static Date lastDayOfSeason(Date date){
+        int season=season(date);
+        int mon=season*3+2;
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH,1);
+        calendar.set(Calendar.MONTH,mon);
+        return calendar.getTime();
+    }
+    public static Date lastDayOfPreviousSeason(Date date){
+        Date sdate=firstDayOfSeason(date);
+        return addDays(sdate,-1);
+    }
+    public static Date firstDayOfNextSeason(Date date){
+        Date sdate=lastDayOfSeason(date);
+        return addDays(sdate,1);
     }
     public static long diff(Date date1,Date date2){
         return (date1.getTime()-date2.getTime());
@@ -224,3 +271,4 @@ public class DateUtil {
         return true;
     }
 }
+
