@@ -259,6 +259,95 @@ window.$url={
         let obj=this.getCurrentUrlParamsObj();
         return obj[name];
     },
+    /**
+     * 解析URL的各部分到对象中
+     * @param url
+     * @returns {{path: string, protocol: string, password: string, file: string, port: string, host: string, arguments: {}, tag: string, username: string}}
+     */
+    urlParse(url){
+        let ret={
+            protocol:'',
+            username:'',
+            password:'',
+            host:'',
+            port:'',
+            path:'',
+            file:'',
+            arguments:{},
+            tag:''
+        };
+        // URL标准定义： 协议：//用户名:密码@子域名.域名.顶级域名:端口号/目录/文件名.文件后缀?参数=值#标志
+        url=url+'';
+        let idx=url.indexOf("://");
+        if(idx>=0){
+            ret.protocol=url.substring(0,idx)+'://';
+            url=url.substring(idx+3);
+        }
+
+        let userHost='';
+        idx=url.indexOf("/");
+        if(idx>=0){
+            userHost=url.substring(0,idx);
+            url=url.substring(idx+1);
+        }
+
+        if(userHost!=''){
+            idx=userHost.indexOf('@');
+            if(idx>=0){
+                let userPassword=userHost.substring(0,idx);
+                userHost=userHost.substring(idx+1);
+                let userPassArr=userPassword.split(":",2);
+                let plen=userPassArr.length;
+                if(plen>=1){
+                    ret.username=userPassArr[0];
+                }
+                if(userPassArr.length>=2){
+                    ret.password=userPassArr[1];
+                }
+            }
+            let hostPortArr=userHost.split(":",2);
+            let plen=hostPortArr.length;
+            if(plen>=1){
+                ret.host=hostPortArr[0];
+            }
+            if(plen>=2){
+                ret.port=hostPortArr[1];
+            }
+        }
+
+        let pathFile='';
+        let urlParamStr='';
+        idx=url.indexOf("?");
+        if(idx>=0){
+            pathFile=url.substring(0,idx);
+            urlParamStr=url.substring(idx+1);
+        }
+
+        if(pathFile!=''){
+            idx=pathFile.lastIndexOf("/");
+            if(idx>=0){
+                ret.path='/'+pathFile.substring(0,idx);
+                ret.file=pathFile.substring(idx+1);
+            }else{
+                ret.file=pathFile;
+            }
+        }
+
+        let tagStr='';
+        if(urlParamStr!=''){
+            idx=urlParamStr.indexOf("#");
+            if(idx>=0){
+                tagStr=urlParamStr.substring(idx+1);
+                urlParamStr=urlParamStr.substring(0,idx);
+            }
+        }
+
+        ret.arguments=this.getUrlParamsObj('?'+urlParamStr);
+        ret.tag=tagStr;
+
+
+        return ret;
+    },
 }
 
 /**
