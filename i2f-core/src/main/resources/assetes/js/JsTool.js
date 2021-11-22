@@ -149,6 +149,122 @@ window.$chk = {
 
 }
 
+/**
+ * 转换工具
+ * @type {{}}
+ */
+window.$cvt={
+    null2(obj,repVal){
+        if($chk.isNull(obj)){
+            return repVal;
+        }
+        return obj;
+    },
+    undefined2(obj,repVal){
+        if($chk.isUndefined(obj)){
+            return repVal;
+        }
+        return obj;
+    },
+    empty2(obj,repVal){
+        if($chk.isEmpty(obj)){
+            return repVal;
+        }
+        return obj;
+    },
+    blank2(obj,repVal){
+        if($chk.isBlank(obj)){
+            return repVal;
+        }
+        return obj;
+    }
+}
+
+window.$url={
+    encode(str){
+        if($chk.isBlank(str)){
+            return "";
+        }
+        return encodeURI(str);
+    },
+    decode(str){
+        if($chk.isBlank(str)){
+            return "";
+        }
+        return decodeURI(str);
+    },
+    stringifyUrlParams(param){
+        let _this=this;
+        let ret='';
+        $obj.each(param,function(val,key,obj){
+           ret+='&';
+           ret+=key;
+           ret+='=';
+           ret+=_this.encode(val+'');
+        });
+        if(ret.length>0){
+            ret=ret.substring(1);
+        }
+        return ret;
+    },
+    buildUrl(url,param){
+        url=url+'';
+        let pstr=this.stringifyUrlParams(param);
+        if(url.indexOf('?')){
+            if(url.endsWith('&')){
+                return url+pstr;
+            }else{
+                return url+'&'+pstr;
+            }
+        }else{
+            return url+'?'+pstr;
+        }
+    },
+    linkUrl(baseUrl,url){
+        baseUrl=baseUrl+'';
+        if(baseUrl.endsWith('/')){
+            return baseUrl+url;
+        }else{
+            return baseUrl+'/'+url;
+        }
+    },
+    getUrlParamsObj(url){
+        url=url+'';
+        let ret={};
+        let idx=url.indexOf('?');
+        if(idx<0){
+            return ret;
+        }
+
+        let pstr=url.substring(idx+1);
+        let parr=pstr.split('&');
+        for(let i=0;i<parr.length;i++){
+            let item=parr[i];
+            let iarr=item.split('=',2);
+            if(iarr.length==2){
+                ret[iarr[0]]=this.decode(iarr[1]);
+            }
+        }
+        return ret;
+    },
+    getUrlParam(url,name){
+        let obj=this.getUrlParamsObj(url);
+        return obj[name];
+    },
+    getCurrentUrlParamsObj(){
+        let url=window.location.href;
+        return this.getUrlParamsObj(url);
+    },
+    getCurrentUrlParam(name){
+        let obj=this.getCurrentUrlParamsObj();
+        return obj[name];
+    },
+}
+
+/**
+ * 存储工具
+ * @type {{localGet(*=): string | null, sessionSetAsJson(*=, *=): *, sessionGetWithJson(*=): any, sessionSet(*=, *=): void, localSetAsJson(*=, *=): *, localClean(*=): void, sessionClean(*=): void, localSet(*=, *=): void, sessionGet(*=): string | null, localGetWithJson(*=): any}}
+ */
 window.$store = {
     localSet(key, val) {
         return localStorage.setItem(key, val);
@@ -182,6 +298,10 @@ window.$store = {
     },
 }
 
+/**
+ * 日期工具
+ * @type {{nextMonday(*=): *, formatDate(*=, *=): string, firstDayOfYear(*=): *, convertDateFmt(*=, *=, *=): string, lastDayOfPreviousMonth(*=): *, addSecond(*, *): *, addMonth(*, *): *, toDateObj(*=): {month: number, hour: number, year: number, millisecond: number, day: number, minute: number, second: number}, addDay(*, *): *, isLegalDate(*=, *=, *): boolean, daysOnMonth(*=, *): number, mondayOfDate(*=): *, convertSupportDateFmt(*=, *=): string, sundayOfDate(*=): *, supportAutoParseDatePattens(): ({patten: RegExp, fmt: string})[], parseDateObj(*=): Date, addHour(*, *): *, addMinute(*, *): *, firstDayOfNextMonth(*=): *, firstDayOfMonth(*=): *, isLeapYear(*): boolean, isSupportAutoParse(*=): boolean, lastDayOfMonth(*=): *, previousSunday(*=): *, addYear(*, *): *, daysOnYear(*=): number, parseDate(*, *=): Date, fromStr(*=, *=): (Date), addMillSecond(*, *): *, lastDayOfYear(*=): *}}
+ */
 window.$date = {
     /**
      * 是否闰年
@@ -597,6 +717,10 @@ window.$date = {
     },
 }
 
+/**
+ * 字符串工具
+ * @type {{toCamel(*): string, toInt(*=, *=): number, parseJson(*=): any, trunc(*=, *=): (*|string), toBoolean(*): boolean, paddingString(*, *=, *, *=): string, toFloat(*=): number, format(*=, *, *=): *, firstUpper(*): (*), toPascal(*): string, firstLower(*): (*), replaceAll(*, *=, *): string}}
+ */
 window.$str = {
     toInt(str, radix = 10) {
         return parseInt(str, radix);
@@ -843,6 +967,10 @@ window.$str = {
     }
 }
 
+/**
+ * JSON工具
+ * @type {{toJson(*=): string, parseJson(*=): any}}
+ */
 window.$json = {
     toJson(obj) {
         return JSON.stringify(obj);
@@ -852,6 +980,10 @@ window.$json = {
     }
 }
 
+/**
+ * 数组工具
+ * @type {{appearCount(*=, *=): *[], max(*=, *=): (null|*), dequeue(*=): (null|*), sort(*=, *=, *=): (*), remove(*=, *=): (*), push(*=, *=): (*), each(*=, *=): (*|undefined), pop(*=): (null|*), filter(*=, *=): (*), enqueue(*=, *=): *, min(*=, *=): (null|*), top(*=): (null|*), unique(*=, *=): (*), shuffle(*=, *=): (*), indexOf(*=, *=, *=): (*|number), map(*=, *=): (*), first(*=): (null|*), combine(*, *): *}}
+ */
 window.$arr = {
     indexOf(arr, elem, comparator = $interface.comparator) {
         if (!$chk.isArray(arr)) {
@@ -1083,11 +1215,14 @@ window.$arr = {
     }
 }
 
+/**
+ * 对象工具
+ * @type {{toJson(*=): string, copyObj2(*=, *=): *, methods(*): [], copyObj(*=, *): ({}|*), deepVal(*, *=): (*), copyArr(*, *, *): [], fields(*): [], emptyObj(*=, *=): (*), each(*=, *=): (undefined)}}
+ */
 window.$obj = {
     toJson(obj) {
         return JSON.stringify(obj);
     },
-
     fields(obj) {
         let arr = [];
         for (let key in obj) {
@@ -1106,6 +1241,20 @@ window.$obj = {
             }
         }
         return arr;
+    },
+    each(obj,executor){
+        if($chk.isEmpty(obj)){
+            return ;
+        }
+        if($chk.isEmpty(executor)){
+            return ;
+        }
+        for (let key in obj) {
+            if (obj[key] instanceof Function) {
+                continue;
+            }
+            executor(obj[key],key,obj);
+        }
     },
     /**
      * 深层次获取值，找不到不报错
@@ -1211,8 +1360,21 @@ window.$obj = {
         }
         return ret;
     },
+    /**
+     * 深拷贝
+     * @param obj
+     * @returns {any}
+     */
+    deepCopy(obj){
+        let js=JSON.stringify(obj);
+        return JSON.parse(js);
+    }
 }
 
+/**
+ * DOM工具
+ * @type {{registerScaleFullPage(*=, *=, *=): void, scaleFixedCenterElem(*=, *, *): void, reloadJs(*=, *): void, dom(*=): any, scalePage(*=, *, *): {ratioX: number, ratioY: number}, locationTo(*, *=): void, style(*, *): *, reloadCss(*=, *): void, registerOnElementChange(*, *=, *=, *=, *=): void, resetTitle(*): void, remove(*): *}}
+ */
 window.$dom = {
     remove(dom) {
         let parent = dom.parentNode;
@@ -1363,4 +1525,6 @@ window.$dom = {
     }
 
 }
+
+
 
