@@ -1053,6 +1053,34 @@ window.$str = {
         }
 
         return ret;
+    },
+    /**
+     * 数据脱敏，开头保持多少位，结束保持多少位，总长度多少位
+     * @param str
+     * @param keepStartLen
+     * @param keepEndLen
+     * @param maxLen
+     */
+    hideSensibleInfo(str,keepStartLen,keepEndLen=0,maxLen=-1){
+        if($chk.isBlank(str)){
+            return str;
+        }
+        str=str+'';
+        let start=str.substring(0,keepStartLen);
+        let end=str.substring(str.length-keepEndLen);
+        let mid=str.substring(keepStartLen,str.length-keepEndLen);
+        if(maxLen>=0){
+            let llen=maxLen-keepStartLen-keepEndLen;
+            if(llen>=0){
+                mid=mid.substring(0,llen);
+            }
+        }
+        let mlen=mid.length;
+        mid='';
+        for(let i=0;i<mlen;i++){
+            mid+='*';
+        }
+        return start+mid+end;
     }
 }
 
@@ -1611,6 +1639,22 @@ window.$dom = {
         document.getElementsByTagName("body")[0].appendChild(scriptObj);
         scriptObj.click();
         document.getElementsByTagName("body")[0].removeChild(scriptObj);
+    },
+
+    selectFile(callback,accept='*.*'){
+        let id='tmpSelectFileForTagInputFile';
+
+        var scriptObj = document.createElement("input");
+        scriptObj.type = 'file';
+        scriptObj.accept = accept;
+        scriptObj.id = id;
+        document.getElementsByTagName("body")[0].appendChild(scriptObj);
+        scriptObj.click();
+
+        scriptObj.onchange=function(event){
+            callback(this.files[0],event,this.files,this);
+            document.getElementsByTagName("body")[0].removeChild(scriptObj);
+        }
     }
 
 }
