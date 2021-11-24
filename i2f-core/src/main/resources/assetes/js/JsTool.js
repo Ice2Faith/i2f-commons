@@ -1687,6 +1687,12 @@ window.$canvas={
       p2.x=maxX;
       p2.y=maxY;
     },
+    middlePoint(p1,p2){
+      return {
+            x:(p1.x+p2.x)/2,
+            y:(p1.y+p2.y)/2,
+      }
+    },
     size2d(x1,y1,x2,y2){
       return {
           width:Math.abs(x2-x1),
@@ -1695,6 +1701,147 @@ window.$canvas={
     },
     sizePoint(p1,p2){
       return this.size2d(p1.x,p1.y,p2.x,p2.y);
+    },
+    drawLine(dc2d,p1,p2){
+        dc2d.beginPath();
+        dc2d.moveTo(p1.x,p1.y);
+        dc2d.lineTo(p2.x,p2.y);
+        dc2d.stroke();
+    },
+    drawRect(dc2d,p1,p2){
+        let pointBegin=$canvas.point2d(p1.x,p1.y);
+        let pointEnd=$canvas.point2d(p2.x,p2.y);
+        $canvas.regularPoint(pointBegin,pointEnd);
+        let psize=$canvas.sizePoint(pointBegin,pointEnd);
+        dc2d.strokeRect(pointBegin.x,pointBegin.y,psize.width,psize.height);
+    },
+    drawFillRect(dc2d,p1,p2){
+        let pointBegin=$canvas.point2d(p1.x,p1.y);
+        let pointEnd=$canvas.point2d(p2.x,p2.y);
+        $canvas.regularPoint(pointBegin,pointEnd);
+        let psize=$canvas.sizePoint(pointBegin,pointEnd);
+
+        dc2d.fillRect(pointBegin.x,pointBegin.y,psize.width,psize.height);
+    },
+    drawCircle(dc2d,p,radius){
+        dc2d.beginPath();
+        dc2d.arc(p.x,p.y,radius,0,2*Math.PI,false);
+        dc2d.stroke();
+        dc2d.closePath();
+    },
+    drawFillCircle(dc2d,p,radius){
+        dc2d.beginPath();
+        dc2d.arc(p.x,p.y,dis,0,2*Math.PI,false);
+        // dc2d.stroke();
+        dc2d.closePath();
+        dc2d.fill();
+    },
+    drawEllipse(dc2d,p1,p2){
+        let beginPoint=$canvas.point2d(p1.x,p1.y);
+        let endPoint=$canvas.point2d(p2.x,p2.y);
+        $canvas.regularPoint(beginPoint,endPoint);
+        let psize=$canvas.sizePoint(beginPoint,endPoint);
+        let p=$canvas.middlePoint(beginPoint,endPoint);
+        let radiusX=psize.width/2;
+        let radiusY=psize.height/2;
+        dc2d.save();
+        let radius=Math.max(radiusX,radiusY);
+        let ratioX=radiusX/radius;
+        let ratioY=radiusY/radius;
+        dc2d.scale(ratioX,ratioY);
+        dc2d.beginPath();
+        dc2d.moveTo((p.x+radiusX)/ratioX,p.y/ratioY);
+        dc2d.arc(p.x/ratioX,p.y/ratioY,radius,0,2*Math.PI,true);
+        dc2d.closePath();
+        dc2d.stroke();
+        dc2d.restore();
+    },
+    drawFillEllipse(dc2d,p1,p2){
+        let beginPoint=$canvas.point2d(p1.x,p1.y);
+        let endPoint=$canvas.point2d(p2.x,p2.y);
+        $canvas.regularPoint(beginPoint,endPoint);
+        let psize=$canvas.sizePoint(beginPoint,endPoint);
+        let p=$canvas.middlePoint(beginPoint,endPoint);
+        let radiusX=psize.width/2;
+        let radiusY=psize.height/2;
+        dc2d.save();
+        let radius=Math.max(radiusX,radiusY);
+        let ratioX=radiusX/radius;
+        let ratioY=radiusY/radius;
+        dc2d.scale(ratioX,ratioY);
+        dc2d.beginPath();
+        dc2d.moveTo((p.x+radiusX)/ratioX,p.y/ratioY);
+        dc2d.arc(p.x/ratioX,p.y/ratioY,radius,0,2*Math.PI,true);
+        // dc2d.stroke();
+        dc2d.closePath();
+        dc2d.fill();
+        dc2d.restore();
+    },
+    drawRoundRect(dc2d,p1,p2,radius){
+        let beginPoint=$canvas.point2d(p1.x,p1.y);
+        let endPoint=$canvas.point2d(p2.x,p2.y);
+        let psize=$canvas.sizePoint(beginPoint,endPoint);
+        if(!radius){
+            radius=Math.min(psize.width,psize.height)*1/5;
+        }
+        if(radius*2>Math.min(psize.width,psize.height)){
+            radius=Math.min(psize.width,psize.height)/2;
+        }
+        dc2d.beginPath();
+        dc2d.moveTo(beginPoint.x+radius,beginPoint.y);
+        dc2d.arcTo(beginPoint.x+psize.width,beginPoint.y,beginPoint.x+psize.width,beginPoint.y+psize.height,radius);
+        dc2d.arcTo(beginPoint.x+psize.width,beginPoint.y+psize.height,beginPoint.x,beginPoint.y+psize.height,radius);
+        dc2d.arcTo(beginPoint.x,beginPoint.y+psize.height,beginPoint.x,beginPoint.y,radius);
+        dc2d.arcTo(beginPoint.x,beginPoint.y,beginPoint.x+psize.width,beginPoint.y,radius);
+        dc2d.stroke();
+        dc2d.closePath();
+    },
+    drawFillRoundRect(dc2d,p1,p2,radius){
+        let beginPoint=$canvas.point2d(p1.x,p1.y);
+        let endPoint=$canvas.point2d(p2.x,p2.y);
+        let psize=$canvas.sizePoint(beginPoint,endPoint);
+        if(!radius){
+            radius=Math.min(psize.width,psize.height)*1/5;
+        }
+        if(radius*2>Math.min(psize.width,psize.height)){
+            radius=Math.min(psize.width,psize.height)/2;
+        }
+        dc2d.beginPath();
+        dc2d.moveTo(beginPoint.x+radius,beginPoint.y);
+        dc2d.arcTo(beginPoint.x+psize.width,beginPoint.y,beginPoint.x+psize.width,beginPoint.y+psize.height,radius);
+        dc2d.arcTo(beginPoint.x+psize.width,beginPoint.y+psize.height,beginPoint.x,beginPoint.y+psize.height,radius);
+        dc2d.arcTo(beginPoint.x,beginPoint.y+psize.height,beginPoint.x,beginPoint.y,radius);
+        dc2d.arcTo(beginPoint.x,beginPoint.y,beginPoint.x+psize.width,beginPoint.y,radius);
+        // dc2d.stroke();
+        dc2d.closePath();
+        dc2d.fill();
+    },
+    drawPolygon(dc2d,pointArr){
+      if(!pointArr || pointArr.length==0){
+          return ;
+      }
+      dc2d.beginPath();
+      dc2d.moveTo(pointArr[0].x,pointArr[0].y);
+      for(let i=1;i<pointArr.length;i++){
+          dc2d.lineTo(pointArr[i].x,pointArr[i].y);
+      }
+      dc2d.lineTo(pointArr[0].x,pointArr[0].y);
+      dc2d.stroke();
+      dc2d.closePath();
+    },
+    drawFillPolygon(dc2d,pointArr){
+        if(!pointArr || pointArr.length==0){
+            return ;
+        }
+        dc2d.beginPath();
+        dc2d.moveTo(pointArr[0].x,pointArr[0].y);
+        for(let i=1;i<pointArr.length;i++){
+            dc2d.lineTo(pointArr[i].x,pointArr[i].y);
+        }
+        dc2d.lineTo(pointArr[0].x,pointArr[0].y);
+        // dc2d.stroke();
+        dc2d.closePath();
+        dc2d.fill();
     },
     initPainter(id,config){
         let defaultConfig={
@@ -1731,28 +1878,21 @@ window.$canvas={
         }
         const DrawTypes={
             NONE:'none',
+            CLEANER:'cleaner',
             LINE:'line',
             FREE_LINE:'free_line',
             RECT:'rect',
             FILL_RECT:'fill_rect',
             CIRCLE:'circle',
             FILL_CIRCLE:'fill_circle',
-        }
-        const StrokeStyles={
-            BLACK:'black',
-            RED:'red',
-            GREEN:'green',
-            BLUE:'blue',
-            WHITE:'white',
+            ELLIPSE:'ellipse',
+            FILL_ELLIPSE:'fill_ellipse',
+            ROUND_RECT:'round_rect',
+            FILL_ROUND_RECT:'fill_round_rect',
+            POLYGON:'polygon',
+            FILL_POLYGON:'fill_polygon',
         }
 
-        const FillStyles={
-            BLACK:'black',
-            RED:'red',
-            GREEN:'green',
-            BLUE:'blue',
-            WHITE:'white',
-        }
         const EventTypes={
             MOUSE_DOWN:'mousedown',
             MOUSE_UP:'mouseup',
@@ -1783,18 +1923,51 @@ window.$canvas={
 
         }
 
+
+
         let contextMenuDom=document.createElement('ul');
         contextMenuDom.id=id+'_contextmenu';
         contextMenuDom.style.position='absolute';
         contextMenuDom.style.display='none';
         contextMenuDom.style.zIndex=2000+dom.style.zIndex;
         contextMenuDom.style.border='solid 1px #eee';
-        contextMenuDom.style.background='#eee';
+        contextMenuDom.style.background='#eaeaeaaa';
+        contextMenuDom.style.padding='5px';
+        contextMenuDom.style.borderRadius='5px';
+        contextMenuDom.style.boxShadow='1px 2px 5px rgba(0,0,0,0.3)';
+        contextMenuDom.style
         dom.parentNode.appendChild(contextMenuDom);
 
+        let state={
+            drawType:DrawTypes.FREE_LINE,
+            strokeStyle:'black',
+            fillStyle:'black',
+            lineWidth:'1px',
+            isDrawing:false,
+            beginPoint:{
+                x:0,
+                y:0,
+            },
+            controlKey:0,
+            contextMenu:contextMenuDom,
+            points:[],
+        };
+
         let childFstDom=document.createElement('ul');
-        childFstDom.innerText='图形';
+        childFstDom.innerText='> 图形';
+        childFstDom.addEventListener('click',function(event){
+            let cdom=document.getElementById(id+'_contextmenu_graph_container');
+            if(cdom.style.display=='none'){
+                cdom.style.display='block';
+            }else{
+                cdom.style.display='none';
+            }
+        });
         contextMenuDom.appendChild(childFstDom);
+
+        let fstContainDom=document.createElement('div');
+        fstContainDom.id=id+'_contextmenu_graph_container';
+        childFstDom.appendChild(fstContainDom);
 
         let childSecDom=document.createElement('li');
         childSecDom.innerText='无';
@@ -1802,7 +1975,15 @@ window.$canvas={
            state.drawType=DrawTypes.NONE;
            state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='橡皮';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.CLEANER;
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='直线';
@@ -1810,7 +1991,7 @@ window.$canvas={
             state.drawType=DrawTypes.LINE;
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='曲线';
@@ -1818,7 +1999,7 @@ window.$canvas={
             state.drawType=DrawTypes.FREE_LINE;
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='矩形';
@@ -1826,7 +2007,7 @@ window.$canvas={
             state.drawType=DrawTypes.RECT;
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='填充矩形';
@@ -1834,7 +2015,23 @@ window.$canvas={
             state.drawType=DrawTypes.FILL_RECT;
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='圆角矩形';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.ROUND_RECT;
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='填充圆角矩形';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.FILL_ROUND_RECT;
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='圆形';
@@ -1842,7 +2039,7 @@ window.$canvas={
             state.drawType=DrawTypes.CIRCLE;
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='填充圆形';
@@ -1850,109 +2047,281 @@ window.$canvas={
             state.drawType=DrawTypes.FILL_CIRCLE;
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='椭圆形';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.ELLIPSE;
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='填充椭圆形';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.FILL_ELLIPSE;
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='多边形';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.POLYGON;
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='填充多边形';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.FILL_POLYGON;
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
 
 
         childFstDom=document.createElement('ul');
-        childFstDom.innerText='线颜色';
+        childFstDom.innerText='> 线颜色';
+        childFstDom.addEventListener('click',function(event){
+            let cdom=document.getElementById(id+'_contextmenu_line_color_container');
+            if(cdom.style.display=='none'){
+                cdom.style.display='block';
+            }else{
+                cdom.style.display='none';
+            }
+        });
         contextMenuDom.appendChild(childFstDom);
+
+        fstContainDom=document.createElement('div');
+        fstContainDom.id=id+'_contextmenu_line_color_container';
+        fstContainDom.style.display='none';
+        childFstDom.appendChild(fstContainDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='黑色';
+        childSecDom.style.borderBottom='solid 2px black';
         childSecDom.addEventListener('click',function(event){
-            state.strokeStyle=StrokeStyles.BLACK;
+            state.strokeStyle='black';
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='红色';
+        childSecDom.style.borderBottom='solid 2px red';
         childSecDom.addEventListener('click',function(event){
-            state.strokeStyle=StrokeStyles.RED;
+            state.strokeStyle='red';
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='橙红色';
+        childSecDom.style.borderBottom='solid 2px orangered';
+        childSecDom.addEventListener('click',function(event){
+            state.strokeStyle='orangered';
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='绿色';
+        childSecDom.style.borderBottom='solid 2px green';
         childSecDom.addEventListener('click',function(event){
-            state.strokeStyle=StrokeStyles.GREEN;
+            state.strokeStyle='green';
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='蓝色';
+        childSecDom.style.borderBottom='solid 2px blue';
         childSecDom.addEventListener('click',function(event){
-            state.strokeStyle=StrokeStyles.BLUE;
+            state.strokeStyle='blue';
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='白色';
+        childSecDom.style.borderBottom='solid 2px white';
         childSecDom.addEventListener('click',function(event){
-            state.strokeStyle=StrokeStyles.WHITE;
+            state.strokeStyle='white';
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childFstDom=document.createElement('ul');
-        childFstDom.innerText='填充颜色';
+        childFstDom.innerText='> 线粗度';
+        childFstDom.addEventListener('click',function(event){
+            let cdom=document.getElementById(id+'_contextmenu_line_width_container');
+            if(cdom.style.display=='none'){
+                cdom.style.display='block';
+            }else{
+                cdom.style.display='none';
+            }
+        });
         contextMenuDom.appendChild(childFstDom);
+
+        fstContainDom=document.createElement('div');
+        fstContainDom.id=id+'_contextmenu_line_width_container';
+        fstContainDom.style.display='none';
+        childFstDom.appendChild(fstContainDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='1px';
+        childSecDom.style.borderBottom='solid 1px black';
+        childSecDom.addEventListener('click',function(event){
+            state.lineWidth='1';
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='2px';
+        childSecDom.style.borderBottom='solid 2px black';
+        childSecDom.addEventListener('click',function(event){
+            state.lineWidth='2';
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='3px';
+        childSecDom.style.borderBottom='solid 3px black';
+        childSecDom.addEventListener('click',function(event){
+            state.lineWidth='3';
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='5px';
+        childSecDom.style.borderBottom='solid 5px black';
+        childSecDom.addEventListener('click',function(event){
+            state.lineWidth='5';
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='8px';
+        childSecDom.style.borderBottom='solid 8px black';
+        childSecDom.addEventListener('click',function(event){
+            state.lineWidth='8';
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='12px';
+        childSecDom.style.borderBottom='solid 12px black';
+        childSecDom.addEventListener('click',function(event){
+            state.lineWidth='12';
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='16px';
+        childSecDom.style.borderBottom='solid 16px black';
+        childSecDom.addEventListener('click',function(event){
+            state.lineWidth='16';
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='20px';
+        childSecDom.style.borderBottom='solid 20px black';
+        childSecDom.addEventListener('click',function(event){
+            state.lineWidth='20';
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
+
+
+
+        childFstDom=document.createElement('ul');
+        childFstDom.innerText='> 填充颜色';
+        childFstDom.addEventListener('click',function(event){
+            let cdom=document.getElementById(id+'_contextmenu_fill_color_container');
+            if(cdom.style.display=='none'){
+                cdom.style.display='block';
+            }else{
+                cdom.style.display='none';
+            }
+        });
+        contextMenuDom.appendChild(childFstDom);
+
+        fstContainDom=document.createElement('div');
+        fstContainDom.id=id+'_contextmenu_fill_color_container';
+        fstContainDom.style.display='none';
+        childFstDom.appendChild(fstContainDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='黑色';
+        childSecDom.style.background='black';
+        childSecDom.style.color='White';
         childSecDom.addEventListener('click',function(event){
-            state.fillStyle=FillStyles.BLACK;
+            state.fillStyle='black';
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='红色';
+        childSecDom.style.background='red';
+        childSecDom.style.color='White';
         childSecDom.addEventListener('click',function(event){
-            state.fillStyle=FillStyles.RED;
+            state.fillStyle='red';
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='橙红色';
+        childSecDom.style.background='orangered';
+        childSecDom.style.color='White';
+        childSecDom.addEventListener('click',function(event){
+            state.fillStyle='orangered';
+            state.contextMenu.style.display='none';
+        });
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='绿色';
+        childSecDom.style.background='green';
+        childSecDom.style.color='White';
         childSecDom.addEventListener('click',function(event){
-            state.fillStyle=FillStyles.GREEN;
+            state.fillStyle='green';
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='蓝色';
+        childSecDom.style.background='blue';
+        childSecDom.style.color='White';
         childSecDom.addEventListener('click',function(event){
-            state.fillStyle=FillStyles.BLUE;
+            state.fillStyle='blue';
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
         childSecDom=document.createElement('li');
         childSecDom.innerText='白色';
+        childSecDom.style.background='white';
+        childSecDom.style.color='Black';
         childSecDom.addEventListener('click',function(event){
-            state.fillStyle=FillStyles.WHITE;
+            state.fillStyle='white';
             state.contextMenu.style.display='none';
         });
-        childFstDom.appendChild(childSecDom);
+        fstContainDom.appendChild(childSecDom);
 
-        let state={
-            drawType:DrawTypes.FREE_LINE,
-            strokeStyle:StrokeStyles.BLACK,
-            fillStyle:FillStyles.BLACK,
-            isDrawing:false,
-            beginPoint:{
-                x:0,
-                y:0,
-            },
-            controlKey:0,
-            contextMenu:contextMenuDom
-        };
+
         let eventHandler=function(type,event){
             if(type==EventTypes.KEY_DOWN){
 
@@ -1960,77 +2329,126 @@ window.$canvas={
             if(type==EventTypes.KEY_UP){
 
             }
+            if(type==EventTypes.MOUSE_LEAVE){
+                state.isDrawing=false;
+            }
             if(type==EventTypes.MOUSE_DOWN){
                 state.isDrawing=true;
                 dc2d.strokeStyle=state.strokeStyle;
                 dc2d.fillStyle=state.fillStyle;
-                state.beginPoint.x=event.x;
-                state.beginPoint.y=event.y;
+                dc2d.lineWidth=state.lineWidth;
+                state.beginPoint.x=event.offsetX;
+                state.beginPoint.y=event.offsetY;
                 if(state.isDrawing && event.button==MouseButtons.LEFT){
                     if(state.drawType==DrawTypes.FREE_LINE){
                         dc2d.beginPath();
-                        dc2d.moveTo(event.x,event.y);
+                        dc2d.moveTo(event.offsetX,event.offsetY);
+                    }
+                    if(state.drawType==DrawTypes.CLEANER){
+                        let wid=parseInt(state.lineWidth);
+                        dc2d.clearRect(event.offsetX-1,event.offsetY-1,wid,wid);
                     }
                 }
             }
             if(type==EventTypes.MOUSE_MOVE){
                 if(state.isDrawing && event.button==MouseButtons.LEFT){
                     if(state.drawType==DrawTypes.FREE_LINE){
-                        dc2d.lineTo(event.x,event.y);
+                        dc2d.lineTo(event.offsetX,event.offsetY);
                         dc2d.stroke();
-                        dc2d.moveTo(event.x,event.y);
+                        dc2d.moveTo(event.offsetX,event.offsetY);
+                    }
+                    if(state.drawType==DrawTypes.CLEANER){
+                        let wid=parseInt(state.lineWidth);
+                        dc2d.clearRect(event.offsetX-1,event.offsetY-1,wid,wid);
                     }
                 }
 
             }
             if(type==EventTypes.MOUSE_UP){
                 console.log(type,event);
+                if(event.button==MouseButtons.LEFT){
+                    if(state.drawType==DrawTypes.POLYGON){
+                        let p=$canvas.point2d(event.offsetX,event.offsetY);
+                        state.points.push(p);
+                    }
+                    if(state.drawType==DrawTypes.FILL_POLYGON){
+                        let p=$canvas.point2d(event.offsetX,event.offsetY);
+                        state.points.push(p);
+                    }
+                }
                 if(event.button==MouseButtons.RIGHT){
                     state.contextMenu.style.display='none';
                     if(event.ctrlKey){
                         dc2d.clearRect(-1,-1,dom.clientWidth+2,dom.clientHeight+2);
                     }
-                    else /* if(event.altKey) */ {
+                    else if(event.altKey)  {
+                        if(state.drawType==DrawTypes.POLYGON){
+                            $canvas.drawPolygon(dc2d,state.points);
+                            state.points=[];
+                        }
+                        if(state.drawType==DrawTypes.FILL_POLYGON){
+                            $canvas.drawFillPolygon(dc2d,state.points);
+                            state.points=[];
+                        }
+                    }else{
                         console.log('contextMenuShow',event,state.contextMenu);
                         state.contextMenu.style.left=event.clientX+'px';
                         state.contextMenu.style.top=event.clientY+'px';
                         state.contextMenu.style.display='block';
                     }
+                }else{
+                    state.contextMenu.style.display='none';
                 }
                 if(state.isDrawing  && event.button==MouseButtons.LEFT){
                     if(state.drawType==DrawTypes.LINE){
-                        dc2d.beginPath();
-                        dc2d.moveTo(state.beginPoint.x,state.beginPoint.y);
-                        dc2d.lineTo(event.x,event.y);
-                        dc2d.stroke();
+                        let cp=$canvas.point2d(event.offsetX,event.offsetY);
+                        $canvas.drawLine(dc2d,state.beginPoint,cp);
                     }
                     if(state.drawType==DrawTypes.FREE_LINE){
-                        dc2d.lineTo(event.x,event.y);
+                        dc2d.lineTo(event.offsetX,event.offsetY);
                         dc2d.stroke();
                     }
                     if(state.drawType==DrawTypes.RECT){
                         let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
-                        let pointEnd=$canvas.point2d(event.x,event.y);
-                        $canvas.regularPoint(pointBegin,pointEnd);
-                        let psize=$canvas.sizePoint(pointBegin,pointEnd);
-
-                        dc2d.strokeRect(pointBegin.x,pointEnd.y,psize.width,psize.height);
+                        let pointEnd=$canvas.point2d(event.offsetX,event.offsetY);
+                        $canvas.drawRect(dc2d,pointBegin,pointEnd);
                     }
                     if(state.drawType==DrawTypes.FILL_RECT){
                         let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
-                        let pointEnd=$canvas.point2d(event.x,event.y);
-                        $canvas.regularPoint(pointBegin,pointEnd);
-                        let psize=$canvas.sizePoint(pointBegin,pointEnd);
-
-                        dc2d.fillRect(pointBegin.x,pointEnd.y,psize.width,psize.height);
+                        let pointEnd=$canvas.point2d(event.offsetX,event.offsetY);
+                        $canvas.drawFillRect(dc2d,pointBegin,pointEnd);
                     }
                     if(state.drawType==DrawTypes.CIRCLE){
-                        dc2d.beginPath();
                         let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
-                        let pointEnd=$canvas.point2d(event.x,event.y);
+                        let pointEnd=$canvas.point2d(event.offsetX,event.offsetY);
                         let dis=$canvas.distancePoint(pointBegin,pointEnd);
-                        dc2d.arc(state.beginPoint.x,state.beginPoint.y,dis,0,ConstValues.PIm2,false);
-                        dc2d.stroke();
+                        $canvas.drawCircle(dc2d,pointBegin,dis);
+                    }
+                    if(state.drawType==DrawTypes.FILL_CIRCLE){
+                        let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
+                        let pointEnd=$canvas.point2d(event.offsetX,event.offsetY);
+                        let dis=$canvas.distancePoint(pointBegin,pointEnd);
+                        $canvas.drawFillCircle(dc2d,pointBegin,dis);
+                    }
+                    if(state.drawType==DrawTypes.ELLIPSE){
+                        let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
+                        let pointEnd=$canvas.point2d(event.offsetX,event.offsetY);
+                        $canvas.drawEllipse(dc2d,pointBegin,pointEnd);
+                    }
+                    if(state.drawType==DrawTypes.FILL_ELLIPSE){
+                        let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
+                        let pointEnd=$canvas.point2d(event.offsetX,event.offsetY);
+                        $canvas.drawFillEllipse(dc2d,pointBegin,pointEnd);
+                    }
+                    if(state.drawType==DrawTypes.ROUND_RECT){
+                        let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
+                        let pointEnd=$canvas.point2d(event.offsetX,event.offsetY);
+                        $canvas.drawRoundRect(dc2d,pointBegin,pointEnd);
+                    }
+                    if(state.drawType==DrawTypes.FILL_ROUND_RECT){
+                        let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
+                        let pointEnd=$canvas.point2d(event.offsetX,event.offsetY);
+                        $canvas.drawFillRoundRect(dc2d,pointBegin,pointEnd);
                     }
                 }
                 state.isDrawing=false;
