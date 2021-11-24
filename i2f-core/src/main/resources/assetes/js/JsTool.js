@@ -1457,17 +1457,20 @@ window.$obj = {
         if (!srcObj) {
             return srcObj;
         }
-        let ret = dstObj;
-
-        for (let field in dstObj) {
-            for (let attr in srcObj) {
-                if (field == attr) {
-                    ret[field] = srcObj[field];
-                    break;
+        for(let dkey in dstObj){
+            if (dstObj[dkey] instanceof Function) {
+                continue;
+            }
+            for(let skey in srcObj){
+                if(srcObj[skey] instanceof Function){
+                    continue;
+                }
+                if(dkey==skey){
+                    dstObj[dkey]=srcObj[skey];
                 }
             }
         }
-        return ret;
+        return dstObj;
     },
     copyArr(arr, offset, len) {
         let arrLen = arr.length;
@@ -1659,5 +1662,413 @@ window.$dom = {
 
 }
 
+
+
+window.$canvas={
+    point2d(x,y){
+        return {
+            x:x,
+            y:y
+        };
+    },
+    distance(x1,y1,x2,y2){
+        return Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
+    },
+    distancePoint(p1,p2){
+      return this.distance(p1.x,p1.y,p2.x,p2.y);
+    },
+    regularPoint(p1,p2){
+      let minX=Math.min(p1.x,p2.x);
+      let minY=Math.min(p1.y,p2.y);
+      let maxX=Math.max(p1.x,p2.x);
+      let maxY=Math.max(p1.y,p2.y);
+      p1.x=minX;
+      p1.y=minY;
+      p2.x=maxX;
+      p2.y=maxY;
+    },
+    size2d(x1,y1,x2,y2){
+      return {
+          width:Math.abs(x2-x1),
+          height:Math.abs(y2-y1)
+      };
+    },
+    sizePoint(p1,p2){
+      return this.size2d(p1.x,p1.y,p2.x,p2.y);
+    },
+    initPainter(id,config){
+        let defaultConfig={
+            width:null,
+            height:null,
+            border:null,
+        };
+        $obj.copyObj2(config,defaultConfig);
+
+        let dom=document.getElementById(id);
+
+        if(defaultConfig.width){
+            dom.width=defaultConfig.width;
+            dom.style.width=defaultConfig.width;
+        }
+        if(defaultConfig.height){
+            dom.height=defaultConfig.width;
+            dom.style.height=defaultConfig.height;
+        }
+        if(defaultConfig.border){
+            dom.style.border=defaultConfig.border;
+        }
+
+        if(!dom.getContext){
+            console.error('not support!');
+            return ;
+        }
+        let dc2d=dom.getContext('2d');
+        const ConstValues={
+            PIm2:2*Math.PI,
+            PI:Math.PI,
+            PId2:Math.PI/2,
+            PI0:0,
+        }
+        const DrawTypes={
+            NONE:'none',
+            LINE:'line',
+            FREE_LINE:'free_line',
+            RECT:'rect',
+            FILL_RECT:'fill_rect',
+            CIRCLE:'circle',
+            FILL_CIRCLE:'fill_circle',
+        }
+        const StrokeStyles={
+            BLACK:'black',
+            RED:'red',
+            GREEN:'green',
+            BLUE:'blue',
+            WHITE:'white',
+        }
+
+        const FillStyles={
+            BLACK:'black',
+            RED:'red',
+            GREEN:'green',
+            BLUE:'blue',
+            WHITE:'white',
+        }
+        const EventTypes={
+            MOUSE_DOWN:'mousedown',
+            MOUSE_UP:'mouseup',
+            MOUSE_MOVE:'mousemove',
+            MOUSE_LEAVE:'mouseleave',
+            CLICK:'click',
+            DBL_CLICK:'dblclick',
+            KEY_DOWN:'keydown',
+            KEY_UP:'keyup',
+            CONTEXT_MENU:'contextmenu',
+        }
+        const MouseButtons={
+            LEFT:0,
+            MIDDLE:1,
+            RIGHT:2
+        }
+        const ControlKeyMap={
+            None:0,
+            Ctrl:1,
+            Shift:2,
+            Alt:4,
+
+        }
+        const ControlKeyCodes={
+            Ctrl:17,
+            Shift:16,
+            Alt:18,
+
+        }
+
+        let contextMenuDom=document.createElement('ul');
+        contextMenuDom.id=id+'_contextmenu';
+        contextMenuDom.style.position='absolute';
+        contextMenuDom.style.display='none';
+        contextMenuDom.style.zIndex=2000+dom.style.zIndex;
+        contextMenuDom.style.border='solid 1px #eee';
+        contextMenuDom.style.background='#eee';
+        dom.parentNode.appendChild(contextMenuDom);
+
+        let childFstDom=document.createElement('ul');
+        childFstDom.innerText='图形';
+        contextMenuDom.appendChild(childFstDom);
+
+        let childSecDom=document.createElement('li');
+        childSecDom.innerText='无';
+        childSecDom.addEventListener('click',function(event){
+           state.drawType=DrawTypes.NONE;
+           state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='直线';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.LINE;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='曲线';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.FREE_LINE;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='矩形';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.RECT;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='填充矩形';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.FILL_RECT;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='圆形';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.CIRCLE;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='填充圆形';
+        childSecDom.addEventListener('click',function(event){
+            state.drawType=DrawTypes.FILL_CIRCLE;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+
+        childFstDom=document.createElement('ul');
+        childFstDom.innerText='线颜色';
+        contextMenuDom.appendChild(childFstDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='黑色';
+        childSecDom.addEventListener('click',function(event){
+            state.strokeStyle=StrokeStyles.BLACK;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='红色';
+        childSecDom.addEventListener('click',function(event){
+            state.strokeStyle=StrokeStyles.RED;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='绿色';
+        childSecDom.addEventListener('click',function(event){
+            state.strokeStyle=StrokeStyles.GREEN;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='蓝色';
+        childSecDom.addEventListener('click',function(event){
+            state.strokeStyle=StrokeStyles.BLUE;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='白色';
+        childSecDom.addEventListener('click',function(event){
+            state.strokeStyle=StrokeStyles.WHITE;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childFstDom=document.createElement('ul');
+        childFstDom.innerText='填充颜色';
+        contextMenuDom.appendChild(childFstDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='黑色';
+        childSecDom.addEventListener('click',function(event){
+            state.fillStyle=FillStyles.BLACK;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='红色';
+        childSecDom.addEventListener('click',function(event){
+            state.fillStyle=FillStyles.RED;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='绿色';
+        childSecDom.addEventListener('click',function(event){
+            state.fillStyle=FillStyles.GREEN;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='蓝色';
+        childSecDom.addEventListener('click',function(event){
+            state.fillStyle=FillStyles.BLUE;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        childSecDom=document.createElement('li');
+        childSecDom.innerText='白色';
+        childSecDom.addEventListener('click',function(event){
+            state.fillStyle=FillStyles.WHITE;
+            state.contextMenu.style.display='none';
+        });
+        childFstDom.appendChild(childSecDom);
+
+        let state={
+            drawType:DrawTypes.FREE_LINE,
+            strokeStyle:StrokeStyles.BLACK,
+            fillStyle:FillStyles.BLACK,
+            isDrawing:false,
+            beginPoint:{
+                x:0,
+                y:0,
+            },
+            controlKey:0,
+            contextMenu:contextMenuDom
+        };
+        let eventHandler=function(type,event){
+            if(type==EventTypes.KEY_DOWN){
+
+            }
+            if(type==EventTypes.KEY_UP){
+
+            }
+            if(type==EventTypes.MOUSE_DOWN){
+                state.isDrawing=true;
+                dc2d.strokeStyle=state.strokeStyle;
+                dc2d.fillStyle=state.fillStyle;
+                state.beginPoint.x=event.x;
+                state.beginPoint.y=event.y;
+                if(state.isDrawing && event.button==MouseButtons.LEFT){
+                    if(state.drawType==DrawTypes.FREE_LINE){
+                        dc2d.beginPath();
+                        dc2d.moveTo(event.x,event.y);
+                    }
+                }
+            }
+            if(type==EventTypes.MOUSE_MOVE){
+                if(state.isDrawing && event.button==MouseButtons.LEFT){
+                    if(state.drawType==DrawTypes.FREE_LINE){
+                        dc2d.lineTo(event.x,event.y);
+                        dc2d.stroke();
+                        dc2d.moveTo(event.x,event.y);
+                    }
+                }
+
+            }
+            if(type==EventTypes.MOUSE_UP){
+                console.log(type,event);
+                if(event.button==MouseButtons.RIGHT){
+                    state.contextMenu.style.display='none';
+                    if(event.ctrlKey){
+                        dc2d.clearRect(-1,-1,dom.clientWidth+2,dom.clientHeight+2);
+                    }
+                    else /* if(event.altKey) */ {
+                        console.log('contextMenuShow',event,state.contextMenu);
+                        state.contextMenu.style.left=event.clientX+'px';
+                        state.contextMenu.style.top=event.clientY+'px';
+                        state.contextMenu.style.display='block';
+                    }
+                }
+                if(state.isDrawing  && event.button==MouseButtons.LEFT){
+                    if(state.drawType==DrawTypes.LINE){
+                        dc2d.beginPath();
+                        dc2d.moveTo(state.beginPoint.x,state.beginPoint.y);
+                        dc2d.lineTo(event.x,event.y);
+                        dc2d.stroke();
+                    }
+                    if(state.drawType==DrawTypes.FREE_LINE){
+                        dc2d.lineTo(event.x,event.y);
+                        dc2d.stroke();
+                    }
+                    if(state.drawType==DrawTypes.RECT){
+                        let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
+                        let pointEnd=$canvas.point2d(event.x,event.y);
+                        $canvas.regularPoint(pointBegin,pointEnd);
+                        let psize=$canvas.sizePoint(pointBegin,pointEnd);
+
+                        dc2d.strokeRect(pointBegin.x,pointEnd.y,psize.width,psize.height);
+                    }
+                    if(state.drawType==DrawTypes.FILL_RECT){
+                        let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
+                        let pointEnd=$canvas.point2d(event.x,event.y);
+                        $canvas.regularPoint(pointBegin,pointEnd);
+                        let psize=$canvas.sizePoint(pointBegin,pointEnd);
+
+                        dc2d.fillRect(pointBegin.x,pointEnd.y,psize.width,psize.height);
+                    }
+                    if(state.drawType==DrawTypes.CIRCLE){
+                        dc2d.beginPath();
+                        let pointBegin=$canvas.point2d(state.beginPoint.x,state.beginPoint.y);
+                        let pointEnd=$canvas.point2d(event.x,event.y);
+                        let dis=$canvas.distancePoint(pointBegin,pointEnd);
+                        dc2d.arc(state.beginPoint.x,state.beginPoint.y,dis,0,ConstValues.PIm2,false);
+                        dc2d.stroke();
+                    }
+                }
+                state.isDrawing=false;
+            }
+        }
+
+        dom.addEventListener(EventTypes.MOUSE_DOWN, event => {
+            eventHandler(EventTypes.MOUSE_DOWN,event);
+        });
+
+        dom.addEventListener(EventTypes.MOUSE_UP, event => {
+            eventHandler(EventTypes.MOUSE_UP,event);
+        });
+
+        dom.addEventListener(EventTypes.MOUSE_MOVE, event => {
+            eventHandler(EventTypes.MOUSE_MOVE,event);
+        });
+
+        dom.addEventListener(EventTypes.MOUSE_LEAVE, event => {
+            eventHandler(EventTypes.MOUSE_LEAVE,event);
+        });
+        dom.addEventListener(EventTypes.CLICK, event => {
+            eventHandler(EventTypes.CLICK,event);
+        });
+        dom.addEventListener(EventTypes.DBL_CLICK, event => {
+            eventHandler(EventTypes.DBL_CLICK,event);
+        });
+        dom.addEventListener(EventTypes.KEY_DOWN, event => {
+            eventHandler(EventTypes.KEY_DOWN,event);
+        });
+        dom.addEventListener(EventTypes.KEY_UP, event => {
+            eventHandler(EventTypes.KEY_UP,event);
+        });
+        dom.addEventListener(EventTypes.CONTEXT_MENU, event => {
+            event.preventDefault();
+            eventHandler(EventTypes.CONTEXT_MENU,event);
+        });
+    }
+}
 
 
