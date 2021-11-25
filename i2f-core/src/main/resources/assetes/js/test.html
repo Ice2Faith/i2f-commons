@@ -7,12 +7,11 @@
 </head>
 <body style="padding: 20px">
     <div id="app">
-        <div style="height: 30px;width: 60px;background: #eee;">画板</div>
+        <div id="click" style="height: 30px;width: 60px;background: #eee;">画板</div>
         <canvas id="painter">
             你的浏览器不支持Canvas
         </canvas>
     </div>
-
 </body>
 <script>
     $canvas.initPainter('painter',{
@@ -25,7 +24,7 @@
         velSpace:20,
         horSpace: 60,
         fontSize:12,
-        rotate:-30/180*Math.PI,
+        rotate:-30,
     });
 </script>
 </html>
