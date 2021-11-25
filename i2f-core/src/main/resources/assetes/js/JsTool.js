@@ -1702,6 +1702,31 @@ window.$canvas={
     sizePoint(p1,p2){
       return this.size2d(p1.x,p1.y,p2.x,p2.y);
     },
+    dataUrl2File(dataUrl,fileName){
+        let arr=dataUrl.split(',');
+        let mime=arr[0].match(/:(.*?);/)[1];
+        let bstr=atob(arr[1]);
+        let len=bstr.length;
+        let u8arr=new Uint8Array(len);
+        while(len--){
+            u8arr[len]=bstr.charCodeAt(len);
+        }
+        return new File([u8arr],fileName,{type:mime});
+    },
+    dc2d2File(dc2dDom,fileName,mime='image/png'){
+      let dataUrl=dc2dDom.toDataURL(mime);
+      return $canvas.dataUrl2File(dataUrl,fileName);
+    },
+    downloadDc2d(dc2dDom,fileName,mime='image/png'){
+        let dataUrl=dc2dDom.toDataURL(mime);
+        let dom=document.createElement('a');
+        dom.download=fileName;
+        dom.href=dataUrl;
+        dom.target='_self';
+        document.body.appendChild(dom);
+        dom.click();
+        document.body.removeChild(dom);
+    },
     drawLine(dc2d,p1,p2){
         dc2d.beginPath();
         dc2d.moveTo(p1.x,p1.y);
@@ -1858,7 +1883,7 @@ window.$canvas={
             dom.style.width=defaultConfig.width;
         }
         if(defaultConfig.height){
-            dom.height=defaultConfig.width;
+            dom.height=defaultConfig.height;
             dom.style.height=defaultConfig.height;
         }
         if(defaultConfig.border){
@@ -1870,6 +1895,7 @@ window.$canvas={
             return ;
         }
         let dc2d=dom.getContext('2d');
+
         const ConstValues={
             PIm2:2*Math.PI,
             PI:Math.PI,
@@ -1923,8 +1949,6 @@ window.$canvas={
 
         }
 
-
-
         let contextMenuDom=document.createElement('ul');
         contextMenuDom.id=id+'_contextmenu';
         contextMenuDom.style.position='absolute';
@@ -1935,7 +1959,8 @@ window.$canvas={
         contextMenuDom.style.padding='5px';
         contextMenuDom.style.borderRadius='5px';
         contextMenuDom.style.boxShadow='1px 2px 5px rgba(0,0,0,0.3)';
-        contextMenuDom.style
+        contextMenuDom.style.maxHeight='360px';
+        contextMenuDom.style.overflowY='auto';
         dom.parentNode.appendChild(contextMenuDom);
 
         let state={
@@ -1953,7 +1978,95 @@ window.$canvas={
             points:[],
         };
 
+        let graphicsMenuItems=[
+            {
+                text:'无',
+                value:{
+                    drawType:DrawTypes.NONE,
+                }
+            },
+            {
+                text:'橡皮',
+                value:{
+                    drawType:DrawTypes.CLEANER,
+                }
+            },
+            {
+                text:'直线',
+                value:{
+                    drawType:DrawTypes.LINE,
+                }
+            },
+            {
+                text:'曲线',
+                value:{
+                    drawType:DrawTypes.FREE_LINE,
+                }
+            },
+            {
+                text:'矩形',
+                value:{
+                    drawType:DrawTypes.RECT,
+                }
+            },
+            {
+                text:'填充矩形',
+                value:{
+                    drawType:DrawTypes.FILL_RECT,
+                }
+            },
+            {
+                text:'圆角矩形',
+                value:{
+                    drawType:DrawTypes.ROUND_RECT,
+                }
+            },
+            {
+                text:'填充圆角矩形',
+                value:{
+                    drawType:DrawTypes.FILL_ROUND_RECT,
+                }
+            },
+            {
+                text:'圆形',
+                value:{
+                    drawType:DrawTypes.CIRCLE,
+                }
+            },
+            {
+                text:'填充圆形',
+                value:{
+                    drawType:DrawTypes.FILL_CIRCLE,
+                }
+            },
+            {
+                text:'椭圆形',
+                value:{
+                    drawType:DrawTypes.ELLIPSE,
+                }
+            },
+            {
+                text:'填充椭圆形',
+                value:{
+                    drawType:DrawTypes.FILL_ELLIPSE,
+                }
+            },
+            {
+                text:'多边形',
+                value:{
+                    drawType:DrawTypes.POLYGON,
+                }
+            },
+            {
+                text:'填充多边形',
+                value:{
+                    drawType:DrawTypes.FILL_POLYGON,
+                }
+            },
+        ];
+
         let childFstDom=document.createElement('ul');
+        childFstDom.style.listStyle='none';
         childFstDom.innerText='> 图形';
         childFstDom.addEventListener('click',function(event){
             let cdom=document.getElementById(id+'_contextmenu_graph_container');
@@ -1969,120 +2082,67 @@ window.$canvas={
         fstContainDom.id=id+'_contextmenu_graph_container';
         childFstDom.appendChild(fstContainDom);
 
-        let childSecDom=document.createElement('li');
-        childSecDom.innerText='无';
-        childSecDom.addEventListener('click',function(event){
-           state.drawType=DrawTypes.NONE;
-           state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
+        for (let i = 0; i < graphicsMenuItems.length; i++) {
+            let item=graphicsMenuItems[i];
+            let childSecDom=document.createElement('li');
+            childSecDom.innerText=item.text;
+            childSecDom.addEventListener('click',function(event){
+                state.drawType=item.value.drawType;
+                state.contextMenu.style.display='none';
+            });
+            childSecDom.addEventListener('mouseover',function(event){
+                event.target.style.borderLeft='solid 2px orangered';
+                event.target.style.paddingLeft='4px';
+            });
+            childSecDom.addEventListener('mouseleave',function(event){
+                event.target.style.borderLeft='none';
+                event.target.style.paddingLeft='0';
+            });
+            fstContainDom.appendChild(childSecDom);
+        }
 
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='橡皮';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.CLEANER;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
 
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='直线';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.LINE;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='曲线';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.FREE_LINE;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='矩形';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.RECT;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='填充矩形';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.FILL_RECT;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='圆角矩形';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.ROUND_RECT;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='填充圆角矩形';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.FILL_ROUND_RECT;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='圆形';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.CIRCLE;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='填充圆形';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.FILL_CIRCLE;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='椭圆形';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.ELLIPSE;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='填充椭圆形';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.FILL_ELLIPSE;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='多边形';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.POLYGON;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='填充多边形';
-        childSecDom.addEventListener('click',function(event){
-            state.drawType=DrawTypes.FILL_POLYGON;
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
+        let lineColorMenuItems=[
+            {
+                text:'黑色',
+                value:{
+                    strokeStyle:'black',
+                }
+            },
+            {
+                text:'红色',
+                value:{
+                    strokeStyle:'red',
+                }
+            },
+            {
+                text:'橙红色',
+                value:{
+                    strokeStyle:'orangered',
+                }
+            },
+            {
+                text:'绿色',
+                value:{
+                    strokeStyle:'green',
+                }
+            },
+            {
+                text:'蓝色',
+                value:{
+                    strokeStyle:'blue',
+                }
+            },
+            {
+                text:'白色',
+                value:{
+                    strokeStyle:'white',
+                }
+            },
+        ];
 
         childFstDom=document.createElement('ul');
+        childFstDom.style.listStyle='none';
         childFstDom.innerText='> 线颜色';
         childFstDom.addEventListener('click',function(event){
             let cdom=document.getElementById(id+'_contextmenu_line_color_container');
@@ -2099,61 +2159,80 @@ window.$canvas={
         fstContainDom.style.display='none';
         childFstDom.appendChild(fstContainDom);
 
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='黑色';
-        childSecDom.style.borderBottom='solid 2px black';
-        childSecDom.addEventListener('click',function(event){
-            state.strokeStyle='black';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
+        for (let i = 0; i < lineColorMenuItems.length; i++) {
+            let item=lineColorMenuItems[i];
+            let childSecDom=document.createElement('li');
+            childSecDom.innerText=item.text;
+            childSecDom.style.borderBottom='solid 2px '+item.value.strokeStyle;
+            childSecDom.addEventListener('click',function(event){
+                state.strokeStyle=item.value.strokeStyle;
+                state.contextMenu.style.display='none';
+            });
+            childSecDom.addEventListener('mouseover',function(event){
+                event.target.style.borderLeft='solid 2px orangered';
+                event.target.style.paddingLeft='4px';
+            });
+            childSecDom.addEventListener('mouseleave',function(event){
+                event.target.style.borderLeft='none';
+                event.target.style.paddingLeft='0';
+            });
+            fstContainDom.appendChild(childSecDom);
 
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='红色';
-        childSecDom.style.borderBottom='solid 2px red';
-        childSecDom.addEventListener('click',function(event){
-            state.strokeStyle='red';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
+        }
 
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='橙红色';
-        childSecDom.style.borderBottom='solid 2px orangered';
-        childSecDom.addEventListener('click',function(event){
-            state.strokeStyle='orangered';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='绿色';
-        childSecDom.style.borderBottom='solid 2px green';
-        childSecDom.addEventListener('click',function(event){
-            state.strokeStyle='green';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='蓝色';
-        childSecDom.style.borderBottom='solid 2px blue';
-        childSecDom.addEventListener('click',function(event){
-            state.strokeStyle='blue';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='白色';
-        childSecDom.style.borderBottom='solid 2px white';
-        childSecDom.addEventListener('click',function(event){
-            state.strokeStyle='white';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
+        let lineWidthMenuItems=[
+            {
+                text:'1px',
+                value:{
+                    lineWidth:'1',
+                }
+            },
+            {
+                text:'2px',
+                value:{
+                    lineWidth:'2',
+                }
+            },
+            {
+                text:'3px',
+                value:{
+                    lineWidth:'3',
+                }
+            },
+            {
+                text:'5px',
+                value:{
+                    lineWidth:'5',
+                }
+            },
+            {
+                text:'8px',
+                value:{
+                    lineWidth:'8',
+                }
+            },
+            {
+                text:'12px',
+                value:{
+                    lineWidth:'12',
+                }
+            },
+            {
+                text:'16px',
+                value:{
+                    lineWidth:'16',
+                }
+            },
+            {
+                text:'20px',
+                value:{
+                    lineWidth:'20',
+                }
+            },
+        ]
 
         childFstDom=document.createElement('ul');
+        childFstDom.style.listStyle='none';
         childFstDom.innerText='> 线粗度';
         childFstDom.addEventListener('click',function(event){
             let cdom=document.getElementById(id+'_contextmenu_line_width_container');
@@ -2170,81 +2249,73 @@ window.$canvas={
         fstContainDom.style.display='none';
         childFstDom.appendChild(fstContainDom);
 
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='1px';
-        childSecDom.style.borderBottom='solid 1px black';
-        childSecDom.addEventListener('click',function(event){
-            state.lineWidth='1';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
+        for (let i = 0; i < lineWidthMenuItems.length; i++) {
+            let item=lineWidthMenuItems[i];
+            let childSecDom=document.createElement('li');
+            childSecDom.innerText=item.text;
+            childSecDom.style.borderBottom='solid '+item.value.lineWidth+'px black';
+            childSecDom.addEventListener('click',function(event){
+                state.lineWidth=item.value.lineWidth;
+                state.contextMenu.style.display='none';
+            });
+            childSecDom.addEventListener('mouseover',function(event){
+                event.target.style.borderLeft='solid 2px orangered';
+                event.target.style.paddingLeft='4px';
+            });
+            childSecDom.addEventListener('mouseleave',function(event){
+                event.target.style.borderLeft='none';
+                event.target.style.paddingLeft='0';
+            });
+            fstContainDom.appendChild(childSecDom);
+        }
 
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='2px';
-        childSecDom.style.borderBottom='solid 2px black';
-        childSecDom.addEventListener('click',function(event){
-            state.lineWidth='2';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='3px';
-        childSecDom.style.borderBottom='solid 3px black';
-        childSecDom.addEventListener('click',function(event){
-            state.lineWidth='3';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='5px';
-        childSecDom.style.borderBottom='solid 5px black';
-        childSecDom.addEventListener('click',function(event){
-            state.lineWidth='5';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='8px';
-        childSecDom.style.borderBottom='solid 8px black';
-        childSecDom.addEventListener('click',function(event){
-            state.lineWidth='8';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='12px';
-        childSecDom.style.borderBottom='solid 12px black';
-        childSecDom.addEventListener('click',function(event){
-            state.lineWidth='12';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='16px';
-        childSecDom.style.borderBottom='solid 16px black';
-        childSecDom.addEventListener('click',function(event){
-            state.lineWidth='16';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='20px';
-        childSecDom.style.borderBottom='solid 20px black';
-        childSecDom.addEventListener('click',function(event){
-            state.lineWidth='20';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-
+        let fillColorMenuItems=[
+            {
+                text:'黑色',
+                value:{
+                    fillStyle:'black',
+                    color:'white',
+                }
+            },
+            {
+                text:'红色',
+                value:{
+                    fillStyle:'red',
+                    color:'white',
+                }
+            },
+            {
+                text:'橙红色',
+                value:{
+                    fillStyle:'orangered',
+                    color:'white',
+                }
+            },
+            {
+                text:'绿色',
+                value:{
+                    fillStyle:'green',
+                    color:'white',
+                }
+            },
+            {
+                text:'蓝色',
+                value:{
+                    fillStyle:'blue',
+                    color:'white',
+                }
+            },
+            {
+                text:'白色',
+                value:{
+                    fillStyle:'white',
+                    color:'black',
+                }
+            },
+        ]
 
         childFstDom=document.createElement('ul');
+        childFstDom.style.listStyle='none';
         childFstDom.innerText='> 填充颜色';
         childFstDom.addEventListener('click',function(event){
             let cdom=document.getElementById(id+'_contextmenu_fill_color_container');
@@ -2261,66 +2332,61 @@ window.$canvas={
         fstContainDom.style.display='none';
         childFstDom.appendChild(fstContainDom);
 
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='黑色';
-        childSecDom.style.background='black';
-        childSecDom.style.color='White';
+        for (let i = 0; i < fillColorMenuItems.length; i++) {
+            let item=fillColorMenuItems[i];
+            let childSecDom=document.createElement('li');
+            childSecDom.innerText=item.text;
+            childSecDom.style.background=item.value.fillStyle;
+            childSecDom.style.color=item.value.color;
+            childSecDom.addEventListener('click',function(event){
+                state.fillStyle=item.value.fillStyle;
+                state.contextMenu.style.display='none';
+            });
+            childSecDom.addEventListener('mouseover',function(event){
+                event.target.style.borderLeft='solid 2px orangered';
+                event.target.style.paddingLeft='4px';
+            });
+            childSecDom.addEventListener('mouseleave',function(event){
+                event.target.style.borderLeft='none';
+                event.target.style.paddingLeft='0';
+            });
+            fstContainDom.appendChild(childSecDom);
+        }
+
+
+        childFstDom=document.createElement('ul');
+        childFstDom.style.listStyle='none';
+        childFstDom.innerText='> 工具';
+        childFstDom.addEventListener('click',function(event){
+            let cdom=document.getElementById(id+'_contextmenu_tools_container');
+            if(cdom.style.display=='none'){
+                cdom.style.display='block';
+            }else{
+                cdom.style.display='none';
+            }
+        });
+        contextMenuDom.appendChild(childFstDom);
+
+        fstContainDom=document.createElement('div');
+        fstContainDom.id=id+'_contextmenu_tools_container';
+        fstContainDom.style.display='none';
+        childFstDom.appendChild(fstContainDom);
+
+        let childSecDom=document.createElement('li');
+        childSecDom.innerText='保存为PNG图片';
         childSecDom.addEventListener('click',function(event){
-            state.fillStyle='black';
+            $canvas.downloadDc2d(dom,'save.png','image/png');
             state.contextMenu.style.display='none';
         });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='红色';
-        childSecDom.style.background='red';
-        childSecDom.style.color='White';
-        childSecDom.addEventListener('click',function(event){
-            state.fillStyle='red';
-            state.contextMenu.style.display='none';
+        childSecDom.addEventListener('mouseover',function(event){
+            event.target.style.borderLeft='solid 2px orangered';
+            event.target.style.paddingLeft='4px';
+        });
+        childSecDom.addEventListener('mouseleave',function(event){
+            event.target.style.borderLeft='none';
+            event.target.style.paddingLeft='0';
         });
         fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='橙红色';
-        childSecDom.style.background='orangered';
-        childSecDom.style.color='White';
-        childSecDom.addEventListener('click',function(event){
-            state.fillStyle='orangered';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='绿色';
-        childSecDom.style.background='green';
-        childSecDom.style.color='White';
-        childSecDom.addEventListener('click',function(event){
-            state.fillStyle='green';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='蓝色';
-        childSecDom.style.background='blue';
-        childSecDom.style.color='White';
-        childSecDom.addEventListener('click',function(event){
-            state.fillStyle='blue';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
-        childSecDom=document.createElement('li');
-        childSecDom.innerText='白色';
-        childSecDom.style.background='white';
-        childSecDom.style.color='Black';
-        childSecDom.addEventListener('click',function(event){
-            state.fillStyle='white';
-            state.contextMenu.style.display='none';
-        });
-        fstContainDom.appendChild(childSecDom);
-
 
         let eventHandler=function(type,event){
             if(type==EventTypes.KEY_DOWN){
@@ -2365,7 +2431,6 @@ window.$canvas={
 
             }
             if(type==EventTypes.MOUSE_UP){
-                console.log(type,event);
                 if(event.button==MouseButtons.LEFT){
                     if(state.drawType==DrawTypes.POLYGON){
                         let p=$canvas.point2d(event.offsetX,event.offsetY);
@@ -2391,7 +2456,6 @@ window.$canvas={
                             state.points=[];
                         }
                     }else{
-                        console.log('contextMenuShow',event,state.contextMenu);
                         state.contextMenu.style.left=event.clientX+'px';
                         state.contextMenu.style.top=event.clientY+'px';
                         state.contextMenu.style.display='block';
@@ -2486,7 +2550,94 @@ window.$canvas={
             event.preventDefault();
             eventHandler(EventTypes.CONTEXT_MENU,event);
         });
-    }
+    },
+    initWaterMark(id,config){
+        let defaultConfig={
+            velSpace:30,
+            horSpace:40,
+            text:'water mark',
+            fontSize:'24',
+            fontFamily:'黑体',
+            fontColor:'silver',
+            opacity:0.3,
+            rotate:-30/180*Math.PI,
+        };
+        $obj.copyObj2(config,defaultConfig);
+
+        let mainDom=document.getElementById(id);
+        let dom=document.createElement('canvas');
+        dom.id=id+'_watermark';
+        dom.style.zIndex='2000'+mainDom.style.zIndex;
+        dom.style.position='absolute';
+        mainDom.parentNode.appendChild(dom);
+
+        let listenHandler=function() {
+            dom.style.width = mainDom.clientWidth + 'px';
+            dom.style.height = mainDom.clientHeight + 'px';
+            dom.style.left = mainDom.offsetLeft + 'px';
+            dom.style.top = mainDom.offsetTop + 'px';
+            dom.style.display = 'block';
+            dom.style.pointerEvents = 'none';
+            if (!dom.getContext) {
+                console.error('not support!');
+                return;
+            }
+            let dc2d = dom.getContext('2d');
+
+            dc2d.globalAlpha = defaultConfig.opacity;
+            dc2d.fillStyle = defaultConfig.fontColor;
+            dc2d.font = defaultConfig.fontSize + 'px ' + defaultConfig.fontFamily;
+
+            let width = mainDom.clientWidth;
+            let height = mainDom.clientHeight;
+            dc2d.clearRect(-1,-1,width+2,height+2);
+
+            let curHei = 0 - parseInt(defaultConfig.velSpace);
+            while (curHei < height) {
+                let curWid = 0 - parseInt(defaultConfig.horSpace);
+                while (curWid < width) {
+                    dc2d.save();
+
+                    dc2d.translate(curWid, curHei);
+                    dc2d.rotate(defaultConfig.rotate);
+                    let mesure = dc2d.measureText(defaultConfig.text);
+                    dc2d.fillText(defaultConfig.text, 0 - (mesure.width) / 2, 0);
+
+                    dc2d.restore();
+
+                    curWid += parseInt(defaultConfig.fontSize);
+                    curWid += parseInt(defaultConfig.velSpace);
+                }
+                curHei += parseInt(defaultConfig.fontSize);
+                curHei += parseInt(defaultConfig.velSpace);
+            }
+        }
+        listenHandler();
+
+         mainDom.addEventListener('resize',function(event){
+            listenHandler();
+         });
+
+         mainDom.addEventListener('scroll',function (event){
+            listenHandler();
+         });
+
+         mainDom.addEventListener('load',function (event){
+             listenHandler();
+         });
+
+         mainDom.addEventListener('copy',function (event){
+             listenHandler();
+         })
+
+        mainDom.addEventListener('cut',function (event){
+            listenHandler();
+        })
+
+        mainDom.addEventListener('wheel',function (event){
+            listenHandler();
+        })
+    },
 }
 
 
