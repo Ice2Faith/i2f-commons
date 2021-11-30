@@ -11,6 +11,7 @@
         <canvas id="painter">
             你的浏览器不支持Canvas
         </canvas>
+
     </div>
 </body>
 <script>
@@ -25,6 +26,14 @@
         horSpace: 60,
         fontSize:12,
         rotate:-30,
+    });
+    document.getElementById('click').addEventListener('click',function(event){
+       $dlg.inputDialog({
+           type:'checkbox',
+           accept:'image/png',
+       },function(val){
+           alert(JSON.stringify(val));
+       }) ;
     });
 </script>
 </html>

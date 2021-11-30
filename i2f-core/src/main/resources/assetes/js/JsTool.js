@@ -3,7 +3,7 @@
  * @type {{filter(*, *, *): boolean, comparator(*, *): number, executor(*, *, *), mapper(*, *, *): *, executorConsoleLog(*=, *, *): void}}
  */
 window.$interface = {
-    comparator(elem1, elem2) {
+    comparator:function (elem1, elem2) {
         if (elem1 == elem2) {
             return 0;
         }
@@ -12,16 +12,16 @@ window.$interface = {
         }
         return 1;
     },
-    executor(item, index, arr) {
+    executor:function (item, index, arr) {
 
     },
-    mapper(item, index, arr) {
+    mapper:function (item, index, arr) {
         return item;
     },
-    filter(item, index, arr) {
+    filter:function (item, index, arr) {
         return true;
     },
-    executorConsoleLog(item, index, arr) {
+    executorConsoleLog:function (item, index, arr) {
         console.log('arr[' + index + ']=', item);
     }
 }
@@ -31,31 +31,31 @@ window.$interface = {
  * @type {{isIntStr(*=): (boolean|boolean), containsStr(*=, *=, *=): (boolean|number), containsElem(*=, *=, *=): boolean, isNull(*): boolean, isEmpty(*=): *, isFloatStr(*=): (boolean|boolean), isUndefined(*=): boolean, isBlank(*=): *, isArray(*=): boolean}}
  */
 window.$chk = {
-    isNull(obj) {
+    isNull:function (obj) {
         return obj == null;
     },
-    isUndefined(obj) {
+    isUndefined:function (obj) {
         return obj == undefined;
     },
-    isEmpty(obj) {
+    isEmpty:function (obj) {
         return !obj;
     },
-    isBlank(obj) {
+    isBlank:function (obj) {
         return !obj || obj == '';
     },
-    isIntStr(str) {
+    isIntStr:function (str) {
         if (this.isBlank(str)) {
             return false;
         }
         return /^[+|-]\d+$/.test(str);
     },
-    isFloatStr(str) {
+    isFloatStr:function (str) {
         if (this.isBlank(str)) {
             return false;
         }
         return /^[+|-]\d+(\.\d+)$/.test(str);
     },
-    isArray(arr) {
+    isArray:function (arr) {
         if (this.isEmpty(arr)) {
             return false;
         }
@@ -68,31 +68,31 @@ window.$chk = {
         }
         return false;
     },
-    isTel11(str) {
+    isTel11:function (str) {
         if (!this.isBlank(str)) {
             return false;
         }
         return /^1\d{10}$/.test(str);
     },
-    isPasswordGe6(str) {
+    isPasswordGe6:function (str) {
         if (!this.isBlank(str)) {
             return false;
         }
         return /^[a-zA-z0-9_]{6,}$/.test(str);
     },
-    isNumPassword6(str) {
+    isNumPassword6:function (str) {
         if (!this.isBlank(str)) {
             return false;
         }
         return /^\d{6}$/.test(str);
     },
-    isEMail(str) {
+    isEMail:function (str) {
         if (!this.isBlank(str)) {
             return false;
         }
         return /^[a-zA-Z0-9_]+@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*$/.test(str);
     },
-    isCnIdNum18(str) {
+    isCnIdNum18:function (str) {
         if (this.isEmpty(str)) {
             return false;
         }
@@ -110,7 +110,7 @@ window.$chk = {
         }
         return true;
     },
-    isSqlSafe(str) {
+    isSqlSafe:function (str) {
         this.isBlank(str)
         {
             return true;
@@ -120,7 +120,10 @@ window.$chk = {
         }
         return true;
     },
-    containsStr(str, findstr, ignoreCase = false) {
+    containsStr:function (str, findstr, ignoreCase) {
+        if(ignoreCase==undefined){
+            ignoreCase=false;
+        }
         if (this.isBlank(str) || this.isBlank(findstr)) {
             return false;
         }
@@ -132,7 +135,10 @@ window.$chk = {
         }
         return str.indexOf(findstr);
     },
-    containsElem(arr, elem, comparator = $interface.comparator) {
+    containsElem:function (arr, elem, comparator ) {
+        if(comparator==undefined){
+            comparator== $interface.comparator;
+        }
         if (this.isEmpty(arr)) {
             return false;
         }
@@ -154,25 +160,25 @@ window.$chk = {
  * @type {{}}
  */
 window.$cvt={
-    null2(obj,repVal){
+    null2:function (obj,repVal){
         if($chk.isNull(obj)){
             return repVal;
         }
         return obj;
     },
-    undefined2(obj,repVal){
+    undefined2:function (obj,repVal){
         if($chk.isUndefined(obj)){
             return repVal;
         }
         return obj;
     },
-    empty2(obj,repVal){
+    empty2:function (obj,repVal){
         if($chk.isEmpty(obj)){
             return repVal;
         }
         return obj;
     },
-    blank2(obj,repVal){
+    blank2:function (obj,repVal){
         if($chk.isBlank(obj)){
             return repVal;
         }
@@ -181,19 +187,19 @@ window.$cvt={
 }
 
 window.$url={
-    encode(str){
+    encode:function (str){
         if($chk.isBlank(str)){
             return "";
         }
         return encodeURI(str);
     },
-    decode(str){
+    decode:function (str){
         if($chk.isBlank(str)){
             return "";
         }
         return decodeURI(str);
     },
-    stringifyUrlParams(param){
+    stringifyUrlParams:function (param){
         let _this=this;
         let ret='';
         $obj.each(param,function(val,key,obj){
@@ -207,7 +213,7 @@ window.$url={
         }
         return ret;
     },
-    buildUrl(url,param){
+    buildUrl:function (url,param){
         url=url+'';
         let pstr=this.stringifyUrlParams(param);
         if(url.indexOf('?')){
@@ -220,7 +226,7 @@ window.$url={
             return url+'?'+pstr;
         }
     },
-    linkUrl(baseUrl,url){
+    linkUrl:function (baseUrl,url){
         baseUrl=baseUrl+'';
         if(baseUrl.endsWith('/')){
             return baseUrl+url;
@@ -228,7 +234,7 @@ window.$url={
             return baseUrl+'/'+url;
         }
     },
-    getUrlParamsObj(url){
+    getUrlParamsObj:function (url){
         url=url+'';
         let ret={};
         let idx=url.indexOf('?');
@@ -247,15 +253,15 @@ window.$url={
         }
         return ret;
     },
-    getUrlParam(url,name){
+    getUrlParam:function (url,name){
         let obj=this.getUrlParamsObj(url);
         return obj[name];
     },
-    getCurrentUrlParamsObj(){
+    getCurrentUrlParamsObj:function (){
         let url=window.location.href;
         return this.getUrlParamsObj(url);
     },
-    getCurrentUrlParam(name){
+    getCurrentUrlParam:function (name){
         let obj=this.getCurrentUrlParamsObj();
         return obj[name];
     },
@@ -264,7 +270,7 @@ window.$url={
      * @param url
      * @returns {{path: string, protocol: string, password: string, file: string, port: string, host: string, arguments: {}, tag: string, username: string}}
      */
-    urlParse(url){
+    urlParse:function (url){
         let ret={
             protocol:'',
             username:'',
@@ -355,34 +361,34 @@ window.$url={
  * @type {{localGet(*=): string | null, sessionSetAsJson(*=, *=): *, sessionGetWithJson(*=): any, sessionSet(*=, *=): void, localSetAsJson(*=, *=): *, localClean(*=): void, sessionClean(*=): void, localSet(*=, *=): void, sessionGet(*=): string | null, localGetWithJson(*=): any}}
  */
 window.$store = {
-    localSet(key, val) {
+    localSet:function (key, val) {
         return localStorage.setItem(key, val);
     },
-    localGet(key) {
+    localGet:function (key) {
         return localStorage.getItem(key);
     },
-    localClean(key) {
+    localClean:function (key) {
         return localStorage.removeItem(key);
     },
-    localSetAsJson(key, obj) {
+    localSetAsJson:function (key, obj) {
         return this.localSet(key, $json.toJson(obj));
     },
-    localGetWithJson(key) {
+    localGetWithJson:function (key) {
         return $json.parseJson(this.localGet(key));
     },
-    sessionSet(key, val) {
+    sessionSet:function (key, val) {
         return sessionStorage.setItem(key, val);
     },
-    sessionGet(key) {
+    sessionGet:function (key) {
         return sessionStorage.getItem(key);
     },
-    sessionClean(key) {
+    sessionClean:function (key) {
         return sessionStorage.removeItem(key);
     },
-    sessionSetAsJson(key, obj) {
+    sessionSetAsJson:function (key, obj) {
         return this.sessionSet(key, $json.toJson(obj));
     },
-    sessionGetWithJson(key) {
+    sessionGetWithJson:function (key) {
         return $json.parseJson(this.sessionGet(key));
     },
 }
@@ -397,7 +403,7 @@ window.$date = {
      * @param year
      * @returns {boolean}
      */
-    isLeapYear(year) {
+    isLeapYear:function (year) {
         year = parseInt(year + '');
         if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) {
             return true;
@@ -410,7 +416,7 @@ window.$date = {
      * @param mon
      * @returns {number}
      */
-    daysOnMonth(year, mon) {
+    daysOnMonth:function (year, mon) {
         mon = parseInt(mon + '');
         switch (mon) {
             case 1:
@@ -446,13 +452,13 @@ window.$date = {
      * @param year
      * @returns {number}
      */
-    daysOnYear(year) {
+    daysOnYear:function (year) {
         if (this.isLeapYear(year)) {
             return 366;
         }
         return 365;
     },
-    isLegalDate(year, month, day) {
+    isLegalDate:function (year, month, day) {
         let mdays = this.daysOnMonth(year, month);
         if (mdays == 0) {
             return false;
@@ -462,35 +468,35 @@ window.$date = {
         }
         return true;
     },
-    addDay(date, num) {
+    addDay:function (date, num) {
         date.setDate(date.getDate() + num);
         return date;
     },
-    addMonth(date, num) {
+    addMonth:function (date, num) {
         date.setMonth(date.getMonth() + num);
         return date;
     },
-    addYear(date, num) {
+    addYear:function (date, num) {
         date.setFullYear(date.getFullYear() + num);
         return date;
     },
-    addHour(date, num) {
+    addHour:function (date, num) {
         date.setHours(date.getHours() + num);
         return date;
     },
-    addMinute(date, num) {
+    addMinute:function (date, num) {
         date.setMinutes(date.getMinutes() + num);
         return date;
     },
-    addSecond(date, num) {
+    addSecond:function (date, num) {
         date.setSeconds(date.getSeconds() + num);
         return date;
     },
-    addMillSecond(date, num) {
+    addMillSecond:function (date, num) {
         date.setMilliseconds(date.getMilliseconds() + num);
         return date;
     },
-    firstDayOfYear(date) {
+    firstDayOfYear:function (date) {
         if (!date) {
             date = new Date();
         } else {
@@ -500,7 +506,7 @@ window.$date = {
         date.setDate(1);
         return date;
     },
-    firstDayOfMonth(date) {
+    firstDayOfMonth:function (date) {
         if (!date) {
             date = new Date();
         } else {
@@ -509,7 +515,7 @@ window.$date = {
         date.setDate(1);
         return date;
     },
-    lastDayOfYear(date) {
+    lastDayOfYear:function (date) {
         if (!date) {
             date = new Date();
         } else {
@@ -523,7 +529,7 @@ window.$date = {
         date.setDate(date.getDate() - 1);
         return date;
     },
-    lastDayOfMonth(date) {
+    lastDayOfMonth:function (date) {
         if (!date) {
             date = new Date();
         } else {
@@ -535,18 +541,18 @@ window.$date = {
         date.setDate(date.getDate() - 1);
         return date;
     },
-    lastDayOfPreviousMonth(date) {
+    lastDayOfPreviousMonth:function (date) {
         date = this.firstDayOfMonth(date);
         date.setDate(1);
         date.setDate(date.getDate() - 1);
         return date;
     },
-    firstDayOfNextMonth(date) {
+    firstDayOfNextMonth:function (date) {
         date = this.firstDayOfMonth(date);
         date.setMonth(date.getMonth() + 1);
         return date;
     },
-    mondayOfDate(date) {
+    mondayOfDate:function (date) {
         if (!date) {
             date = new Date(0);
         } else {
@@ -557,7 +563,7 @@ window.$date = {
         date.setDate(day - week + 1);
         return date;
     },
-    sundayOfDate(date) {
+    sundayOfDate:function (date) {
         if (!date) {
             date = new Date();
         } else {
@@ -568,12 +574,12 @@ window.$date = {
         date.setDate(day + (7 - week));
         return date;
     },
-    nextMonday(date) {
+    nextMonday:function (date) {
         date = this.mondayOfDate(date);
         date.setDate(date.getDate() + 7);
         return date;
     },
-    previousSunday(date) {
+    previousSunday:function (date) {
         date = this.sundayOfDate(date);
         date.setDate(date.getDate() - 7);
         return date;
@@ -585,7 +591,7 @@ window.$date = {
      * @param patten
      * @returns {string}
      */
-    formatDate(date, patten) {
+    formatDate:function (date, patten) {
         if (!date) {
             date = new Date();
         } else {
@@ -635,7 +641,7 @@ window.$date = {
      * @param patten
      * @returns {Date}
      */
-    parseDate(str, patten) {
+    parseDate:function (str, patten) {
         str = str + '';
         if (!patten) {
             patten = 'yyyy-MM-dd HH:mm:ss SSS';
@@ -685,7 +691,7 @@ window.$date = {
      * fmt为格式，patten为格式对应的regex
      * @returns {({patten: RegExp, fmt: string}|{patten: RegExp, fmt: string}|{patten: RegExp, fmt: string}|{patten: RegExp, fmt: string}|{patten: RegExp, fmt: string})[]}
      */
-    supportAutoParseDatePattens() {
+    supportAutoParseDatePattens:function () {
         return [
             {
                 fmt: 'yyyy-MM-dd HH:mm:ss SSS',
@@ -717,7 +723,7 @@ window.$date = {
             }
         ];
     },
-    isSupportAutoParse(str) {
+    isSupportAutoParse:function (str) {
         if ($chk.isBlank(str)) {
             return false;
         }
@@ -733,7 +739,10 @@ window.$date = {
      * 常用的日期格式解析
      * @param str
      */
-    fromStr(str, defVal = new Date()) {
+    fromStr:function (str, defVal) {
+        if(defVal==undefined){
+            defVal=new Date();
+        }
         if ($chk.isBlank(str)) {
             return defVal;
         }
@@ -752,7 +761,7 @@ window.$date = {
      * @param dstPatten
      * @returns {string}
      */
-    convertDateFmt(str, srcPatten, dstPatten) {
+    convertDateFmt:function (str, srcPatten, dstPatten) {
         let date = this.parseDate(str, srcPatten);
         return this.formatDate(date, dstPatten);
     },
@@ -762,7 +771,7 @@ window.$date = {
      * @param dstPatten
      * @returns {string}
      */
-    convertSupportDateFmt(str, dstPatten) {
+    convertSupportDateFmt:function (str, dstPatten) {
         let date = this.fromStr(str, null);
         return this.formatDate(date, dstPatten);
     },
@@ -771,7 +780,7 @@ window.$date = {
      * @param date
      * @returns {{month: number, hour: number, year: number, millisecond: number, day: number, minute: number, second: number}}
      */
-    toDateObj(date) {
+    toDateObj:function (date) {
         if (!date) {
             date = new Date();
         }
@@ -791,7 +800,7 @@ window.$date = {
      * @param obj
      * @returns {Date}
      */
-    parseDateObj(obj) {
+    parseDateObj:function (obj) {
         if (!obj) {
             return new Date();
         }
@@ -811,13 +820,16 @@ window.$date = {
  * @type {{toCamel(*): string, toInt(*=, *=): number, parseJson(*=): any, trunc(*=, *=): (*|string), toBoolean(*): boolean, paddingString(*, *=, *, *=): string, toFloat(*=): number, format(*=, *, *=): *, firstUpper(*): (*), toPascal(*): string, firstLower(*): (*), replaceAll(*, *=, *): string}}
  */
 window.$str = {
-    toInt(str, radix = 10) {
+    toInt:function (str, radix) {
+        if(radix==undefined){
+            radix=10;
+        }
         return parseInt(str, radix);
     },
-    toFloat(str) {
+    toFloat:function (str) {
         return parseFloat(str);
     },
-    toBoolean(str) {
+    toBoolean:function (str) {
         if (str == 'true') {
             return true;
         } else if (str == 'false') {
@@ -825,29 +837,32 @@ window.$str = {
         }
         return false;
     },
-    parseJson(str) {
+    parseJson:function (str) {
         return JSON.parse(str);
     },
-    trunc(str, maxLen = -1) {
+    trunc:function (str, maxLen) {
+        if(maxLen==undefined){
+            maxLen=-1;
+        }
         let mlen = parseInt(maxLen);
         if (mlen <= 3) {
             return str;
         }
         return str.substring(str, 0, maxLen - 3) + '...';
     },
-    firstLower(str) {
+    firstLower:function (str) {
         if (str.length >= 1) {
             return str.substring(0, 1).toLowerCase() + str.substring(1);
         }
         return str;
     },
-    firstUpper(str) {
+    firstUpper:function (str) {
         if (str.length >= 1) {
             return str.substring(0, 1).toUpperCase() + str.substring(1);
         }
         return str;
     },
-    toCamel(str) {
+    toCamel:function (str) {
         let ret = '';
         let arr = str.split(/-|_/);
         for (let i = 0; i < arr.length; i++) {
@@ -860,7 +875,7 @@ window.$str = {
         }
         return ret;
     },
-    toPascal(str) {
+    toPascal:function (str) {
         let ret = '';
         let arr = str.split(/-|_/);
         for (let i = 0; i < arr.length; i++) {
@@ -876,7 +891,7 @@ window.$str = {
      * @param reg
      * @param rep
      */
-    replaceAll(str, reg, rep) {
+    replaceAll:function (str, reg, rep) {
         let ret = '';
         let arr = str.split(reg);
         for (let i = 0; i < arr.length; i++) {
@@ -896,7 +911,10 @@ window.$str = {
      * @param pad
      * @returns {string}
      */
-    paddingString(str, len, pad, isLeftPad = true) {
+    paddingString:function (str, len, pad, isLeftPad) {
+        if(isLeftPad==undefined){
+            isLeftPad=true;
+        }
         str = str + '';
         pad = pad + '';
         len = parseInt(len);
@@ -948,7 +966,10 @@ window.$str = {
      * @param jsonfy 是否将值JSON化
      * @returns {*}
      */
-    format(fmt, args, jsonfy = false) {
+    format:function (fmt, args, jsonfy) {
+        if(jsonfy==undefined){
+            jsonfy=false;
+        }
         //占位符：{3:+12[0]} 标识，取第三个参数，左边用0填充补足12位
         //尝试支持对象属性
         //{_.name:-14[ ]}
@@ -1061,7 +1082,13 @@ window.$str = {
      * @param keepEndLen
      * @param maxLen
      */
-    hideSensibleInfo(str,keepStartLen,keepEndLen=0,maxLen=-1){
+    hideSensibleInfo:function (str,keepStartLen,keepEndLen,maxLen){
+        if(maxLen==undefined){
+            maxLen=-1;
+        }
+        if(keepEndLen==undefined){
+            keepEndLen=0;
+        }
         if($chk.isBlank(str)){
             return str;
         }
@@ -1089,10 +1116,10 @@ window.$str = {
  * @type {{toJson(*=): string, parseJson(*=): any}}
  */
 window.$json = {
-    toJson(obj) {
+    toJson:function (obj) {
         return JSON.stringify(obj);
     },
-    parseJson(json) {
+    parseJson:function (json) {
         return JSON.parse(json);
     }
 }
@@ -1102,7 +1129,10 @@ window.$json = {
  * @type {{appearCount(*=, *=): *[], max(*=, *=): (null|*), dequeue(*=): (null|*), sort(*=, *=, *=): (*), remove(*=, *=): (*), push(*=, *=): (*), each(*=, *=): (*|undefined), pop(*=): (null|*), filter(*=, *=): (*), enqueue(*=, *=): *, min(*=, *=): (null|*), top(*=): (null|*), unique(*=, *=): (*), shuffle(*=, *=): (*), indexOf(*=, *=, *=): (*|number), map(*=, *=): (*), first(*=): (null|*), combine(*, *): *}}
  */
 window.$arr = {
-    indexOf(arr, elem, comparator = $interface.comparator) {
+    indexOf:function (arr, elem, comparator ) {
+        if(comparator==undefined){
+            comparator=$interface.comparator;
+        }
         if (!$chk.isArray(arr)) {
             return arr;
         }
@@ -1113,7 +1143,7 @@ window.$arr = {
         }
         return -1;
     },
-    remove(arr, idx) {
+    remove:function (arr, idx) {
         if (!$chk.isArray(arr)) {
             return arr;
         }
@@ -1123,14 +1153,14 @@ window.$arr = {
         arr.splice(idx, 1);
         return arr;
     },
-    push(arr, elem) {
+    push:function (arr, elem) {
         if (!$chk.isArray(arr)) {
             return arr;
         }
         arr.push(elem);
         return arr;
     },
-    pop(arr) {
+    pop:function (arr) {
         if (!$chk.isArray(arr)) {
             return null;
         }
@@ -1141,7 +1171,7 @@ window.$arr = {
         arr.splice(arr.length - 1, 1);
         return elem;
     },
-    top(arr) {
+    top:function (arr) {
         if (!$chk.isArray(arr)) {
             return null;
         }
@@ -1150,10 +1180,10 @@ window.$arr = {
         }
         return arr[arr.length - 1];
     },
-    enqueue(arr, elem) {
+    enqueue:function (arr, elem) {
         return this.push(arr, elem);
     },
-    dequeue(arr) {
+    dequeue:function (arr) {
         if (!$chk.isArray(arr)) {
             return null;
         }
@@ -1164,7 +1194,7 @@ window.$arr = {
         arr.splice(0, 1);
         return elem;
     },
-    first(arr) {
+    first:function (arr) {
         if (!$chk.isArray(arr)) {
             return null;
         }
@@ -1174,10 +1204,20 @@ window.$arr = {
         let elem = arr[0];
         return elem;
     },
-    combine(arr1, arr2) {
-        return [...arr1, ...arr2];
+    combine:function (arr1, arr2) {
+        let ret=[];
+        for (let i = 0; i < arr1.length; i++) {
+            ret.push(arr1[i]);
+        }
+        for (let i = 0; i < arr2.length; i++) {
+            ret.push(arr2[i]);
+        }
+        return ret;
     },
-    unique(arr, comparator = $interface.comparator) {
+    unique:function (arr, comparator ) {
+        if(comparator==undefined){
+            comparator=$interface.comparator;
+        }
         if (!$chk.isArray(arr)) {
             return arr;
         }
@@ -1196,7 +1236,10 @@ window.$arr = {
         }
         return ret;
     },
-    min(arr, comparator = $interface.comparator) {
+    min:function (arr, comparator ) {
+        if(comparator==undefined){
+            comparator=$interface.comparator;
+        }
         if (!$chk.isArray(arr)) {
             return null;
         }
@@ -1211,7 +1254,10 @@ window.$arr = {
         }
         return min;
     },
-    max(arr, comparator = $interface.comparator) {
+    max:function (arr, comparator ) {
+        if(comparator==undefined){
+            comparator=$interface.comparator;
+        }
         if (!$chk.isArray(arr)) {
             return null;
         }
@@ -1232,7 +1278,10 @@ window.$arr = {
      * @param comparator
      * @returns {[]}
      */
-    appearCount(arr, comparator = $interface.comparator) {
+    appearCount:function (arr, comparator ) {
+        if(comparator==undefined){
+            comparator=$interface.comparator;
+        }
         // 元素 {item:,count:}
         let ret = [];
         if (!$chk.isArray(arr)) {
@@ -1259,7 +1308,13 @@ window.$arr = {
         });
         return ret;
     },
-    sort(arr, desc = true, comparator = $interface.comparator) {
+    sort:function (arr, desc, comparator ) {
+        if(comparator==undefined){
+            comparator=$interface.comparator;
+        }
+        if(desc==undefined){
+            desc=true;
+        }
         if (!$chk.isArray(arr)) {
             return arr;
         }
@@ -1277,7 +1332,10 @@ window.$arr = {
         }
         return arr;
     },
-    shuffle(arr, factor = 1.0) {
+    shuffle:function (arr, factor) {
+        if(factor==undefined){
+            factor=1.0;
+        }
         if (!$chk.isArray(arr)) {
             return arr;
         }
@@ -1296,7 +1354,7 @@ window.$arr = {
         }
         return arr;
     },
-    each(arr, executor) {
+    each:function (arr, executor) {
         if (!$chk.isArray(arr)) {
             return arr;
         }
@@ -1308,7 +1366,10 @@ window.$arr = {
         }
         return arr;
     },
-    map(arr, mapper = $interface.mapper) {
+    map:function (arr, mapper ) {
+        if(mapper==undefined){
+            mapper=$interface.mapper;
+        }
         if (!$chk.isArray(arr)) {
             return arr;
         }
@@ -1318,7 +1379,10 @@ window.$arr = {
         }
         return ret;
     },
-    filter(arr, filter = $interface.filter) {
+    filter:function (arr, filter ) {
+        if(filter==undefined){
+            filter = $interface.filter
+        }
         if (!$chk.isArray(arr)) {
             return arr;
         }
@@ -1337,10 +1401,10 @@ window.$arr = {
  * @type {{toJson(*=): string, copyObj2(*=, *=): *, methods(*): [], copyObj(*=, *): ({}|*), deepVal(*, *=): (*), copyArr(*, *, *): [], fields(*): [], emptyObj(*=, *=): (*), each(*=, *=): (undefined)}}
  */
 window.$obj = {
-    toJson(obj) {
+    toJson:function (obj) {
         return JSON.stringify(obj);
     },
-    fields(obj) {
+    fields:function (obj) {
         let arr = [];
         for (let key in obj) {
             if (obj[key] instanceof Function) {
@@ -1350,7 +1414,7 @@ window.$obj = {
         }
         return arr;
     },
-    methods(obj) {
+    methods:function (obj) {
         let arr = [];
         for (let key in obj) {
             if (obj[key] instanceof Function) {
@@ -1359,7 +1423,7 @@ window.$obj = {
         }
         return arr;
     },
-    each(obj,executor){
+    each:function (obj,executor){
         if($chk.isEmpty(obj)){
             return ;
         }
@@ -1382,7 +1446,7 @@ window.$obj = {
      * @param route
      * @returns {Object}
      */
-    deepVal(obj, route) {
+    deepVal:function (obj, route) {
         if (!route || route == '') {
             return obj;
         }
@@ -1412,7 +1476,7 @@ window.$obj = {
         }
         return ret;
     },
-    emptyObj(obj, val = '') {
+    emptyObj:function (obj, val ) {
         if (!obj) {
             return obj;
         }
@@ -1427,7 +1491,7 @@ window.$obj = {
      * @param attrArray
      * @returns {{}|*}
      */
-    copyObj(obj, attrArray) {
+    copyObj:function (obj, attrArray) {
         if (!obj) {
             return obj;
         }
@@ -1450,7 +1514,7 @@ window.$obj = {
      * @param dstObj
      * @returns {*}
      */
-    copyObj2(srcObj, dstObj) {
+    copyObj2:function (srcObj, dstObj) {
         if (!dstObj) {
             return dstObj;
         }
@@ -1472,7 +1536,7 @@ window.$obj = {
         }
         return dstObj;
     },
-    copyArr(arr, offset, len) {
+    copyArr:function (arr, offset, len) {
         let arrLen = arr.length;
         let ret = [];
         for (let i = offset; i < arrLen && i < (offset + len); i++) {
@@ -1485,9 +1549,202 @@ window.$obj = {
      * @param obj
      * @returns {any}
      */
-    deepCopy(obj){
+    deepCopy:function (obj){
         let js=JSON.stringify(obj);
         return JSON.parse(js);
+    }
+}
+
+window.$jq=function(selector){
+    let _dom=document.querySelectorAll(selector);
+    return {
+        selector:selector,
+        dom:_dom,
+        each:function (callback){
+            if(!this.dom){
+                return ;
+            }
+            for (let i = 0; i < this.dom.length; i++) {
+                callback(this.dom[i],i);
+            }
+        },
+        size:function (){
+            if(!this.dom){
+                return 0;
+            }
+            return this.dom.length;
+        },
+        remove:function (){
+            this.each(function(item,index){
+                if(item.parentNode){
+                    item.parentNode.removeChild(item);
+                    return ;
+                }
+                if(item.parentElement){
+                    item.parentElement.removeChild(item);
+                    return ;
+                }
+                document.body.removeChild(item);
+                document.head.removeChild(item);
+            });
+        },
+        move2Body:function (){
+            this.each(function(item,index){
+                if(item.parentNode){
+                    item.parentNode.removeChild(item);
+                    document.body.appendChild(item);
+                    return ;
+                }
+                if(item.parentElement){
+                    item.parentElement.removeChild(item);
+                    document.body.appendChild(item);
+                    return ;
+                }
+                document.head.removeChild(item);
+                document.body.appendChild(item);
+            });
+        },
+        width:function (wid){
+            this.each(function(item,index){
+                item.width=wid;
+            });
+        },
+        height:function (hei){
+            this.each(function(item,index){
+                item.height=hei;
+            });
+        },
+        attr:function (name,val){
+            name=$str.toCamel(name);
+            this.each(function(item,index){
+                item[name]=val;
+            });
+        },
+        hide:function (){
+            this.each(function(item,index){
+               item.style.display='none';
+            });
+        },
+        show:function (){
+            this.each(function(item,index){
+                item.style.display='block';
+            });
+        },
+        display:function (val){
+            this.each(function(item,index){
+                item.style.display=val;
+            });
+        },
+        disable:function (){
+            this.each(function(item,index){
+               item.disabled=true;
+            });
+        },
+        enable:function (){
+            this.each(function(item,index){
+                delete item.disabled;
+            });
+        },
+        style:function (styObj){
+            this.each(function(item,index){
+                $obj.copyObj2(styObj,item.style);
+            });
+        },
+        value:function (){
+            if(!this.dom){
+                return undefined;
+            }
+            if(this.dom.length==0){
+                return null;
+            }
+            return this.dom[0].value;
+        },
+        text:function (){
+            if(!this.dom){
+                return undefined;
+            }
+            if(this.dom.length==0){
+                return null;
+            }
+            return this.dom[0].innerText;
+        },
+        html:function (){
+            if(!this.dom){
+                return undefined;
+            }
+            if(this.dom.length==0){
+                return null;
+            }
+            return this.dom[0].innerHTML;
+        },
+        on:function (eventName,callback){
+            this.each(function(item,index){
+               item.addEventListener(eventName,function(event){
+                   callback(event,eventName,event.target);
+               });
+            });
+        },
+        onMulti:function (eventNamesArray,callback){
+            if(!$chk.isArray(eventNamesArray)){
+                return ;
+            }
+            for (let i = 0; i <eventNamesArray.length; i++) {
+                let eventName=eventNamesArray[i];
+                this.on(eventName,callback);
+            }
+        },
+        click:function (){
+            this.each(function(item,index){
+               item.click();
+            });
+        },
+        onClick:function (callback){
+            this.on('click',callback);
+        },
+        onDblclick:function (callback){
+            this.on('dblclick',callback);
+        },
+        onMouseEvent:function (callback){
+            this.onMulti([
+                'mousedown',
+                'mousemove',
+                'mouseup',
+                'mouseover',
+                'mouseleave',
+                'mouseenter',
+                'mouseout',
+                'wheel'],callback);
+        },
+        onHover:function (callback){
+          this.on('mouseover',callback);
+        },
+        hoverStyle:function (styObj){
+            this.each(function(item,index){
+               item._sourceStyle=item.style;
+               item._hoverStyle=$obj.deepCopy(styObj);
+               item.addEventListener('mouseenter',function(event){
+                   $obj.copyObj2(event.target._hoverStyle,event.target.style);
+               });
+                item.addEventListener('mouseover',function(event){
+                    $obj.copyObj2(event.target._hoverStyle,event.target.style);
+                });
+               item.addEventListener('mouseout',function(event){
+                   $obj.copyObj2(event.target._sourceStyle,event.target.style);
+               });
+                item.addEventListener('mouseleave',function(event){
+                    $obj.copyObj2(event.target._sourceStyle,event.target.style);
+                });
+            });
+        },
+        onKeyEvent:function (callback){
+            this.onMulti([
+                'keydown',
+                'keyup',
+                'keypress'],callback);
+        },
+        onload:function (callback){
+            this.on('load',callback);
+        },
     }
 }
 
@@ -1496,27 +1753,27 @@ window.$obj = {
  * @type {{registerScaleFullPage(*=, *=, *=): void, scaleFixedCenterElem(*=, *, *): void, reloadJs(*=, *): void, dom(*=): any, scalePage(*=, *, *): {ratioX: number, ratioY: number}, locationTo(*, *=): void, style(*, *): *, reloadCss(*=, *): void, registerOnElementChange(*, *=, *=, *=, *=): void, resetTitle(*): void, remove(*): *}}
  */
 window.$dom = {
-    remove(dom) {
+    remove:function (dom) {
         let parent = dom.parentNode;
         let ret = dom;
         parent.removeChild(ret);
         return ret;
     },
-    style(dom, sylObj) {
+    style:function (dom, sylObj) {
         for (let att in sylObj) {
             let name = att.$toCamel();
             dom.style[name] = sylObj[att];
         }
         return dom;
     },
-    dom(name) {
+    dom:function (name) {
         return document.createElement(name);
     },
     /**
      * 设置标题
      * @param title
      */
-    resetTitle(title) {
+    resetTitle:function (title) {
         let tar = document.getElementsByTagName("title")[0];
         tar.innerHTML = title;
     },
@@ -1525,7 +1782,7 @@ window.$dom = {
      * @param id
      * @param src
      */
-    reloadCss(id, src) {
+    reloadCss:function (id, src) {
         let tar = document.getElementById(id);
         tar.parentNode.removeChild(tar);
         var domObj = this.dom("link");
@@ -1537,7 +1794,7 @@ window.$dom = {
     // 重新加载JS文件
     // 示例：
     // reloadJs('jsDataId','/static/data.js');
-    reloadJs(id, src) {
+    reloadJs:function (id, src) {
         let tar = document.getElementById(id);
         tar.parentNode.removeChild(tar);
         var scriptObj = this.dom("script");
@@ -1549,7 +1806,7 @@ window.$dom = {
     // 强制缩放屏幕至全屏
     // 示例：
     // let ratio=scalePage('body',1920,768);
-    scalePage(elemSelector, originWidth, originHeight) {
+    scalePage:function (elemSelector, originWidth, originHeight) {
         let innerWidth = window.innerWidth;
         let ratioX = innerWidth / originWidth;
         let innerHeight = window.innerHeight;
@@ -1565,19 +1822,21 @@ window.$dom = {
     // 一般结合全屏缩放参数使用：
     // let ratio=scalePage('body',1920,768);
     // scaleFixedCenterElem('.el-dialog',ratio.ratioX,ratio.ratioY);
-    scaleFixedCenterElem(elemSelector, ratioX, ratioY) {
+    scaleFixedCenterElem:function (elemSelector, ratioX, ratioY) {
         let elems = document.querySelectorAll(elemSelector);
-        elems.forEach(item => {
+
+        for (let i = 0; i < elems.length; i++) {
+            let item=elems[i];
             item.style.transform = 'scale(' + ratioX + ',' + ratioY + ') translateX(-50%)';
             item.style.transformOrigin = '0 0';
             item.style.left = '50%';
             item.style.position = 'fixed';
-        })
+        }
     },
     // 注册当屏幕大小改变时强制缩放，实现自适应分辨率缩放
     // 示例：
     // registerScaleFullPage('body',1920,768);
-    registerScaleFullPage(elemSelector, originWidth, originHeight) {
+    registerScaleFullPage:function (elemSelector, originWidth, originHeight) {
         this.scalePage(elemSelector, originWidth, originHeight);
         window.onresize = function () {
             this.scalePage(elemSelector, originWidth, originHeight);
@@ -1586,7 +1845,7 @@ window.$dom = {
     // 注册元素改变监听器，可以在此实现回调
     // 示例：
     // registerOnElementChange(func,'body',true,true,true);
-    registerOnElementChange(callbackFunc, elemSelector, needListenAttr, needListenChild, needListenSubTree) {
+    registerOnElementChange:function (callbackFunc, elemSelector, needListenAttr, needListenChild, needListenSubTree) {
 
         if (elemSelector == undefined) {
             elemSelector = 'body';
@@ -1632,7 +1891,10 @@ window.$dom = {
      * @param href
      * @param target
      */
-    locationTo(href, target = '_blank') {
+    locationTo:function (href, target ) {
+        if(target==undefined){
+            target='_blank';
+        }
         let id = 'tmpClickIdForTagA';
 
         var scriptObj = document.createElement("a");
@@ -1644,7 +1906,10 @@ window.$dom = {
         document.getElementsByTagName("body")[0].removeChild(scriptObj);
     },
 
-    selectFile(callback,accept='*.*'){
+    selectFile:function (callback,accept){
+        if(accept==undefined){
+            accept='*.*';
+        }
         let id='tmpSelectFileForTagInputFile';
 
         var scriptObj = document.createElement("input");
@@ -1663,7 +1928,7 @@ window.$dom = {
 }
 
 window.$dlg={
-    pickColorDialog(config,callback=null){
+    pickColorDialog:function (config,callback){
         let defaultConfig={
             title:'颜色选择器',
             width:'480',
@@ -2006,24 +2271,198 @@ window.$dlg={
         canvasDom.addEventListener('mousedown',function (event){
             eventHandler('mousedown',event);
         });
+    },
+    inputDialog:function (config,callback){
+        let defaultConfig={
+            title:'输入框',
+            placeholder:'请输入',
+            type:'text',
+
+            validator:null,
+            width:720,
+            height:64,
+            ctrlHeight:20,
+            attachDom:null,
+            attachId:null,
+            background:'white',
+
+            enterOk:true,
+
+            accept:'*.*',
+
+            multiple:false,
+            rows:4,
+
+            min:0,
+            max:100,
+            step:1,
+        }
+
+        $obj.copyObj2(config,defaultConfig);
+
+        defaultConfig.width=parseInt(defaultConfig.width);
+        defaultConfig.height=parseInt(defaultConfig.height);
+        defaultConfig.ctrlHeight=parseInt(defaultConfig.ctrlHeight);
+
+        let inputText={
+            text:'',
+            valid:true,
+            files:[],
+        };
+
+        let virtualId='dlg_text_input';
+        let ckDom=document.getElementById(virtualId);
+        if(ckDom){
+            ckDom.parentNode.removeChild(ckDom);
+        }
+        let containDom=document.createElement('div');
+        containDom.id=virtualId;
+        document.body.appendChild(containDom);
+
+        containDom.style.position='absolute';
+        containDom.style.left=(window.innerWidth/2)+'px';
+        containDom.style.top=(window.innerHeight/2)+'px';
+        containDom.style.width=defaultConfig.width+'px';
+        containDom.style.height=(defaultConfig.height+defaultConfig.ctrlHeight)+'px';
+        containDom.style.transform='translate(-50%,-50%)';
+        containDom.style.zIndex=2000;
+        containDom.style.display='block';
+        containDom.style.border='solid 1px #eee';
+        containDom.style.padding='5px';
+        containDom.style.borderRadius='5px';
+        containDom.style.background=defaultConfig.background;
+
+        if(defaultConfig.attachDom){
+            let attachDom=defaultConfig.attachDom;
+            containDom.style.left=attachDom.offsetLeft+(attachDom.clientWidth/2);
+            containDom.style.top=attachDom.offsetTop+(attachDom.clientHeight/2);
+        }
+        else if(defaultConfig.attachId && defaultConfig.attachId!=''){
+            let attachDom=document.getElementById(attachId);
+            containDom.style.left=attachDom.offsetLeft+(attachDom.clientWidth/2);
+            containDom.style.top=attachDom.offsetTop+(attachDom.clientHeight/2);
+        }
+
+        let topCtrlDom=document.createElement('div');
+        topCtrlDom.style.width='100%';
+        topCtrlDom.style.height=defaultConfig.ctrlHeight+'px';
+        topCtrlDom.style.borderBottom='solid 1px #eee';
+        containDom.appendChild(topCtrlDom);
+
+        let titleDom=document.createElement('span');
+        topCtrlDom.appendChild(titleDom);
+        titleDom.innerText=defaultConfig.title;
+        titleDom.style.height='100%';
+        titleDom.style.float='left';
+        titleDom.style.marginRight='8px';
+        titleDom.style.fontSize=(defaultConfig.ctrlHeight*0.8)+'px';
+
+        let ctrlDom=document.createElement('span');
+        topCtrlDom.appendChild(ctrlDom);
+        ctrlDom.style.textAlign='center';
+        ctrlDom.innerText='X';
+        ctrlDom.style.height='100%';
+        ctrlDom.style.float='right';
+
+        let okEventHandler=function(event){
+            if(defaultConfig.validator){
+                inputText.valid=defaultConfig.validator(inputText.text);
+            }
+            if(callback){
+                callback(inputText);
+            }
+        }
+        ctrlDom.addEventListener('click',function (event){
+            containDom.style.display='none';
+            containDom.parentNode.removeChild(containDom);
+            okEventHandler(event);
+        });
+
+        let pannelDom=document.createElement('div');
+        containDom.appendChild(pannelDom);
+        pannelDom.style.width=defaultConfig.width+'px';
+        pannelDom.style.height=defaultConfig.height+'px';
+
+        let inputDom=null;
+        if(defaultConfig.type.toLowerCase()=='textarea'){
+            inputDom=document.createElement('textarea');
+            pannelDom.appendChild(inputDom);
+        }else{
+            inputDom=document.createElement('input');
+            pannelDom.appendChild(inputDom);
+        }
+
+        inputDom.placeholder=defaultConfig.placeholder;
+        inputDom.rows=defaultConfig.rows;
+        inputDom.type=defaultConfig.type;
+        inputDom.min=defaultConfig.min;
+        inputDom.max=defaultConfig.max;
+        inputDom.step=defaultConfig.step;
+        inputDom.accept=defaultConfig.accept;
+        inputDom.style.width=(defaultConfig.width-50)+'px';
+        inputDom.style.height='100%';
+        inputDom.style.margin='0';
+        inputDom.style.padding='0';
+        inputDom.addEventListener('change',function(event){
+            inputText.files=event.target.files;
+            inputText.text=event.target.value;
+            if(defaultConfig.validator){
+                inputText.valid=defaultConfig.validator(inputText.text);
+            }
+        });
+        if(defaultConfig.enterOk==true){
+            inputDom.addEventListener('keyup',function(event){
+               if(event.keyCode==13){ //enter
+                   inputText.text=inputDom.value;
+                   if(defaultConfig.validator){
+                       inputText.valid=defaultConfig.validator(inputText.text);
+                   }
+                   containDom.style.display='none';
+                   containDom.parentNode.removeChild(containDom);
+                   okEventHandler(event);
+               }
+            });
+        }
+
+        let okDom=document.createElement('span');
+        pannelDom.appendChild(okDom);
+        okDom.innerText='OK';
+        okDom.style.width='50px';
+        okDom.style.marginLeft='3px';
+        okDom.style.height='100%';
+        okDom.style.border='solid 1px #eee';
+        okDom.style.padding='3px';
+        okDom.style.borderRadius='3px';
+        okDom.style.background='lightgreen';
+        okDom.style.color='white';
+        okDom.addEventListener('click',function(event){
+            inputText.text=inputDom.value;
+            if(defaultConfig.validator){
+                inputText.valid=defaultConfig.validator(inputText.text);
+            }
+            containDom.style.display='none';
+            containDom.parentNode.removeChild(containDom);
+            okEventHandler(event);
+        });
+
     }
 }
 
 
 window.$canvas={
-    point2d(x,y){
+    point2d:function (x,y){
         return {
             x:x,
             y:y
         };
     },
-    distance(x1,y1,x2,y2){
+    distance:function (x1,y1,x2,y2){
         return Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
     },
-    distancePoint(p1,p2){
+    distancePoint:function (p1,p2){
       return this.distance(p1.x,p1.y,p2.x,p2.y);
     },
-    regularPoint(p1,p2){
+    regularPoint:function (p1,p2){
       let minX=Math.min(p1.x,p2.x);
       let minY=Math.min(p1.y,p2.y);
       let maxX=Math.max(p1.x,p2.x);
@@ -2033,25 +2472,25 @@ window.$canvas={
       p2.x=maxX;
       p2.y=maxY;
     },
-    angle2Radian(angle){
+    angle2Radian:function (angle){
       return angle/180*Math.PI;
     },
-    middlePoint(p1,p2){
+    middlePoint:function (p1,p2){
       return {
             x:(p1.x+p2.x)/2,
             y:(p1.y+p2.y)/2,
       }
     },
-    size2d(x1,y1,x2,y2){
+    size2d:function (x1,y1,x2,y2){
       return {
           width:Math.abs(x2-x1),
           height:Math.abs(y2-y1)
       };
     },
-    sizePoint(p1,p2){
+    sizePoint:function (p1,p2){
       return this.size2d(p1.x,p1.y,p2.x,p2.y);
     },
-    dataUrl2File(dataUrl,fileName){
+    dataUrl2File:function (dataUrl,fileName){
         let arr=dataUrl.split(',');
         let mime=arr[0].match(/:(.*?);/)[1];
         let bstr=atob(arr[1]);
@@ -2062,11 +2501,17 @@ window.$canvas={
         }
         return new File([u8arr],fileName,{type:mime});
     },
-    dc2d2File(dc2dDom,fileName,mime='image/png'){
+    dc2d2File:function (dc2dDom,fileName,mime){
+        if(mine==undefined){
+            mime='image/png';
+        }
       let dataUrl=dc2dDom.toDataURL(mime);
       return $canvas.dataUrl2File(dataUrl,fileName);
     },
-    downloadDc2d(dc2dDom,fileName,mime='image/png'){
+    downloadDc2d:function (dc2dDom,fileName,mime){
+        if(mine==undefined){
+            mime='image/png';
+        }
         let dataUrl=dc2dDom.toDataURL(mime);
         let dom=document.createElement('a');
         dom.download=fileName;
@@ -2076,20 +2521,20 @@ window.$canvas={
         dom.click();
         document.body.removeChild(dom);
     },
-    drawLine(dc2d,p1,p2){
+    drawLine:function (dc2d,p1,p2){
         dc2d.beginPath();
         dc2d.moveTo(p1.x,p1.y);
         dc2d.lineTo(p2.x,p2.y);
         dc2d.stroke();
     },
-    drawRect(dc2d,p1,p2){
+    drawRect:function (dc2d,p1,p2){
         let pointBegin=$canvas.point2d(p1.x,p1.y);
         let pointEnd=$canvas.point2d(p2.x,p2.y);
         $canvas.regularPoint(pointBegin,pointEnd);
         let psize=$canvas.sizePoint(pointBegin,pointEnd);
         dc2d.strokeRect(pointBegin.x,pointBegin.y,psize.width,psize.height);
     },
-    drawFillRect(dc2d,p1,p2){
+    drawFillRect:function (dc2d,p1,p2){
         let pointBegin=$canvas.point2d(p1.x,p1.y);
         let pointEnd=$canvas.point2d(p2.x,p2.y);
         $canvas.regularPoint(pointBegin,pointEnd);
@@ -2097,20 +2542,20 @@ window.$canvas={
 
         dc2d.fillRect(pointBegin.x,pointBegin.y,psize.width,psize.height);
     },
-    drawCircle(dc2d,p,radius){
+    drawCircle:function (dc2d,p,radius){
         dc2d.beginPath();
         dc2d.arc(p.x,p.y,radius,0,2*Math.PI,false);
         dc2d.stroke();
         dc2d.closePath();
     },
-    drawFillCircle(dc2d,p,radius){
+    drawFillCircle:function (dc2d,p,radius){
         dc2d.beginPath();
         dc2d.arc(p.x,p.y,dis,0,2*Math.PI,false);
         // dc2d.stroke();
         dc2d.closePath();
         dc2d.fill();
     },
-    drawEllipse(dc2d,p1,p2){
+    drawEllipse:function (dc2d,p1,p2){
         let beginPoint=$canvas.point2d(p1.x,p1.y);
         let endPoint=$canvas.point2d(p2.x,p2.y);
         $canvas.regularPoint(beginPoint,endPoint);
@@ -2130,7 +2575,7 @@ window.$canvas={
         dc2d.stroke();
         dc2d.restore();
     },
-    drawFillEllipse(dc2d,p1,p2){
+    drawFillEllipse:function (dc2d,p1,p2){
         let beginPoint=$canvas.point2d(p1.x,p1.y);
         let endPoint=$canvas.point2d(p2.x,p2.y);
         $canvas.regularPoint(beginPoint,endPoint);
@@ -2151,7 +2596,7 @@ window.$canvas={
         dc2d.fill();
         dc2d.restore();
     },
-    drawRoundRect(dc2d,p1,p2,radius){
+    drawRoundRect:function (dc2d,p1,p2,radius){
         let beginPoint=$canvas.point2d(p1.x,p1.y);
         let endPoint=$canvas.point2d(p2.x,p2.y);
         $canvas.regularPoint(beginPoint,endPoint);
@@ -2171,7 +2616,7 @@ window.$canvas={
         dc2d.stroke();
         dc2d.closePath();
     },
-    drawFillRoundRect(dc2d,p1,p2,radius){
+    drawFillRoundRect:function (dc2d,p1,p2,radius){
         let beginPoint=$canvas.point2d(p1.x,p1.y);
         let endPoint=$canvas.point2d(p2.x,p2.y);
         $canvas.regularPoint(beginPoint,endPoint);
@@ -2192,7 +2637,7 @@ window.$canvas={
         dc2d.closePath();
         dc2d.fill();
     },
-    drawPolygon(dc2d,pointArr){
+    drawPolygon:function (dc2d,pointArr){
       if(!pointArr || pointArr.length==0){
           return ;
       }
@@ -2205,7 +2650,7 @@ window.$canvas={
       dc2d.stroke();
       dc2d.closePath();
     },
-    drawFillPolygon(dc2d,pointArr){
+    drawFillPolygon:function (dc2d,pointArr){
         if(!pointArr || pointArr.length==0){
             return ;
         }
@@ -2219,7 +2664,7 @@ window.$canvas={
         dc2d.closePath();
         dc2d.fill();
     },
-    initPainter(id,config){
+    initPainter:function (id,config){
         let defaultConfig={
             width:null,
             height:null,
@@ -2920,39 +3365,39 @@ window.$canvas={
             }
         }
 
-        dom.addEventListener(EventTypes.MOUSE_DOWN, event => {
+        dom.addEventListener(EventTypes.MOUSE_DOWN, function(event) {
             eventHandler(EventTypes.MOUSE_DOWN,event);
         });
 
-        dom.addEventListener(EventTypes.MOUSE_UP, event => {
+        dom.addEventListener(EventTypes.MOUSE_UP, function(event) {
             eventHandler(EventTypes.MOUSE_UP,event);
         });
 
-        dom.addEventListener(EventTypes.MOUSE_MOVE, event => {
+        dom.addEventListener(EventTypes.MOUSE_MOVE, function(event) {
             eventHandler(EventTypes.MOUSE_MOVE,event);
         });
 
-        dom.addEventListener(EventTypes.MOUSE_LEAVE, event => {
+        dom.addEventListener(EventTypes.MOUSE_LEAVE, function(event) {
             eventHandler(EventTypes.MOUSE_LEAVE,event);
         });
-        dom.addEventListener(EventTypes.CLICK, event => {
+        dom.addEventListener(EventTypes.CLICK, function(event) {
             eventHandler(EventTypes.CLICK,event);
         });
-        dom.addEventListener(EventTypes.DBL_CLICK, event => {
+        dom.addEventListener(EventTypes.DBL_CLICK, function(event) {
             eventHandler(EventTypes.DBL_CLICK,event);
         });
-        dom.addEventListener(EventTypes.KEY_DOWN, event => {
+        dom.addEventListener(EventTypes.KEY_DOWN, function(event) {
             eventHandler(EventTypes.KEY_DOWN,event);
         });
-        dom.addEventListener(EventTypes.KEY_UP, event => {
+        dom.addEventListener(EventTypes.KEY_UP, function(event) {
             eventHandler(EventTypes.KEY_UP,event);
         });
-        dom.addEventListener(EventTypes.CONTEXT_MENU, event => {
+        dom.addEventListener(EventTypes.CONTEXT_MENU, function(event) {
             event.preventDefault();
             eventHandler(EventTypes.CONTEXT_MENU,event);
         });
     },
-    initWaterMark(id,config){
+    initWaterMark:function (id,config){
         let defaultConfig={
             velSpace:30,
             horSpace:40,
