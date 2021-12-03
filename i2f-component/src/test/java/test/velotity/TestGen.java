@@ -14,5 +14,6 @@ public class TestGen {
         params.put("age",22);
         String rs= VelocityGenerator.render(template,params);
         System.out.println("rs:\n"+rs);
+
     }
 }

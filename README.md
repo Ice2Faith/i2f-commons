@@ -45,6 +45,47 @@ commons util package project for java devlop
 - just include the jar i2f-core.jar
 
 # update log
+- 2021-12-03 21h
+    - add elasticsearch util
+        - simple use es spring-boot-data-elasticsearch & RestHighLevelClient env
+        - now get start
+        - for two example:
+```java
+//use case：
+  //1.base on spring-boot-data-elasticsearch
+  PageData page= EsQryUtil.builder()
+                  .must()
+                  .eqs("sex","man")
+                  .likes("name","Zhang")
+                  .range("age",15,25)
+                  .convert()
+                  .order("updateTime",SortOrder.DESC)
+                  .order("id", SortOrder.ASC)
+                  .page(1,20)
+                  .respPage(this implements ElasticsearchRepository);
+ 
+ // 2.base on RestHighLevelClient
+  PageData page= EsQryUtil.builder()
+                  .must()
+                  .eqs("sex","man")
+                  .likes("name","Zhang")
+                  .range("age",15,25)
+                  .convert2()
+                  .order("updateTime",SortOrder.DESC)
+                  .order("id", SortOrder.ASC)
+                  .page(1,20)
+                  .doSearch(RestHighLevelClient,"indexName")
+                  .respPage();
+```
+- and 
+    - EsBeanUtil.class
+        - base on java bean and annotation to simple query and insert document
+        - just you use annotation EsField on bean fields which need save to es
+        - use EsIndex on bean class which declare bean form which index of es 
+        - use EsId on bean field which one field as es doc id
+        - use EsQuery on bean fields which as simple query condition
+    - add cglib util
+    - add spring util
 - 2021-11-03 23h
     - add  number to visual string static method in StringUtil
     - example use case and result:
