@@ -351,6 +351,81 @@ public class GeneratorTool {
         }
         return false;
     }
+
+    public static String toPascal(String str){
+        if(isEmpty(str)){
+            return str;
+        }
+        if(!str.contains("_") && !str.contains("-")){
+            return firstUpper(str);
+        }
+        String[] arr=split(str,true,"_|-",-1,true);
+        StringBuffer buffer=new StringBuffer();
+        for(String item : arr){
+            buffer.append(firstUpper(item));
+        }
+        return buffer.toString();
+    }
+    public static String toCamel(String str){
+        if(isEmpty(str)){
+            return str;
+        }
+        if(!str.contains("_") && !str.contains("-")){
+            return firstLower(str);
+        }
+        String[] arr=split(str,true,"_|-",-1,true);
+        StringBuffer buffer=new StringBuffer();
+        for (int i = 0; i < arr.length; i++) {
+            if(i==0){
+                buffer.append(firstLower(arr[i]));
+            }else{
+                buffer.append(firstUpper(arr[i]));
+            }
+        }
+        return buffer.toString();
+    }
+    public static String toUnderScore(String str){
+        if(str.contains("_")){
+            return str.trim();
+        }
+        StringBuffer buffer=new StringBuffer();
+        char[] arr=str.toCharArray();
+        for (int i = 0; i < arr.length; i++) {
+            if(arr[i]>='A' && arr[i]<='Z'){
+                buffer.append("_");
+                buffer.append((char)(arr[i]|32));
+            }else{
+                buffer.append(arr[i]);
+            }
+        }
+        return buffer.toString();
+    }
+
+    public static String[] split(String str,boolean trimBefore,String regex,int limit,boolean removeEmpty){
+        String[] ret=new String[]{};
+        if(str==null){
+            return ret;
+        }
+        if(trimBefore){
+            str=str.trim();
+        }
+        ret=str.split(regex,limit);
+        Vector<String> result=new Vector<>();
+        for(String item : ret){
+            if(removeEmpty){
+                if("".equals(item)){
+                    continue;
+                }
+            }
+            result.add(item);
+        }
+        ret=new String[result.size()];
+        for(int i=0;i<result.size();i++){
+            ret[i]=result.get(i);
+        }
+        return ret;
+    }
+
     protected static boolean isInTypes(Class target,Class ... types){
         if(target==null){
             return false;
