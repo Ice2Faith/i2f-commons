@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gen.out.dao.UserDao">
+
+    <resultMap id="beanMap" type="gen.out.model.UserBean">
+                    <result property="id" column="id"/>
+                    <result property="userName" column="user_name"/>
+                    <result property="age" column="user_age"/>
+            </resultMap>
+
+    <select id="getList" resultMap="beanMap">
+        select
+                    id
+                            ,
+                                user_name
+                            ,
+                                user_age
+                            from sys_user
+        <where>
+                            <if test='id!=null'>
+                    and id = ${id}
+                </if>
+                            <if test='userName!=null'>
+                    and user_name = ${userName}
+                </if>
+                            <if test='age!=null'>
+                    and user_age = ${age}
+                </if>
+                    </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,28 @@
+#filename ${beanName}ServiceImpl
+package ${package}.service.impl;
+
+import ${package}.service.${beanName}Service;
+import ${package}.dao.${beanName}Dao;
+import ${package}.model.${beanName}Bean;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.lang.*;
+import java.util.*;
+
+/**
+ * @desc operation for table ${tableName}
+ */
+@Service
+@Transactional
+public class ${beanName}ServiceImpl implements ${beanName}Service {
+
+    @Resource
+    private ${beanName}Dao ${beanLowerName}Dao;
+
+    @Override
+    public List<${beanName}Bean> getList(${beanName}Bean post){
+        return ${beanLowerName}Dao.getList(post);
+    }
+}

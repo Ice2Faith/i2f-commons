@@ -1,0 +1,26 @@
+#filename ${beanName}Controller
+package ${package}.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ${package}.service.${beanName}Service;
+import ${package}.model.${beanName}Bean;
+import java.lang.*;
+import java.util.*;
+
+/**
+* @desc operation for table ${tableName}
+*/
+@RestController
+@RequestMapping("${beanLowerName}")
+public class ${beanName}Controller {
+
+    @Autowired
+    private ${beanName}Service ${beanLowerName}Service;
+
+    @RequestMapping("list")
+    public List<${beanName}Bean> getList(${beanName}Bean post){
+        return ${beanLowerName}Service.getList(post);
+    }
+}

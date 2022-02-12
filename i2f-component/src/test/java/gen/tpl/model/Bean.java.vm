@@ -1,0 +1,21 @@
+#filename ${beanName}Bean
+package ${package}.model;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.lang.*;
+import java.util.*;
+
+/**
+ * @desc operation for table ${tableName}
+ */
+@Data
+@NoArgsConstructor
+public class ${beanName}Bean {
+
+    #foreach( ${item} in ${property})
+        // for filed ${item.colName}
+        private ${item.javaType} ${item.fieldName};
+    #end
+}

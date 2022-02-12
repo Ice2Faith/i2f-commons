@@ -1,0 +1,31 @@
+#filename ${beanName}Mapper
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${package}.dao.${beanName}Dao">
+
+    <resultMap id="beanMap" type="${package}.model.${beanName}Bean">
+        #foreach( ${item} in ${property})
+            <result property="${item.fieldName}" column="${item.colName}"/>
+        #end
+    </resultMap>
+
+    <select id="getList" resultMap="beanMap">
+        select
+        #foreach(${item} in ${property})
+            ${item.colName}
+            #if($velocityCount !=$property.size())
+                ,
+            #end
+        #end
+        from ${tableName}
+        <where>
+            #foreach(${item} in ${property})
+                <if test='${item.fieldName}!=null'>
+                    and ${item.colName} = ${${item.fieldName}}
+                </if>
+            #end
+        </where>
+    </select>
+
+</mapper>

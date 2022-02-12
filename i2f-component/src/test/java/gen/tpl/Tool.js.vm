@@ -1,0 +1,39 @@
+${_vm.sysProperty("os.name")}
+--------------------
+${_vm.format(${_vm.now()},"yyyy-MM-dd HH:mm:ss SSS")}
+---------------------
+#foreach($item in ${_vm.list(${_vm.fori(0,20,2)})})
+    ${item.first} ${item.last} ${item.index} ${item.size} ${item.value}
+#end
+---------------------
+${_vm.format("%03d-%.02f",12,2.125)}
+---------------------
+${_vm.randInt(3,5)}
+----------------------
+${_vm.sysEnv("path")}
+----------------------
+${_vm.join(${_vm.split(${_vm.sysEnv("path")},";",-1)},"->%s","
+","path:
+{","
+}")}
+
+${_vm.uuid()}
+${_vm.replaceAll(${_vm.uuid()},"-","").toUpperCase()}
+
+${_vm.join(${_vm.listFiles("D:\IDEA_ROOT\i2f-commons\i2f-component\src\test\java\gen\tpl")},null,"
+","files:[
+","
+]")}
+
+#foreach($file in ${_vm.listFiles("D:\IDEA_ROOT\i2f-commons\i2f-component\src\test\java\gen\tpl")})
+    #if($file.isFile())
+        file:${file.getAbsolutePath()}
+    #elseif($file.isDirectory())
+        dir:${file.getAbsolutePath()}
+    #end
+#end
+
+
+${_vm.readFile("D:\IDEA_ROOT\i2f-commons\i2f-component\src\test\java\gen\tpl\Tool.js.vm","UTF-8")}
+
+${_vm.cmdResult("ping 114.114.114.114","GBK")}

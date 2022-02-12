@@ -1,0 +1,16 @@
+#filename ${beanName}Service
+package ${package}.service;
+
+import ${package}.model.${beanName}Bean;
+
+import java.lang.*;
+import java.util.*;
+
+/**
+ * @desc operation for table ${tableName}
+ */
+public interface ${beanName}Service {
+
+    List<${beanName}Bean> getList(${beanName}Bean post);
+
+}

@@ -1,0 +1,23 @@
+{
+  "package": "gen.out",
+  "beanName": "User",
+  "beanLowerName": "user",
+  "tableName": "sys_user",
+  "property": [
+    {
+      "colName": "id",
+      "fieldName": "id",
+      "javaType": "Integer"
+    },
+    {
+      "colName": "user_name",
+      "fieldName": "userName",
+      "javaType": "String"
+    },
+    {
+      "colName": "user_age",
+      "fieldName": "age",
+      "javaType": "Integer"
+    }
+  ]
+}

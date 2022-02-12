@@ -1,0 +1,18 @@
+#filename ${beanName}Dao
+package ${package}.dao;
+
+import ${package}.model.${beanName}Bean;
+
+import org.apache.ibatis.annotations.Param;
+
+import java.lang.*;
+import java.util.*;
+
+/**
+ * @desc operation for table ${tableName}
+ */
+public interface ${beanName}Dao {
+
+    List<${beanName}Bean> getList(@Param("post")${beanName}Bean post);
+
+}
