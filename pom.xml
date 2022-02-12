@@ -12,6 +12,7 @@
     <modules>
         <module>i2f-core</module>
         <module>i2f-component</module>
+        <module>i2f-design</module>
 
     </modules>
 

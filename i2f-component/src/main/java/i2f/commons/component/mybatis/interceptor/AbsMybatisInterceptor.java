@@ -24,7 +24,9 @@ public class AbsMybatisInterceptor implements Interceptor {
         Object[] arg=invocation.getArgs();
         Method method=invocation.getMethod();
 
+
         if(target instanceof Executor){
+
 
         }else if(target instanceof ParameterHandler){
 
