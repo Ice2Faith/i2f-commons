@@ -16,6 +16,6 @@ public class ${beanName}Bean {
 
     #foreach( ${item} in ${property})
         // for filed ${item.colName}
-        private ${item.javaType} ${item.fieldName};
+        private ${item.javaType} ${_vm.toCamel(${item.colName})};
     #end
 }

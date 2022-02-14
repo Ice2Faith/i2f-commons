@@ -20,6 +20,7 @@
       <el-table-column
         v-if="config.table.select"
         type="selection"
+        fixed="left"
         width="55">
         <template slot="header" slot-scope="scope">
           <el-checkbox
@@ -34,103 +35,79 @@
       <el-table-column
         v-if="config.table.index"
         type="index"
+        fixed="left"
+        label="行号"
         width="50">
       </el-table-column>
-      <el-table-column v-if="config.expand && config.expand.enable" type="expand">
+      <el-table-column
+        v-if="config.expand && config.expand.enable"
+        fixed="left"
+        type="expand">
         <template slot-scope="props">
           <el-form
             :style="config.expand.formStyle"
             :label-position="config.expand.labelPosition"
             :inline="config.expand.formInline"
             :label-width="config.expand.labelWidth">
-            <el-form-item
-              v-for="(index, item) in config.expands"
-              :key="index"
-              :style="config.expand.itemStyle"
-              :label="item.label">
-              <span :style="item.style">{{ props.row[item.prop] }}</span>
-            </el-form-item>
+            <template v-for="(item, index) in config.expands">
+              <el-form-item
+                :key="index"
+                :style="config.expand.itemStyle"
+                :label="item.label">
+                <span :style="item.style">{{ props.row[item.prop] }}</span>
+              </el-form-item>
+            </template>
           </el-form>
         </template>
       </el-table-column>
-      <template v-for="(index, column) in config.columns">
-        <!-- 允许自定义整个列 -->
-        <slot v-if="column.slot && column.slot!=''" :name="column.slot" :meta="column">
-        </slot>
-        <!-- 常规列定义，带过滤功能 -->
-        <template v-else>
-          <el-table-column
-            v-if="column.filter"
-            :resizable="config.table.resizable"
-            :align="config.table.align"
-            :prop="column.prop"
-            :label="column.label"
-            :fixed="column.fixed"
-            :sortable="column.sort"
-            :width="column.width"
-            :min-width="column.minWidth"
-            :show-overflow-tooltip="column.tooltip"
-            :key="index"
-            :filters="getFilters(column.prop)"
-            :filter-method="filterHandler">
-            <!-- 允许自定义表头 -->
-            <template v-if="column.headerSlot && column.headerSlot!=''">
-              <template slot="header" slot-scope="scope">
-                <slot :name="column.headerSlot" :scope="scope">
-                </slot>
-              </template>
-            </template>
-            <!-- 支持点击的特殊样式 -->
-            <template v-if="column.click && column.click!=''">
-              <template slot-scope="scope">
-                <el-link @click="onTableColumnCellClick(scope.row,column.prop,scope)">{{ scope.row[column.prop] }}</el-link>
-              </template>
-            </template>
-            <!-- 支持单元格内容定义的样式 -->
-            <template v-if="column.columnSlot && column.columnSlot!=''">
-              <template slot-scope="scope">
-                <slot :name="column.columnSlot" :scope="scope">
-                </slot>
-              </template>
-            </template>
-          </el-table-column>
-          <!-- 常规列定义，不带过滤功能 -->
-          <el-table-column
-            v-else
-            :resizable="config.table.resizable"
-            :align="config.table.align"
-            :prop="column.prop"
-            :label="column.label"
-            :sortable="column.sort"
-            :width="column.width"
-            :min-width="column.minWidth"
-            :fixed="column.fixed"
-            :show-overflow-tooltip="column.tooltip"
-            :key="index">
-            <!-- 允许自定义表头 -->
-            <template v-if="column.headerSlot && column.headerSlot!=''">
-              <template slot="header" slot-scope="scope">
-                <slot :name="column.headerSlot" :scope="scope">
-                </slot>
-              </template>
-            </template>
-            <!-- 支持点击的特殊样式 -->
-            <template v-if="column.click && column.click!=''">
-              <template slot-scope="scope">
-                <el-link v-if="column.href && column.href!=''" :href="column.href">{{ scope.row[column.prop] }}</el-link>
-                <el-link v-else @click="onTableColumnCellClick(scope.row,column.prop,scope)">{{ scope.row[column.prop] }}</el-link>
-              </template>
-            </template>
-            <!-- 支持单元格内容定义的样式 -->
-            <template v-if="column.columnSlot && column.columnSlot!=''">
-              <template slot-scope="scope">
-                <slot :name="column.columnSlot" :scope="scope">
-                </slot>
-              </template>
-            </template>
-          </el-table-column>
-        </template>
+      <template v-for="(column, index) in config.columns">
+        <LzMultiTableColumn
+          :key="index"
+          :column="column"
+          :config="config"
+          :data="data"
+          @click="onTableColumnCellClick"
+          @row-input-change="onTableRowInputChange"
+          @row-checkbox-change="onTableRowCheckboxChange">
+        </LzMultiTableColumn>
       </template>
+      <el-table-column
+        v-if="config.operation.enable"
+        :resizable="config.table.resizable"
+        :align="config.operation.align"
+        :label="config.operation.label"
+        :width="config.operation.width"
+        :min-width="config.operation.minWidth"
+        :fixed="config.operation.fixed">
+        <template slot-scope="scope">
+          <el-row :gutter="config.operation.gutter">
+            <template v-for="(item, index) in config.operations">
+              <el-link v-if="item.href && item.href!=''" :href="item.href" :key="index">
+                <el-button
+                  :type="item.type"
+                  :icon="item.icon"
+                  :size="item.size"
+                  :plain="item.plain"
+                  :round="item.round"
+                  :circle="item.circle"
+                  :style="item.style"
+                  @click="onTableOperationButton(item.event,scope)">{{ item.text }}</el-button>
+              </el-link>
+              <el-button
+                v-else
+                :key="index"
+                :type="item.type"
+                :icon="item.icon"
+                :size="item.size"
+                :plain="item.plain"
+                :round="item.round"
+                :circle="item.circle"
+                :style="item.style"
+                @click="onTableOperationButton(item.event,scope)">{{ item.text }}</el-button>
+            </template>
+          </el-row>
+        </template>
+      </el-table-column>
     </el-table>
     <div style="z-index: 10;"></div>
     <template v-if="config.options && config.options.page">
@@ -150,9 +127,11 @@
 </template>
 
 <script>
+import LzMultiTableColumn from '@/components/lz/components/LzMultiTableColumn'
 export default {
-  name: 'CommonTable',
+  name: 'LzTable',
   components: {
+    LzMultiTableColumn
   },
   props: {
     prefer: { // 参考defaultConfig函数的返回值
@@ -205,8 +184,8 @@ export default {
     onTableSelectionsChange(selections) {
       this.$emit('selection-change', selections)
     },
-    onTableColumnCellClick(row, prop, scope) {
-      this.$emit('click', row[prop], row, prop)
+    onTableColumnCellClick(value, row, prop) {
+      this.$emit('click', value, row, prop)
     },
     onTableSelectAll() {
       if (this.setting.checkBox.checkAll) {
@@ -231,6 +210,15 @@ export default {
     },
     onTableRowDbClick(row, column, event) {
       this.$emit('row-dbclick', row, column, event)
+    },
+    onTableRowInputChange(value, row, scope, column) {
+      this.$emit('row-input-change', value, row, scope, column)
+    },
+    onTableRowCheckboxChange(value, row, scope, column) {
+      this.$emit('row-checkbox-change', value, row, scope, column)
+    },
+    onTableOperationButton(event, scope) {
+      this.$emit(event, scope.row, scope)
     },
     onPageIndexChange(val) {
       const page = {
@@ -292,6 +280,12 @@ export default {
           maxHeight: undefined, // 表格最大高度
           highlightCurrentRow: true // 是否高亮显示当前行，用于单选
         },
+        page: { // 分页配置
+          autoHidden: false, // 不满一页时是否自动隐藏
+          small: false, // 是否以小样式显示
+          sizes: [10, 20, 30, 50, 100, 200, 300, 500], // 下拉的页大小配置
+          layout: 'total, sizes, prev, pager, next, jumper' // 分页的布局控件配置
+        },
         expand: { // 展开行配置
           enable: false, // 是否启用展开行
           labelPosition: 'left', // 展开行的标签位置
@@ -299,12 +293,6 @@ export default {
           labelWidth: '80px', // 展开行标签宽度
           itemStyle: '', // 项目样式
           formStyle: '' // 表单样式
-        },
-        page: { // 分页配置
-          autoHidden: false, // 不满一页时是否自动隐藏
-          small: false, // 是否以小样式显示
-          sizes: [10, 20, 30, 50, 100, 200, 300, 500], // 下拉的页大小配置
-          layout: 'total, sizes, prev, pager, next, jumper' // 分页的布局控件配置
         },
         expands: [ // 展开行配置列表
           {
@@ -327,8 +315,37 @@ export default {
             click: true, // 是否是可点击的样式，将会触发click事件
             href: '', // 可点击的超链接
             tooltip: true, // 内容超长时是否悬浮显示
+            hover: '', // 鼠标悬浮时，要显示的其他prop字段
             sort: true, // 是否启用排序
-            filter: true // 是否启用过滤
+            filter: true, // 是否启用过滤
+            input: false, // 是否是输入列
+            checkbox: false, // 是否复选项
+            multiply: false, // 是否多级表头
+            columns: [] // 多级表头的列配置，与此配置相同
+          }
+        ],
+        operation: { // 操作列按钮功能配置
+          enable: false, // 是否开启操作列
+          gutter: 20, // 按钮之间的间距
+          label: '操作', // 操作列列名
+          width: '120px', // 列宽
+          minWidth: '', // 列最小宽度
+          fixed: 'right', // 是否固定列，或者固定left/right
+          align: 'left' // 列的对其方式
+        },
+        operations: [ // 操作列功能列表
+          {
+            text: '添加', // 按钮文本
+            event: 'add', // 按钮触发的事件
+            href: '', // 按钮可以直接指向一个超链接
+            icon: 'el-icon-plus', // 按钮可以有图标
+            type: 'primary', // 其余这些样式都是官网的属性
+            size: 'small',
+            plain: false,
+            round: true,
+            circle: false,
+            hover: '', // 鼠标悬浮在按钮上时显示的内容
+            style: ''
           }
         ]
       }
@@ -339,7 +356,7 @@ export default {
       immediate: true,
       deep: true,
       handler: function(val, old) {
-        let apply=this.defaultConfig()
+        let apply = this.defaultConfig()
         // TODO 将val的每个属性逐一覆盖到默认配置中，最后使用混合的配置作为组件使用配置
         if (val.options) {
           if (val.options.page !== undefined) {
@@ -413,10 +430,36 @@ export default {
           }
         }
         if (val.expands) {
-          apply.extends = val.extends
+          apply.expands = val.expands
         }
         if (val.columns) {
           apply.columns = val.columns
+        }
+        if (val.operation) {
+          if (val.operation.enable !== undefined) {
+            apply.operation.enable = val.operation.enable
+          }
+          if (val.operation.gutter !== undefined) {
+            apply.operation.gutter = val.operation.gutter
+          }
+          if (val.operation.label !== undefined) {
+            apply.operation.label = val.operation.label
+          }
+          if (val.operation.width !== undefined) {
+            apply.operation.width = val.operation.width
+          }
+          if (val.operation.minWidth !== undefined) {
+            apply.operation.minWidth = val.operation.minWidth
+          }
+          if (val.operation.fixed !== undefined) {
+            apply.operation.fixed = val.operation.fixed
+          }
+          if (val.operation.align !== undefined) {
+            apply.operation.align = val.operation.align
+          }
+        }
+        if (val.operations) {
+          apply.operations = val.operations
         }
         this.config = apply
       }

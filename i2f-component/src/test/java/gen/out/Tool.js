@@ -1,6 +1,6 @@
 Windows 10
 --------------------
-2022-02-12 10:52:43 078
+2022-02-12 15:06:14 419
 ---------------------
     true false 0 10 0
     false false 1 10 2
@@ -15,7 +15,7 @@ Windows 10
 ---------------------
 012-2.13
 ---------------------
-3
+4
 ----------------------
 C:\Program Files (x86)\Python36-32\Scripts\;C:\Program Files (x86)\Python36-32\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Java\jdk1.8.0_201\bin;C:\Java\jdk1.8.0_201\jre\bin;C:\CMDTOOLS;C:\FFMPEG\dll;D:\scrcpy-win32-v1.13;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\ADB;C:\Go;.;\bin;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Redis\;C:\Program Files\TortoiseSVN\bin;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\Microsoft SQL Server\110\Tools\Binn\;E:\Programs\NodeJs;E:\Programs\NodeJs\node_global;C:\OpenCV\opencv\build\bin;C:\OpenCV\opencv\build\x64\vc14\bin;C:\OpenCV\opencv\build\x64\vc15\bin;C:\Program Files\MySQL\MySQL Shell 8.0\bin\
 ----------------------
@@ -49,8 +49,8 @@ path:
 ->C:\Program Files\MySQL\MySQL Shell 8.0\bin\
 }
 
-92bf7e46-d643-44d5-8c9b-3c0c0127e500
-690E5C84F3304E0CB7E0C9C35E3B7B23
+df3ce667-d5c0-4615-9bda-f620970afb84
+8F12DA62E3BD4ECB93B3461291A81D4E
 
 files:[
 D:\IDEA_ROOT\i2f-commons\i2f-component\src\test\java\gen\tpl\controller
@@ -110,13 +110,13 @@ ${_vm.cmdResult("ping 114.114.114.114","GBK")}
 
 
 正在 Ping 114.114.114.114 具有 32 字节的数据:
-来自 114.114.114.114 的回复: 字节=32 时间=51ms TTL=72
-来自 114.114.114.114 的回复: 字节=32 时间=49ms TTL=87
-来自 114.114.114.114 的回复: 字节=32 时间=51ms TTL=79
-来自 114.114.114.114 的回复: 字节=32 时间=48ms TTL=76
+来自 114.114.114.114 的回复: 字节=32 时间=24ms TTL=94
+来自 114.114.114.114 的回复: 字节=32 时间=26ms TTL=75
+来自 114.114.114.114 的回复: 字节=32 时间=25ms TTL=86
+来自 114.114.114.114 的回复: 字节=32 时间=24ms TTL=87
 
 114.114.114.114 的 Ping 统计信息:
     数据包: 已发送 = 4，已接收 = 4，丢失 = 0 (0% 丢失)，
 往返行程的估计时间(以毫秒为单位):
-    最短 = 48ms，最长 = 51ms，平均 = 49ms
+    最短 = 24ms，最长 = 26ms，平均 = 24ms
 
