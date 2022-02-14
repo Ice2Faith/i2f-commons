@@ -26,6 +26,8 @@ export default {
           {
             name: 'Zhang',
             age: 0,
+            nation: '1',
+            level: 1,
             descr: 'Mr.Zhang',
             income_alipay: 10,
             income_wxpay: 20,
@@ -36,6 +38,8 @@ export default {
           {
             name: 'Liu',
             age: 22,
+            nation: '2',
+            level: 2,
             descr: 'Mr.Liu',
             income_alipay: 12,
             income_wxpay: 22,
@@ -46,6 +50,8 @@ export default {
           {
             name: 'Chen',
             age: 23,
+            nation: '3',
+            level: 3,
             descr: 'Mr.Chen',
             income_alipay: 18,
             income_wxpay: 24,
@@ -188,6 +194,36 @@ export default {
               label: '独生子女', // 列名
               width: '120px', // 列宽
               checkbox: true // 是否是输入列
+            },
+            {
+              prop: 'nation',
+              label: '国籍',
+              width: '120px',
+              select: true,
+              selectList: [
+                {
+                  text: '中国',
+                  value: '1'
+                },
+                {
+                  text: '俄罗斯',
+                  value: '2'
+                },
+                {
+                  text: '韩国',
+                  value: '3'
+                }
+              ]
+            },
+            {
+              prop: 'level',
+              label: '级别',
+              width: '120px',
+              counter: true,
+              counterConfig: {
+                min: 1,
+                max: 3
+              }
             }
           ],
           operation: { // 操作列按钮功能配置

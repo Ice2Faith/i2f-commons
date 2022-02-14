@@ -320,6 +320,13 @@ export default {
             filter: true, // 是否启用过滤
             input: false, // 是否是输入列
             checkbox: false, // 是否复选项
+            select: false, // 是否下拉选框
+            selectList: [], // 下拉选框列表
+            counter: false, // 是否计数器
+            counterConfig: {
+              min: 1,
+              max: 100
+            },
             multiply: false, // 是否多级表头
             columns: [] // 多级表头的列配置，与此配置相同
           }

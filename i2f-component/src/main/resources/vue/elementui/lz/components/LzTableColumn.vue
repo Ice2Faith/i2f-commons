@@ -51,6 +51,29 @@
               {{column.label}}
             </el-checkbox>
           </template>
+          <!-- 支持下拉选框的特殊样式 -->
+          <template v-else-if="column.select">
+            <el-select
+              v-model="scope.row[column.prop]"
+              style="width: 100%"
+              filterable
+              placeholder="请选择">
+              <el-option
+                v-for="(item,index) in column.selectList"
+                :key="index"
+                :label="item.text"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </template>
+          <!-- 支持计数器的特殊样式 -->
+          <template v-else-if="column.counter">
+            <el-input-number
+              v-model="scope.row[column.prop]"
+              :min="column.counterConfig.min"
+              :max="column.counterConfig.max">
+            </el-input-number>
+          </template>
           <!-- 支持单元格内容定义的样式 -->
           <template v-else-if="column.columnSlot && column.columnSlot!=''">
             <slot :name="column.columnSlot" :scope="scope">
@@ -119,6 +142,29 @@
               @change="onTableRowCheckboxChange(scope,column)">
               {{column.label}}
             </el-checkbox>
+          </template>
+          <!-- 支持下拉选框的特殊样式 -->
+          <template v-else-if="column.select">
+            <el-select
+              v-model="scope.row[column.prop]"
+              style="width: 100%"
+              filterable
+              placeholder="请选择">
+              <el-option
+                v-for="(item,index) in column.selectList"
+                :key="index"
+                :label="item.text"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </template>
+          <!-- 支持计数器的特殊样式 -->
+          <template v-else-if="column.counter">
+            <el-input-number
+              v-model="scope.row[column.prop]"
+              :min="column.counterConfig.min"
+              :max="column.counterConfig.max">
+            </el-input-number>
           </template>
           <!-- 支持单元格内容定义的样式 -->
           <template v-else-if="column.columnSlot && column.columnSlot!=''">
