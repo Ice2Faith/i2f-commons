@@ -14,6 +14,15 @@ import java.util.*;
 public class GeneratorTool {
     private final String sharp="#";
     private final String dolar="$";
+
+    public String getSharp() {
+        return sharp;
+    }
+
+    public String getDolar() {
+        return dolar;
+    }
+
     public static boolean isnull(Object obj){
         return obj==null;
     }
