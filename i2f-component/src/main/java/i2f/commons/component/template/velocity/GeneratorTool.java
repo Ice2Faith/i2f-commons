@@ -12,6 +12,8 @@ import java.util.*;
  * @desc
  */
 public class GeneratorTool {
+    private final String sharp="#";
+    private final String dolar="$";
     public static boolean isnull(Object obj){
         return obj==null;
     }
