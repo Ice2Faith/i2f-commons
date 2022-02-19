@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="i2f-design" />
+        <module name="i2f-generator" />
+        <module name="i2f-component" />
+        <module name="i2f-core" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="i2f-dev-tool" target="1.8" />
+      <module name="i2f-jdbc" target="1.8" />
+      <module name="i2f-pkg" target="1.8" />
+      <module name="i2f-reflect" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="i2f-component" options="-parameters" />
+      <module name="i2f-core" options="-parameters" />
+      <module name="i2f-design" options="-parameters" />
+      <module name="i2f-dev-tool" options="-parameters" />
+      <module name="i2f-generator" options="-parameters" />
+      <module name="i2f-jdbc" options="-parameters" />
+      <module name="i2f-pkg" options="-parameters" />
+      <module name="i2f-reflect" options="-parameters" />
+    </option>
+  </component>
+</project>

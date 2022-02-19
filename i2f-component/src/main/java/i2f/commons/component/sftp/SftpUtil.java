@@ -42,7 +42,7 @@ public class SftpUtil implements Closeable{
 
         Properties cusConfig=meta.getConfig();
         for(Map.Entry<Object,Object> item : cusConfig.entrySet()){
-           config.put(item.getKey(),item.getValue());
+            config.put(item.getKey(),item.getValue());
         }
 
         session.setConfig(config);
@@ -81,9 +81,23 @@ public class SftpUtil implements Closeable{
             builder.append("/");
             builder.append(item);
             String ppath=builder.toString();
-            channelSftp.mkdir(ppath);
+            if(!existDir(ppath)) {
+                channelSftp.mkdir(ppath);
+            }
         }
         return this;
+    }
+
+    public boolean existDir(String path){
+        try{
+            String bak=channelSftp.pwd();
+            channelSftp.cd(path);
+            channelSftp.cd(bak);
+            return true;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public SftpUtil upload(String serverPath, String  serverFileName, InputStream is) throws SftpException {

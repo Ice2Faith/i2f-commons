@@ -3,6 +3,9 @@ package gen.out.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.lang.*;
+import java.util.*;
+
 /**
  * @desc operation for table sys_user
  */

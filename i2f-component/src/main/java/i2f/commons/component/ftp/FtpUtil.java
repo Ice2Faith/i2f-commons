@@ -58,9 +58,23 @@ public class FtpUtil  implements Closeable {
             builder.append("/");
             builder.append(item);
             String ppath=builder.toString();
-            ftpClient.makeDirectory(ppath);
+            if(!existDir(ppath)) {
+                ftpClient.makeDirectory(ppath);
+            }
         }
         return this;
+    }
+
+    public boolean existDir(String path){
+        try{
+            String bak=ftpClient.printWorkingDirectory();
+            ftpClient.changeWorkingDirectory(path);
+            ftpClient.changeWorkingDirectory(bak);
+            return true;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public FtpUtil upload(String serverPath, String  serverFileName, InputStream is) throws  IOException {
