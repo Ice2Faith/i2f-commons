@@ -104,11 +104,11 @@ public class NetUtil {
         for (Map.Entry<NetworkInterface, Set<InetAddress>> item : address.entrySet()) {
             NetworkInterface net = item.getKey();
             Set<InetAddress> addrs = item.getValue();
-            if (net.isVirtual() || !net.isUp()) {
-                continue;
-            }
             Map<InetAddress, Set<InetAddress>> map = new HashMap<>();
             for (InetAddress addr : addrs) {
+                if (net.isVirtual() || !net.isUp()) {
+                    map.put(addr,null);
+                }
                 if (addr instanceof Inet4Address) {
                     if (addr.isLoopbackAddress()) {
                         continue;
@@ -126,7 +126,8 @@ public class NetUtil {
         return ret;
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static Map<InetAddress,Set<InetAddress>> getAllLanInfo() throws SocketException, InterruptedException {
+        Map<InetAddress,Set<InetAddress>> ret=new HashMap<>();
         Map<NetworkInterface,Map<InetAddress,Set<InetAddress>>> info=getAllNetInfo();
 
         for(Map.Entry<NetworkInterface,Map<InetAddress,Set<InetAddress>>> item : info.entrySet()){
@@ -135,35 +136,46 @@ public class NetUtil {
             if(net.isVirtual() || !net.isUp()){
                 continue;
             }
-            System.out.println("---------------------------");
-            System.out.println("name:"+net.getName());
-            System.out.println("displayName:"+net.getDisplayName());
-            System.out.println("virtual:"+net.isVirtual());
-            System.out.println("up:"+net.isUp());
-            System.out.println("loopback:"+net.isLoopback());
-            System.out.println("p2p:"+net.isPointToPoint());
             for(InetAddress addr : addrs.keySet()){
-                System.out.println("\t------------------------");
-                System.out.println("\tname:"+addr.getHostName());
                 if(addr instanceof Inet4Address){
-                    System.out.println("\tipv4:"+addr.getHostAddress());
                     if(addr.isLoopbackAddress()){
                         continue;
                     }
+                    Set<InetAddress> set=new HashSet<>();
                     Set<InetAddress> scans=addrs.get(addr);
                     for(InetAddress scan : scans){
                         if(scan.getHostAddress().equals(addr.getHostAddress())){
                             continue;
                         }
+                        set.add(scan);
+                    }
+                    ret.put(addr,set);
+                }
+                if(addr instanceof Inet6Address){
+
+                }
+            }
+        }
+        return ret;
+    }
+
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+            Map<InetAddress,Set<InetAddress>> addrs=getAllLanInfo();
+            for(InetAddress addr : addrs.keySet()){
+                System.out.println("\t------------------------");
+                System.out.println("\tname:"+addr.getHostName());
+                if(addr instanceof Inet4Address){
+                    System.out.println("\tipv4:"+addr.getHostAddress());
+                    Set<InetAddress> scans=addrs.get(addr);
+                    for(InetAddress scan : scans){
                         System.out.println("\t\t----------------------");
                         System.out.println("\t\t"+scan.getHostName());
                         System.out.println("\t\t"+scan.getHostAddress());
                     }
                 }
-                if(addr instanceof Inet6Address){
-                    System.out.println("\tipv6:"+addr.getHostAddress());
-                }
+
             }
-        }
+
     }
 }
