@@ -32,6 +32,36 @@ public class NetTransferResponse extends NetTransferHead{
         inputStream.close();
         fos.close();
     }
+    public boolean isTextPlain(){
+        return NetTransferHead.MIME_TEXT_PLAIN.equals(getMimeType());
+    }
+    public boolean isTextJson(){
+        return NetTransferHead.MIME_TEXT_JSON.equals(getMimeType());
+    }
+    public boolean isTextXml(){
+        return NetTransferHead.MIME_TEXT_XML.equals(getMimeType());
+    }
+    public boolean isTextHtml(){
+        return NetTransferHead.MIME_TEXT_HTML.equals(getMimeType());
+    }
+    public boolean isFile(){
+        return NetTransferHead.MIME_OCTET_STREAM.equals(getMimeType());
+    }
+    public boolean isImageJpg(){
+        return NetTransferHead.MIME_IMAGE_JPEG.equals(getMimeType());
+    }
+    public boolean isImagePng(){
+        return NetTransferHead.MIME_IMAGE_PNG.equals(getMimeType());
+    }
+    public boolean isImageGif(){
+        return NetTransferHead.MIME_IMAGE_GIF.equals(getMimeType());
+    }
+    public boolean isVideoMp4(){
+        return NetTransferHead.MIME_VIDEO_MP4.equals(getMimeType());
+    }
+    public boolean isAudioMp3(){
+        return NetTransferHead.MIME_AUDIO_MPEG.equals(getMimeType());
+    }
 
     public String getAsString() throws IOException {
         return getAsString("UTF-8");
