@@ -17,6 +17,9 @@ public class SocketTransfer {
     public OutputStream getOutputStream() throws IOException {
         return sock.getOutputStream();
     }
+    public Socket getSocket(){
+        return sock;
+    }
     public BufferedReader getBufferedReader() throws IOException {
         return new BufferedReader(new InputStreamReader(sock.getInputStream()));
     }

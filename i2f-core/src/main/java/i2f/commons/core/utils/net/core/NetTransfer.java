@@ -171,9 +171,17 @@ public class NetTransfer {
         if (ilen == length) { // 判断是否能用ByteArrayOutputStream存储数据
             ByteArrayOutputStream bos = new ByteArrayOutputStream(ilen);
             byte[] buf = new byte[4096];
-            int len = 0;
-            while ((len = is.read(buf)) > 0) {
-                bos.write(buf, 0, len);
+            long plen = 0;
+            while (plen < length) {
+                if (length - plen >= 4096) {
+                    int len = is.read(buf);
+                    bos.write(buf, 0, len);
+                    plen += len;
+                } else {
+                    int len = is.read(buf, 0, (int) (length - plen));
+                    bos.write(buf, 0, len);
+                    plen += len;
+                }
             }
             ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
             response.setInputStream(bis);

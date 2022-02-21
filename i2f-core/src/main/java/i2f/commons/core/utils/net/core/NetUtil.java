@@ -1,6 +1,5 @@
 package i2f.commons.core.utils.net.core;
 
-import java.io.IOException;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -159,23 +158,4 @@ public class NetUtil {
         return ret;
     }
 
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-            Map<InetAddress,Set<InetAddress>> addrs=getAllLanInfo();
-            for(InetAddress addr : addrs.keySet()){
-                System.out.println("\t------------------------");
-                System.out.println("\tname:"+addr.getHostName());
-                if(addr instanceof Inet4Address){
-                    System.out.println("\tipv4:"+addr.getHostAddress());
-                    Set<InetAddress> scans=addrs.get(addr);
-                    for(InetAddress scan : scans){
-                        System.out.println("\t\t----------------------");
-                        System.out.println("\t\t"+scan.getHostName());
-                        System.out.println("\t\t"+scan.getHostAddress());
-                    }
-                }
-
-            }
-
-    }
 }

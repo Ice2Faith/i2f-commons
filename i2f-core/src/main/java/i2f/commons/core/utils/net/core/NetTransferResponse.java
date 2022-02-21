@@ -18,6 +18,8 @@ public class NetTransferResponse extends NetTransferHead{
         this.setDate(head.getDate());
         this.setMimeType(head.getMimeType());
         this.setContentLength(head.getContentLength());
+        this.setCharset(head.getCharset());
+        this.setName(head.getName());
     }
     public void saveAsFile(File file) throws IOException{
         if(!file.getParentFile().exists()){
