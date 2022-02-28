@@ -19,12 +19,13 @@ public abstract class ClientAccepter implements IClientAccepter {
             new LinkedBlockingQueue<Runnable>());
     @Override
     public void onClientArrive(Socket sock) {
-        int index=this.socks.size();
+        final int index=this.socks.size();
+        final Socket nsock=sock;
         this.socks.add(sock);
         pool.submit(new Runnable() {
             @Override
             public void run() {
-                sockProcess(index,sock);
+                sockProcess(index,nsock);
             }
         });
     }
