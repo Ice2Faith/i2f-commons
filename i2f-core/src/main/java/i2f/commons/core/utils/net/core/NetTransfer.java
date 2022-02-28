@@ -3,6 +3,7 @@ package i2f.commons.core.utils.net.core;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -104,6 +105,7 @@ public class NetTransfer {
 
     public static void send(InputStream is, NetTransferHead head, OutputStream os) throws IOException {
         head.setDate(formatDate(new Date()));
+        head.setSeed(new Random().nextInt());
 
         long length = 0;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -150,8 +152,13 @@ public class NetTransfer {
         oos.writeObject(head);
         oos.flush();
 
+        int seed=head.getSeed();
         int len = 0;
         while ((len = tis.read(buf)) > 0) {
+            for(int i=0;i<len;i++){
+                buf[i]=(byte)((buf[i]^seed)&0x0ff);
+                seed=(seed*11+7)%1024;
+            }
             os.write(buf, 0, len);
         }
         os.flush();
@@ -166,6 +173,7 @@ public class NetTransfer {
         NetTransferHead head = (NetTransferHead) ois.readObject();
         NetTransferResponse response = new NetTransferResponse(head);
         long length = head.getContentLength();
+        int seed=head.getSeed();
 
         int ilen = (int) length;
         if (ilen == length) { // 判断是否能用ByteArrayOutputStream存储数据
@@ -175,10 +183,18 @@ public class NetTransfer {
             while (plen < length) {
                 if (length - plen >= 4096) {
                     int len = is.read(buf);
+                    for(int i=0;i<len;i++){
+                        buf[i]=(byte)((buf[i]^seed)&0x0ff);
+                        seed=(seed*11+7)%1024;
+                    }
                     bos.write(buf, 0, len);
                     plen += len;
                 } else {
                     int len = is.read(buf, 0, (int) (length - plen));
+                    for(int i=0;i<len;i++){
+                        buf[i]=(byte)((buf[i]^seed)&0x0ff);
+                        seed=(seed*11+7)%1024;
+                    }
                     bos.write(buf, 0, len);
                     plen += len;
                 }
@@ -194,10 +210,18 @@ public class NetTransfer {
             while (plen < length) {
                 if (length - plen >= 4096) {
                     int len = is.read(buf);
+                    for(int i=0;i<len;i++){
+                        buf[i]=(byte)((buf[i]^seed)&0x0ff);
+                        seed=(seed*11+7)%1024;
+                    }
                     fos.write(buf, 0, len);
                     plen += len;
                 } else {
                     int len = is.read(buf, 0, (int) (length - plen));
+                    for(int i=0;i<len;i++){
+                        buf[i]=(byte)((buf[i]^seed)&0x0ff);
+                        seed=(seed*11+7)%1024;
+                    }
                     fos.write(buf, 0, len);
                     plen += len;
                 }

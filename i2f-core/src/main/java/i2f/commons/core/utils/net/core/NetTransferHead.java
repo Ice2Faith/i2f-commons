@@ -31,5 +31,5 @@ public class NetTransferHead implements Serializable {
     private long contentLength;
     private String name;
     private String charset;
-
+    private int seed;
 }

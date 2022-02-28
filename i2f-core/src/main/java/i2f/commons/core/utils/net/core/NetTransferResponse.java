@@ -20,6 +20,7 @@ public class NetTransferResponse extends NetTransferHead{
         this.setContentLength(head.getContentLength());
         this.setCharset(head.getCharset());
         this.setName(head.getName());
+        this.setSeed(head.getSeed());
     }
     public void saveAsFile(File file) throws IOException{
         if(!file.getParentFile().exists()){
