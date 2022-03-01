@@ -177,6 +177,10 @@ public class Bits {
         }
         return bts.length+hlen;
     }
+    public static int getReadStringLength(byte[] b,int off){
+        int len=getInt(b,off);
+        return len+4;
+    }
     public static String getString(byte[] b,int off,String charset) throws UnsupportedEncodingException {
         int len=getInt(b,off);
         off+=4;
