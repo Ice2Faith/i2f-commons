@@ -13,6 +13,7 @@
         <module>i2f-core</module>
         <module>i2f-component</module>
         <module>i2f-design</module>
+        <module>i2f-log</module>
 
     </modules>
 
