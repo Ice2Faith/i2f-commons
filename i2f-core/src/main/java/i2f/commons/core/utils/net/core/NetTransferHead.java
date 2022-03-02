@@ -32,4 +32,5 @@ public class NetTransferHead implements Serializable {
     private String name;
     private String charset;
     private int seed;
+
 }

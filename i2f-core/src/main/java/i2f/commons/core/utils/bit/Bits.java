@@ -77,7 +77,6 @@ public class Bits {
         return ret;
     }
 
-
     public static boolean getBoolean(byte[] b, int off) {
         return b[off] != 0;
     }
@@ -164,10 +163,17 @@ public class Bits {
     }
 
     public static int getWriteStringLength(String str,String charset) throws UnsupportedEncodingException {
+        if(str==null){
+            return 4;
+        }
         byte[] bts=str.getBytes(charset);
         return bts.length+4;
     }
     public static int putString(byte[] b,int off,String str,String charset) throws UnsupportedEncodingException {
+        if(str==null){
+            int hlen=putInt(b,off,-1);
+            return hlen;
+        }
         byte[] bts = str.getBytes(charset);
         int len=bts.length;
         int hlen=putInt(b,off,len);
@@ -179,10 +185,16 @@ public class Bits {
     }
     public static int getReadStringLength(byte[] b,int off){
         int len=getInt(b,off);
+        if(len==-1){
+            return 4;
+        }
         return len+4;
     }
     public static String getString(byte[] b,int off,String charset) throws UnsupportedEncodingException {
         int len=getInt(b,off);
+        if(len==-1){
+            return null;
+        }
         off+=4;
         byte[] buf=new byte[len];
         for(int i=0;i<len;i++){
