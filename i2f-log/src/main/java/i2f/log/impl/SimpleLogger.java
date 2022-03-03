@@ -11,14 +11,29 @@ import i2f.log.resolver.LogResolver;
  * @date 2022/3/3 10:06
  * @desc
  */
-public class SimpleLogger extends AbsLoggerAdapter implements ObjectLogouter {
+public class SimpleLogger extends AbsLoggerAdapter implements ObjectContentLogger {
     private LogWriter writer;
+    private String className;
+    private String system;
+    private String module;
+    private String label;
     public SimpleLogger(LogWriter writer){
         this.writer=writer;
+    }
+    public SimpleLogger(LogWriter writer,String className,String system,String module){
+        this.writer=writer;
+        this.system=system;
+        this.module=module;
+        this.className=className;
     }
     @Override
     public void write(BaseLogModel log) {
         writer.write(log);
+    }
+
+    public SimpleLogger label(String label){
+        this.label=label;
+        return this;
     }
 
     protected ExceptionLogModel proxy(Object content){
@@ -26,6 +41,10 @@ public class SimpleLogger extends AbsLoggerAdapter implements ObjectLogouter {
         LogResolver resolver=new LogResolver();
         resolver.resolve(log,null,null,content);
         resolver.resolve(log,2);
+        log.setClassName(className);
+        log.setSystem(system);
+        log.setModule(module);
+        log.setLabel(label);
         return log;
     }
 

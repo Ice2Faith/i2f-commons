@@ -29,7 +29,9 @@ public class LogTest {
         manager.registerLogWriter(new PrintStreamLogWriterImpl(System.err));
         manager.registerLogWriter(new FileLogWriterImpl("./logs/LogTest.log"));
         manager.registerLogWriter(new FileLogWriterImpl("./logs/LogTestDispach.log"));
-        SimpleLogger logger=new SimpleLogger(manager);
+        SimpleLogger logger=new SimpleLogger(manager,LogTest.class.getName(),"日志系统","日志测试");
+
+        logger.label("简易测试性质日志");
 
         LogResolver resolver=new LogResolver();
         resolver.resolve(log,"测试性质日志", LogLevel.INFO,"test invoke");

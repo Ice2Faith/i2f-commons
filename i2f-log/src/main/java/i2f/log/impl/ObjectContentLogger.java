@@ -7,7 +7,7 @@ import i2f.log.Logger;
  * @date 2022/3/3 10:09
  * @desc
  */
-public interface ObjectLogouter extends Logger {
+public interface ObjectContentLogger extends Logger {
     void fatal(Object content);
     void error(Object content);
     void warn(Object content);
