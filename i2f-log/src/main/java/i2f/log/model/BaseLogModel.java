@@ -1,5 +1,6 @@
 package i2f.log.model;
 
+import i2f.log.enums.LogLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,14 +15,11 @@ import java.util.Date;
 @NoArgsConstructor
 public class BaseLogModel {
     // 日志时间
-    protected Date time;
+    protected Date date;
     // 日志类型
     protected String type;
-    // 日志级别，FITAL/DEBUG/WARN/INFO
-    protected String level;
-
-    // 日志位置
-    protected String location;
+    // 日志级别
+    protected LogLevel level;
     // 日志内容
-    protected String content;
+    protected Object content;
 }

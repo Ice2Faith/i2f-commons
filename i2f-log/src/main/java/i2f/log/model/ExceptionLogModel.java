@@ -15,4 +15,8 @@ public class ExceptionLogModel extends SimpleBaseLogModel{
     protected String exceptionClassName;
     // 异常信息
     protected String exceptionMessage;
+    // 造成类名
+    protected String causeClassName;
+    // 造成原因
+    protected String causeMessage;
 }

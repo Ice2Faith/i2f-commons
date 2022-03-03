@@ -4,6 +4,7 @@ import i2f.log.api.BaseLogWriter;
 import i2f.log.model.*;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author ltb
@@ -15,14 +16,19 @@ public abstract class AbsPrintStreamLogWriterImpl extends BaseLogWriter {
     public static ThreadLocal<SimpleDateFormat> fmt=ThreadLocal.withInitial(()->{
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     });
+    private String fmtDate(Date date){
+        if(date==null){
+            return null;
+        }
+        return fmt.get().format(date);
+    }
     @Override
     public void write(BaseLogModel log) {
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("%s [%-5s] -%-5s @%-35s ",
-                fmt.get().format(log.getTime()),
+        builder.append(String.format("%s [%-5s] -%-5s",
+                fmtDate(log.getDate()),
                 log.getLevel(),
-                log.getType(),
-                log.getLocation()
+                log.getType()
         ));
         if(log instanceof SimpleBaseLogModel){
             SimpleBaseLogModel model=(SimpleBaseLogModel)log;
@@ -45,17 +51,19 @@ public abstract class AbsPrintStreamLogWriterImpl extends BaseLogWriter {
 
         if(log instanceof ExceptionLogModel){
             ExceptionLogModel model=(ExceptionLogModel)log;
-            builder.append(String.format(" ex is: %s msg: %s",
+            builder.append(String.format(" ex is: %s msg: %s cause is: %s cause msg: %s",
                     model.getExceptionClassName(),
-                    model.getExceptionMessage()));
+                    model.getExceptionMessage(),
+                    model.getCauseClassName(),
+                    model.getCauseMessage()));
         }
 
         if(log instanceof InvocationLogModel){
             InvocationLogModel model=(InvocationLogModel)log;
             builder.append(String.format(" ivk type: %s begin: %s end: %s return:%s args: %s",
                     model.getInvokeType(),
-                    model.getBeginDate(),
-                    model.getEndDate(),
+                    fmtDate(model.getBeginDate()),
+                    fmtDate(model.getEndDate()),
                     model.getReturnValue()+"",
                     model.getInvokeArgs()+""));
         }
@@ -64,8 +72,8 @@ public abstract class AbsPrintStreamLogWriterImpl extends BaseLogWriter {
             RemoteInvokeLogModel model=(RemoteInvokeLogModel)log;
             builder.append(String.format(" remote url: %s begin: %s end: %s method: %s request: %s response:%s",
                     model.getRequestUrl(),
-                    model.getRequestDate(),
-                    model.getResponseDate(),
+                    fmtDate(model.getRequestDate()),
+                    fmtDate(model.getResponseDate()),
                     model.getRequestMethod(),
                     model.getRequestContent()+"",
                     model.getResponseContent()+""));
