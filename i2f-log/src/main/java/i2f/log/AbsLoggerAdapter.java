@@ -38,4 +38,9 @@ public abstract class AbsLoggerAdapter implements Logger {
     public void debug(BaseLogModel log) {
         proxy(LogLevel.DEBUG,log);
     }
+
+    @Override
+    public void trace(BaseLogModel log) {
+        proxy(LogLevel.TRACE,log);
+    }
 }

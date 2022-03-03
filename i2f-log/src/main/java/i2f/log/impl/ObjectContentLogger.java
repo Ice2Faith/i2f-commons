@@ -13,4 +13,5 @@ public interface ObjectContentLogger extends Logger {
     void warn(Object content);
     void info(Object content);
     void debug(Object content);
+    void trace(Object content);
 }

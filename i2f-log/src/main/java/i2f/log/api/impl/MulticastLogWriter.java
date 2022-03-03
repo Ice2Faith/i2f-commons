@@ -4,7 +4,7 @@ import i2f.log.Environment;
 import i2f.log.api.LogWriter;
 import i2f.log.model.BaseLogModel;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * @author ltb
@@ -14,15 +14,24 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MulticastLogWriter implements LogWriter{
     private ConcurrentHashMap<String,LogWriter> writers=new ConcurrentHashMap<>();
 
+    protected ExecutorService pool= new ThreadPoolExecutor(2,30,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>());
+
     @Override
     public void write(BaseLogModel log) {
-        for(LogWriter item : writers.values()){
-            try{
-                item.write(log);
-            }catch(Exception e){
-                e.printStackTrace();
+        pool.submit(new Runnable() {
+            @Override
+            public void run() {
+                for(LogWriter item : writers.values()){
+                    try{
+                        item.write(log);
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
             }
-        }
+        });
     }
 
     public void registerLogWriter(LogWriter writer){

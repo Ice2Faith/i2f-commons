@@ -1,7 +1,7 @@
 package i2f.log.impl;
 
 import i2f.log.AbsLoggerAdapter;
-import i2f.log.api.LogWriter;
+import i2f.log.LogContext;
 import i2f.log.model.BaseLogModel;
 import i2f.log.model.ExceptionLogModel;
 import i2f.log.resolver.LogResolver;
@@ -12,27 +12,31 @@ import i2f.log.resolver.LogResolver;
  * @desc
  */
 public class SimpleLogger extends AbsLoggerAdapter implements ObjectContentLogger {
-    private LogWriter writer;
     private String className;
     private String system;
     private String module;
     private String label;
-    public SimpleLogger(LogWriter writer){
-        this.writer=writer;
-    }
-    public SimpleLogger(LogWriter writer,String className,String system,String module){
-        this.writer=writer;
+    private String type;
+
+    public SimpleLogger(String className,String system,String module){
         this.system=system;
         this.module=module;
         this.className=className;
     }
     @Override
     public void write(BaseLogModel log) {
-        writer.write(log);
+        if(LogContext.decision.decision(log)) {
+            LogContext.writer.write(log);
+        }
     }
 
     public SimpleLogger label(String label){
         this.label=label;
+        return this;
+    }
+
+    public SimpleLogger type(String type){
+        this.type=type;
         return this;
     }
 
@@ -45,6 +49,7 @@ public class SimpleLogger extends AbsLoggerAdapter implements ObjectContentLogge
         log.setSystem(system);
         log.setModule(module);
         log.setLabel(label);
+        log.setType(type);
         return log;
     }
 
@@ -71,5 +76,10 @@ public class SimpleLogger extends AbsLoggerAdapter implements ObjectContentLogge
     @Override
     public void debug(Object content) {
         debug(proxy(content));
+    }
+
+    @Override
+    public void trace(Object content) {
+        trace(proxy(content));
     }
 }

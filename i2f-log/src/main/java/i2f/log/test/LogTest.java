@@ -1,9 +1,9 @@
 package i2f.log.test;
 
 import i2f.log.Environment;
+import i2f.log.LogContext;
 import i2f.log.annotations.LogEntry;
 import i2f.log.api.impl.FileLogWriterImpl;
-import i2f.log.api.impl.MulticastLogWriter;
 import i2f.log.api.impl.PrintStreamLogWriterImpl;
 import i2f.log.api.impl.StdoutLogWriterImpl;
 import i2f.log.enums.InvocationRecord;
@@ -23,15 +23,17 @@ import java.lang.reflect.Method;
 public class LogTest {
     public static void main(String[] args) throws NoSuchMethodException {
         System.setProperty(Environment.REGISTER_UNIQUE_WRITER,"false");
-        RemoteInvokeLogModel log=new RemoteInvokeLogModel();
-        MulticastLogWriter manager=new MulticastLogWriter();
-        manager.registerLogWriter(new StdoutLogWriterImpl());
-        manager.registerLogWriter(new PrintStreamLogWriterImpl(System.err));
-        manager.registerLogWriter(new FileLogWriterImpl("./logs/LogTest.log"));
-        manager.registerLogWriter(new FileLogWriterImpl("./logs/LogTestDispach.log"));
-        SimpleLogger logger=new SimpleLogger(manager,LogTest.class.getName(),"日志系统","日志测试");
+        Environment.projectDefaultLogLevel=LogLevel.INFO;
+        LogContext.decision.registerRule("i2f\\.log\\.test\\..+",LogLevel.INFO);
+        LogContext.writer.registerLogWriter(new StdoutLogWriterImpl());
+        LogContext.writer.registerLogWriter(new PrintStreamLogWriterImpl(System.err));
+        LogContext.writer.registerLogWriter(new FileLogWriterImpl("./logs/LogTest.log"));
+        LogContext.writer.registerLogWriter(new FileLogWriterImpl("./logs/LogTestDispach.log"));
 
-        logger.label("简易测试性质日志");
+        RemoteInvokeLogModel log=new RemoteInvokeLogModel();
+        SimpleLogger logger=new SimpleLogger(LogTest.class.getName(),"日志系统","日志测试");
+
+        logger.label("简易测试性质日志").type("框架测试");
 
         LogResolver resolver=new LogResolver();
         resolver.resolve(log,"测试性质日志", LogLevel.INFO,"test invoke");

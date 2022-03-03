@@ -13,4 +13,5 @@ public interface Logger {
     void warn(BaseLogModel log);
     void info(BaseLogModel log);
     void debug(BaseLogModel log);
+    void trace(BaseLogModel log);
 }
