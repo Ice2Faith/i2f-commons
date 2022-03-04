@@ -3,6 +3,7 @@ package i2f.log.test;
 import i2f.log.Environment;
 import i2f.log.LogContext;
 import i2f.log.annotations.LogEntry;
+import i2f.log.annotations.LogParam;
 import i2f.log.api.impl.FileLogWriterImpl;
 import i2f.log.api.impl.PrintStreamLogWriterImpl;
 import i2f.log.api.impl.StdoutLogWriterImpl;
@@ -64,7 +65,7 @@ public class LogTest {
     @LogEntry(system = "日志系统",module = "日志解析",label = "反射测试",
             entries = {InvocationType.AROUND,InvocationType.RETURN,InvocationType.EXCEPTION},
             records = {InvocationRecord.ARGUMENT,InvocationRecord.EXCEPTION,InvocationRecord.RETURN})
-    private static String test(String name,int age){
+    private static String test(@LogParam("userName") String name, @LogParam("userAge") int age){
         return "name:"+name+",age:"+age;
     }
 }
