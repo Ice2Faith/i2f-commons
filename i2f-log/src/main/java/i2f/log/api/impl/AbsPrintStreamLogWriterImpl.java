@@ -37,10 +37,11 @@ public abstract class AbsPrintStreamLogWriterImpl extends BaseLogWriter {
                     model.getModule(),
                     model.getLabel()));
         }
+        builder.append(String.format(" at %s",
+                log.getClassName()));
         if(log instanceof BaseLocationLogModel){
             BaseLocationLogModel model=(BaseLocationLogModel)log;
-            builder.append(String.format(" at %s.%s(%s):@%-4s->%s",
-                    model.getClassName(),
+            builder.append(String.format(" at #%s(%s):@%-4s->%s",
                     model.getMethod(),
                     model.getThread(),
                     model.getFileName(),

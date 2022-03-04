@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BaseLocationLogModel extends BaseLogModel{
-    // 日志发生类
-    protected String className;
     // 日志发生行
     protected String line;
     // 日志发生方法

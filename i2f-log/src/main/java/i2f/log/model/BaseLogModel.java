@@ -20,6 +20,8 @@ public class BaseLogModel {
     protected String type;
     // 日志级别
     protected LogLevel level;
+    // 日志发生类
+    protected String className;
     // 日志内容
     protected Object content;
 }

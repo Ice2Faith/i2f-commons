@@ -20,15 +20,16 @@ public class PackageClassMethodLogLevelDecision implements LogLevelDecision {
     @Override
     public boolean decision(BaseLogModel log) {
         LogLevel logLevel=log.getLevel();
+        String location=log.getClassName();
         if(log instanceof BaseLocationLogModel){
             BaseLocationLogModel model=(BaseLocationLogModel)log;
-            String location=model.getClassName()+"."+model.getMethod();
-            for(Map.Entry<String,LogLevel> item : decisionMap.entrySet()){
-                String patten=item.getKey();
-                LogLevel level=item.getValue();
-                if(location.matches(patten)){
-                    return logLevel.level()<=level.level();
-                }
+            location=model.getClassName()+"."+model.getMethod();
+        }
+        for(Map.Entry<String,LogLevel> item : decisionMap.entrySet()){
+            String patten=item.getKey();
+            LogLevel level=item.getValue();
+            if(location.matches(patten)){
+                return logLevel.level()<=level.level();
             }
         }
         return logLevel.level() <= Environment.projectDefaultLogLevel.level();
