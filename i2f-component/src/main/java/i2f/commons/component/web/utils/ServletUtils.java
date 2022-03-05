@@ -5,6 +5,9 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -39,6 +42,46 @@ public class ServletUtils
     public static HttpSession getSession()
     {
         return getRequest().getSession();
+    }
+
+    public static RequestDispatcher getDispatcher(String target){
+        return getRequest().getRequestDispatcher(target);
+    }
+
+    public static void forward(String target) throws ServletException, IOException {
+        getDispatcher(target).forward(getRequest(),getResponse());
+    }
+
+    public static void include(String target) throws ServletException, IOException {
+        getDispatcher(target).include(getRequest(),getResponse());
+    }
+
+    public static void redirect(String target) throws IOException {
+        getResponse().sendRedirect(target);
+    }
+
+    public static void sessionSet(String key,Object val){
+        getSession().setAttribute(key,val);
+    }
+
+    public static Object sessionGet(String key){
+        return getSession().getAttribute(key);
+    }
+
+    public static ServletContext getServletContext(){
+        return getSession().getServletContext();
+    }
+
+    public static void requestSet(String key,Object val){
+        getRequest().setAttribute(key,val);
+    }
+
+    public static Object requestGet(String key){
+        return getRequest().getAttribute(key);
+    }
+
+    public static String getContextRealPath(String path){
+        return getServletContext().getRealPath(path);
     }
 
     public static ServletRequestAttributes getRequestAttributes()
