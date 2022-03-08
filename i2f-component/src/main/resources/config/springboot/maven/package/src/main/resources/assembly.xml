@@ -1,0 +1,75 @@
+<assembly>
+    <id>all</id>
+    <formats>
+        <!-- 指定最终生成全量包形式 -->
+        <!-- zip,tar,tar.gz,tar.bz2,jar,dir,war -->
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <!-- 依赖包的输出路径 -->
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>/lib</outputDirectory>
+        </dependencySet>
+    </dependencySets>
+
+    <!-- 需要打包的文件 -->
+    <fileSets>
+        <!-- bin，一些脚本，例如启动停止脚本 -->
+        <fileSet>
+            <directory>bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <filtered>true</filtered>
+            <includes>
+                <include>*.sh</include>
+                <include>*.j2</include>
+            </includes>
+            <fileMode>0744</fileMode>
+            <lineEnding>unix</lineEnding>
+        </fileSet>
+
+        <!-- 每一个fileSet做的工作都是将编译出来的target目录下的文件directory，按照一定规则输出到outputDirectory -->
+<!--        <fileSet>-->
+<!--            <directory>lib</directory>-->
+<!--            <outputDirectory>lib</outputDirectory>-->
+<!--            <includes>-->
+<!--                <include>*.jar</include>-->
+<!--                <include>*.j2</include>-->
+<!--            </includes>-->
+
+<!--        </fileSet>-->
+
+        <!-- jar -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+
+        <!-- config，打包配置文件到resource文件夹，之前在pom.xml中已经排除了这些不打包到jar中，这是分离配置的第二部 -->
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory>resources</outputDirectory>
+            <includes>
+                <include>mapper/**</include>
+                <include>logback/**</include>
+                <include>*.properties</include>
+                <include>*.j2</include>
+                <include>*.config</include>
+                <include>logback-spring.xml</include>
+            </includes>
+        </fileSet>
+
+        <!-- 这里logback直接打包到resources中即可，不必单独打包 -->
+        <!-- logback -->
+<!--        <fileSet>-->
+<!--            <directory>src/main/resources/logback</directory>-->
+<!--            <outputDirectory>logback</outputDirectory>-->
+<!--            <includes>-->
+<!--                <include>*.xml</include>-->
+<!--            </includes>-->
+<!--        </fileSet>-->
+    </fileSets>
+</assembly>

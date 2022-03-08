@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="com.common.ConfigMapper">
+
+
+	<select id="qryConfig" resultType="com.common.ConfigDto">
+		select
+		<choose>
+			<when test='filterType=="1"'>
+				entry_desc entryDesc,
+			</when>
+			<when test='filterType=="2"'>
+				group_key groupKey,
+				group_name groupName,
+
+				type_key typeKey,
+				type_name typeName,
+
+				entry_desc entryDesc,
+			</when>
+			<when test='filterType=="3"'>
+				config_id configId,
+				level level,
+				parent_entry_id parentEntryId,
+			</when>
+			<otherwise>
+
+			</otherwise>
+		</choose>
+
+		entry_id entryId,
+		entry_key entryKey,
+		entry_name entryName
+
+		from epc_config
+		<where>
+			and valid_time &lt;= now()
+			and invalid_time &gt;= now()
+			<choose>
+				<when test="status!=null and status!=''">
+					and status = #{status}
+				</when>
+				<otherwise>
+					and status = 1
+				</otherwise>
+			</choose>
+			<if test="groupKey!=null and groupKey!=''">
+				and group_key=#{groupKey}
+			</if>
+			<if test="typeKey!=null and typeKey!=''">
+				and type_key=#{typeKey}
+			</if>
+			<if test="entryId!=null and entryId!=''">
+				and entry_id=#{entryId}
+			</if>
+			<if test="entryKey!=null and entryKey!=''">
+				and entry_key=#{entryKey}
+			</if>
+			<if test="level!=null and level!=''">
+				and level = #{level}
+			</if>
+			<if test="parentEntryId!=null and parentEntryId!=''">
+				and parent_entry_id=#{parentEntryId}
+			</if>
+		</where>
+		order by entry_order asc,entry_id asc,entry_name asc
+	</select>
+
+	<select id="qryTypes" resultType="java.util.Map">
+		select
+			group_key groupKey,
+			group_name groupName,
+
+			type_key typeKey,
+			type_name typeName
+
+		from epc_config
+		group by group_key,group_name,type_key,type_name
+		order by group_key,group_name,type_key,type_name
+	</select>
+
+</mapper>

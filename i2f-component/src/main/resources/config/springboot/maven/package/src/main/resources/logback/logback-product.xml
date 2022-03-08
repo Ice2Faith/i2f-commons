@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <property name="log.max.size" value="${max.size:-20MB}"/>
+    <property name="log.app.name" value="${app.name:-noappname}"/>
+
+    <!-- 1. 按文件大小区分的滚动日志 -->
+    <appender name="rfilebysize" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/${log.app.name}.log</file>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%-40.40logger{40}:%-4.5line] [%-4.24thread] [%X{JOB_ID}]  [%X{TASK_ID}] - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>log/${log.app.name}.%i.log</fileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+
+        <!-- 触发条件: 满足大小时触发 -->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>${log.max.size}</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!--<logger name="com.newland.bd.ngudap.client.EventClient" level="error"/>-->
+    <logger name="com.newland" level="debug" />
+    <root level="info">
+        <appender-ref ref="rfilebysize"/>
+    </root>
+</included>
