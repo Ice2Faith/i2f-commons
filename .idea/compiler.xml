@@ -7,9 +7,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="i2f-log" />
         <module name="i2f-design" />
         <module name="i2f-generator" />
         <module name="i2f-component" />
+        <module name="i2f-lan-transfer" />
         <module name="i2f-core" />
       </profile>
     </annotationProcessing>
@@ -18,6 +20,7 @@
       <module name="i2f-jdbc" target="1.8" />
       <module name="i2f-pkg" target="1.8" />
       <module name="i2f-reflect" target="1.8" />
+      <module name="untitled" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -28,8 +31,11 @@
       <module name="i2f-dev-tool" options="-parameters" />
       <module name="i2f-generator" options="-parameters" />
       <module name="i2f-jdbc" options="-parameters" />
+      <module name="i2f-lan-transfer" options="-parameters" />
+      <module name="i2f-log" options="-parameters" />
       <module name="i2f-pkg" options="-parameters" />
       <module name="i2f-reflect" options="-parameters" />
+      <module name="untitled" options="-parameters" />
     </option>
   </component>
 </project>

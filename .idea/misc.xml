@@ -9,6 +9,7 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="E:/MySystemDefaultFiles/Desktop/30OfficeCenter/00-Learn/i2f-generator/pom.xml" />
+        <option value="E:/MySystemDefaultFiles/Desktop/30OfficeCenter/00-Learn/i2f-lan-transfer/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
@@ -17,6 +18,7 @@
         <option value="$PROJECT_DIR$/i2f-jdbc/pom.xml" />
         <option value="$PROJECT_DIR$/i2f-pkg/pom.xml" />
         <option value="$PROJECT_DIR$/i2f-reflect/pom.xml" />
+        <option value="$PROJECT_DIR$/untitled/pom.xml" />
       </set>
     </option>
   </component>
