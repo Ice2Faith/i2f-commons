@@ -5,6 +5,7 @@
         <!-- zip,tar,tar.gz,tar.bz2,jar,dir,war -->
         <format>tar.gz</format>
     </formats>
+    <!-- 使用包含基本目录，包含将会带一层目录 -->
     <includeBaseDirectory>true</includeBaseDirectory>
     <!-- 依赖包的输出路径 -->
     <dependencySets>
