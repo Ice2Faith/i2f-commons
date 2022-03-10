@@ -169,6 +169,9 @@
                     <finalName>${project.artifactId}</finalName>
                     <descriptors>
                         <descriptor>src/main/resources/assembly.xml</descriptor>
+<!--                        <descriptor>src/main/resources/assembly-lib.xml</descriptor>-->
+                        <descriptor>src/main/resources/assembly-mapper.xml</descriptor>
+<!--                        <descriptor>src/main/resources/assembly-resource.xml</descriptor>-->
                     </descriptors>
                 </configuration>
                 <executions>
