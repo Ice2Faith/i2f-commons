@@ -49,6 +49,10 @@ public class TypeResolver {
             if(ckType.equals(item)){
                 return true;
             }
+            //该方法用于判定，父类target是否派生出了子类item
+            if(ckType.isAssignableFrom(item)){
+                return true;
+            }
         }
         return false;
     }
