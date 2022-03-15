@@ -615,6 +615,23 @@ public class Checker {
             }
             return chk();
         }
+
+        public CheckWorker isArray(Object obj){
+            if(!ok){
+                return chk();
+            }
+            if(obj==null){
+                this.ok=false;
+                this.message="argument require not null!";
+                return chk();
+            }
+            Class clazz = obj.getClass();
+            if(clazz.isArray()){
+                this.ok=false;
+                this.message="argument not allow is array!";
+            }
+            return chk();
+        }
     }
 
 }
