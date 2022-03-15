@@ -1,7 +1,8 @@
 package i2f.commons.core.utils.reflect.simple.reflect.impl;
 
-import i2f.reflect.ValueAccessor;
-import i2f.reflect.exception.ReadOnlyAccessException;
+
+import i2f.commons.core.utils.reflect.simple.reflect.ValueAccessor;
+import i2f.commons.core.utils.reflect.simple.reflect.exception.ReadOnlyAccessException;
 
 /**
  * @author ltb

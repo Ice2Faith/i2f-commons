@@ -1,10 +1,11 @@
 package i2f.commons.core.utils.reflect.simple.reflect;
 
-import i2f.reflect.core.FastReflect;
-import i2f.reflect.exception.FieldAccessException;
-import i2f.reflect.exception.FieldNotFoundException;
-import i2f.reflect.exception.MethodNotFoundException;
-import i2f.reflect.impl.*;
+
+import i2f.commons.core.utils.reflect.simple.reflect.core.FastReflect;
+import i2f.commons.core.utils.reflect.simple.reflect.exception.FieldAccessException;
+import i2f.commons.core.utils.reflect.simple.reflect.exception.FieldNotFoundException;
+import i2f.commons.core.utils.reflect.simple.reflect.exception.MethodNotFoundException;
+import i2f.commons.core.utils.reflect.simple.reflect.impl.*;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

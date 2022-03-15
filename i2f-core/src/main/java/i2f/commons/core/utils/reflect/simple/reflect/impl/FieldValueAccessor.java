@@ -1,8 +1,9 @@
 package i2f.commons.core.utils.reflect.simple.reflect.impl;
 
-import i2f.reflect.ValueAccessor;
-import i2f.reflect.convert.ConvertResolver;
-import i2f.reflect.exception.FieldAccessException;
+
+import i2f.commons.core.utils.reflect.simple.reflect.ValueAccessor;
+import i2f.commons.core.utils.reflect.simple.reflect.convert.ConvertResolver;
+import i2f.commons.core.utils.reflect.simple.reflect.exception.FieldAccessException;
 
 import java.lang.reflect.Field;
 

@@ -1,6 +1,7 @@
 package i2f.commons.core.utils.reflect.simple.reflect.exception;
 
-import i2f.reflect.exception.base.ReflectException;
+
+import i2f.commons.core.utils.reflect.simple.reflect.exception.base.ReflectException;
 
 /**
  * @author ltb

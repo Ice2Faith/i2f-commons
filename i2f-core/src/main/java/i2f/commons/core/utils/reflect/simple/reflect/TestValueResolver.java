@@ -1,6 +1,7 @@
 package i2f.commons.core.utils.reflect.simple.reflect;
 
-import test.model.TestModel;
+
+import i2f.commons.core.utils.reflect.simple.reflect.model.TestModel;
 
 import java.util.*;
 

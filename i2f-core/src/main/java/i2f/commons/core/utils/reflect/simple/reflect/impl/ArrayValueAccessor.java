@@ -1,6 +1,7 @@
 package i2f.commons.core.utils.reflect.simple.reflect.impl;
 
-import i2f.reflect.ValueAccessor;
+
+import i2f.commons.core.utils.reflect.simple.reflect.ValueAccessor;
 
 import java.lang.reflect.Array;
 
