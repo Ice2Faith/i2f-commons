@@ -117,7 +117,7 @@ public class DataUtil {
             ix++;
         }
 
-        return (T[])Arrays.copyOf(arr,arr.length,tarType);
+        return (T[]) ArrayUtil.copyOf(arr,arr.length,tarType);
     }
     public static <T,E> T[] arrCopy(int index, int len, Class<? extends T[]> tarType, E ... srcArr){
         Object[] arr=new Object[len];
@@ -125,7 +125,7 @@ public class DataUtil {
         while(index+i<len){
             arr[i]=srcArr[index+i];
         }
-        return (T[])Arrays.copyOf(arr,arr.length,tarType);
+        return (T[]) ArrayUtil.copyOf(arr,arr.length,tarType);
     }
     public static <T> T[] toArrKeys(Map<T,?> map,Class<? extends T[]> tarType){
         if(CheckUtil.isEmptyMap(map)){
@@ -138,7 +138,7 @@ public class DataUtil {
             arr[ix]=it.next();
             ix++;
         }
-        return (T[])Arrays.copyOf(arr,arr.length,tarType);
+        return (T[]) ArrayUtil.copyOf(arr,arr.length,tarType);
     }
     public static <T,E> T[] toArrVals(Map<?,T> map,Class<? extends E[]> tarType){
         if(CheckUtil.isEmptyMap(map)){
@@ -151,7 +151,7 @@ public class DataUtil {
             arr[ix]=map.get(it.next());
             ix++;
         }
-        return (T[])Arrays.copyOf(arr,arr.length,tarType);
+        return (T[]) ArrayUtil.copyOf(arr,arr.length,tarType);
     }
     public static<T> List<T> toList(T ... vals){
         return toListBase(new ArrayList<T>(),vals);
@@ -247,7 +247,7 @@ public class DataUtil {
         for(T item : arr2){
             ret[i++]=item;
         }
-        return (T[])Arrays.copyOf(ret,size);
+        return (T[]) ArrayUtil.copyOf(ret,size);
     }
 
     public static String toHexString(byte[] data){

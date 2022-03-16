@@ -1,6 +1,9 @@
 package i2f.commons.core.utils.safe;
 
+import i2f.commons.core.data.interfaces.IFilter;
+
 import java.math.BigDecimal;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author ltb
@@ -8,6 +11,24 @@ import java.math.BigDecimal;
  * @desc
  */
 public class Checker {
+    public static ConcurrentHashMap<String, IFilter> validators=new ConcurrentHashMap<>();
+    public static void registerValidator(String name,IFilter filter){
+        validators.put(name,filter);
+    }
+    public static void registerValidator(IFilter filter){
+        String cname=filter.getClass().getSimpleName();
+        String name = cname.substring(0,1).toLowerCase()+cname.substring(1);
+        validators.put(name,filter);
+    }
+    public static IFilter getValidator(String validatorName){
+        return validators.get(validatorName);
+    }
+    public static IFilter getValidator(Class<IFilter> validatorClass){
+        String cname=validatorClass.getSimpleName();
+        String name = cname.substring(0,1).toLowerCase()+cname.substring(1);
+        return validators.get(name);
+    }
+
     public static CheckWorker thr(){
         return new CheckWorker(true);
     }
@@ -159,7 +180,7 @@ public class Checker {
             if(!ok){
                 return chk();
             }
-            if(!condition){
+            if(condition){
                 ok=false;
                 this.message=message;
             }
@@ -170,11 +191,22 @@ public class Checker {
                 return chk();
             }
             for(boolean item : conditions){
-                if(!item){
+                if(item){
                     ok=false;
                     this.message=message;
                     break;
                 }
+            }
+            return chk();
+        }
+
+        public CheckWorker notwhen(boolean condition,String message){
+            if(!ok){
+                return chk();
+            }
+            if(!condition){
+                ok=false;
+                this.message=message;
             }
             return chk();
         }
@@ -632,6 +664,28 @@ public class Checker {
             }
             return chk();
         }
+
+        public CheckWorker validate(String validatorName,Object obj,String message){
+            if(!ok){
+                return chk();
+            }
+            if(getValidator(validatorName).choice(obj)){
+                this.ok=false;
+                this.message=message;
+            }
+            return chk();
+        }
+        public CheckWorker validate(Class<IFilter> validatorClass,Object obj,String message){
+            if(!ok){
+                return chk();
+            }
+            if(getValidator(validatorClass).choice(obj)){
+                this.ok=false;
+                this.message=message;
+            }
+            return chk();
+        }
+
     }
 
 }
