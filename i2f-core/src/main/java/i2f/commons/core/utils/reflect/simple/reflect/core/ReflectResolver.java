@@ -1,19 +1,22 @@
 package i2f.commons.core.utils.reflect.simple.reflect.core;
 
+import i2f.commons.core.utils.reflect.simple.reflect.PropertyAccessor;
+import i2f.commons.core.utils.reflect.simple.reflect.impl.FieldValueAccessor;
+import i2f.commons.core.utils.reflect.simple.reflect.impl.MethodValueAccessor;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author ltb
  * @date 2022/3/14 11:03
- * @desc
+ * @desc 反射核心处理类
+ * 设计原则
+ * 优先使用缓存查找方式，一定程度上降低反射带来的效率问题
  */
-public class FastReflect {
+public class ReflectResolver {
     protected static volatile ConcurrentHashMap<Class, Set<Field>> cacheFields=new ConcurrentHashMap<>();
     protected static volatile ConcurrentHashMap<Class,Set<Method>> cacheMethods=new ConcurrentHashMap<>();
     protected static volatile ConcurrentHashMap<Class,Set<Method>> cacheGetters=new ConcurrentHashMap<>();
@@ -22,6 +25,97 @@ public class FastReflect {
     protected static volatile ConcurrentHashMap<Class, Map<String,Set<Method>>> fastGetter=new ConcurrentHashMap<>();
     protected static volatile ConcurrentHashMap<Class,Map<String,Set<Method>>> fastSetter=new ConcurrentHashMap<>();
     protected static volatile ConcurrentHashMap<Class,Map<String,Field>> fastField=new ConcurrentHashMap<>();
+
+    protected static volatile ConcurrentHashMap<Class, List<PropertyAccessor>> logicalReadableFields=new ConcurrentHashMap<>();
+    protected static volatile ConcurrentHashMap<Class, List<PropertyAccessor>> logicalWritableFields=new ConcurrentHashMap<>();
+
+    protected static volatile ConcurrentHashMap<Class,Set<Field>> cacheForceFields=new ConcurrentHashMap<>();
+
+    /**
+     * 获取指定类的逻辑上可读的所有属性
+     * 认为本类字段以及所有getter包含的都是逻辑上的可读字段
+     * @param clazz
+     * @return
+     */
+    public static List<PropertyAccessor> getLogicalReadableFields(Class clazz){
+        if(logicalReadableFields.containsKey(clazz)){
+            return logicalReadableFields.get(clazz);
+        }
+        List<PropertyAccessor> ret=new ArrayList<>();
+        Set<String> fields=new HashSet<>();
+        Set<Method> methods=getAllGetters(clazz);
+        for(Method item : methods){
+            String name=item.getName();
+            if(name.startsWith("get")){
+                name = name.substring("get".length());
+            }else if(name.startsWith("is")){
+                name = name.substring("is".length());
+            }
+            name=name.substring(0,1).toLowerCase()+name.substring(1);
+            if(fields.contains(name)){
+                continue;
+            }
+            fields.add(name);
+            MethodValueAccessor accessor=new MethodValueAccessor(item,null,name,item.getReturnType());
+            ret.add(accessor);
+        }
+
+        Set<Field> fieldSet=getAllFields(clazz);
+        for(Field item : fieldSet){
+            String name=item.getName();
+            if(fields.contains(name)){
+                continue;
+            }
+            fields.add(name);
+            FieldValueAccessor accessor=new FieldValueAccessor(item);
+            ret.add(accessor);
+        }
+
+        logicalReadableFields.put(clazz,ret);
+        return ret;
+    }
+
+    /**
+     * 获取指定类的逻辑上可写的所有属性
+     * 认为本类字段以及所有setter包含的都是逻辑上可写的字段
+     * @param clazz
+     * @return
+     */
+    public static List<PropertyAccessor> getLogicalWritableFields(Class clazz){
+        if(logicalWritableFields.containsKey(clazz)){
+            return logicalWritableFields.get(clazz);
+        }
+        List<PropertyAccessor> ret=new ArrayList<>();
+        Set<String> fields=new HashSet<>();
+        Set<Method> methods=getAllSetters(clazz);
+        for(Method item : methods){
+            String name=item.getName();
+            if(name.startsWith("set")){
+                name = name.substring("set".length());
+            }
+            name=name.substring(0,1).toLowerCase()+name.substring(1);
+            if(fields.contains(name)){
+                continue;
+            }
+            fields.add(name);
+            MethodValueAccessor accessor=new MethodValueAccessor(null,item,name,item.getParameterTypes()[0]);
+            ret.add(accessor);
+        }
+
+        Set<Field> fieldSet=getAllFields(clazz);
+        for(Field item : fieldSet){
+            String name=item.getName();
+            if(fields.contains(name)){
+                continue;
+            }
+            fields.add(name);
+            FieldValueAccessor accessor=new FieldValueAccessor(item);
+            ret.add(accessor);
+        }
+
+        logicalWritableFields.put(clazz,ret);
+        return ret;
+    }
 
     protected static boolean containsFastGetterProxy(Class clazz, String fieldName){
         if(fastGetter.containsKey(clazz)){
@@ -107,6 +201,11 @@ public class FastReflect {
         map.put(fieldName,field);
     }
 
+    /**
+     * 获取指定类的所有方法
+     * @param clazz
+     * @return
+     */
     public static Set<Method> getAllMethods(Class clazz){
         if(cacheMethods.containsKey(clazz)){
             return cacheMethods.get(clazz);
@@ -122,6 +221,11 @@ public class FastReflect {
         return ret;
     }
 
+    /**
+     * 获取指定类的所有getter
+     * @param clazz
+     * @return
+     */
     public static Set<Method> getAllGetters(Class clazz){
         if(cacheGetters.containsKey(clazz)){
             return cacheGetters.get(clazz);
@@ -137,6 +241,11 @@ public class FastReflect {
         return ret;
     }
 
+    /**
+     * 获取指定类的所有setter
+     * @param clazz
+     * @return
+     */
     public static Set<Method> getAllSetters(Class clazz){
         if(cacheSetters.containsKey(clazz)){
             return cacheSetters.get(clazz);
@@ -152,6 +261,11 @@ public class FastReflect {
         return ret;
     }
 
+    /**
+     * 获取指定类的所有字段，仅本类
+     * @param clazz
+     * @return
+     */
     public static Set<Field> getAllFields(Class clazz){
         if(cacheFields.containsKey(clazz)){
             return cacheFields.get(clazz);
@@ -167,6 +281,12 @@ public class FastReflect {
         return ret;
     }
 
+    /**
+     * 获取指定类的指定字段的setter
+     * @param clazz
+     * @param fieldName
+     * @return
+     */
     public static Set<Method> findGetters(Class clazz,String fieldName){
         if(containsFastGetterProxy(clazz,fieldName)){
             return getFastGetterProxy(clazz,fieldName);
@@ -183,6 +303,12 @@ public class FastReflect {
         return ret;
     }
 
+    /**
+     * 获取指定类的指定字段的getter
+     * @param clazz
+     * @param fieldName
+     * @return
+     */
     public static Set<Method> findSetters(Class clazz,String fieldName){
         if(containsFastSetterProxy(clazz,fieldName)){
             return getFastSetterProxy(clazz,fieldName);
@@ -199,6 +325,13 @@ public class FastReflect {
         return ret;
     }
 
+    /**
+     * 获取指定类中的指定名称的字段
+     * 本类未找到，则尝试从父类中查找
+     * @param clazz
+     * @param fieldName
+     * @return
+     */
     public static Field findField(Class clazz,String fieldName){
         if(containsFastFieldProxy(clazz,fieldName)){
             return getFastFieldProxy(clazz,fieldName);
@@ -210,6 +343,16 @@ public class FastReflect {
             if (name.equals(fieldName)) {
                 field=item;
                 break;
+            }
+        }
+        if(field==null){
+            Set<Field> force=forceAllFields(clazz);
+            for(Field item : force) {
+                String name = item.getName();
+                if (name.equals(fieldName)) {
+                    field=item;
+                    break;
+                }
             }
         }
         setFastFieldProxy(clazz,fieldName,field);
@@ -247,6 +390,31 @@ public class FastReflect {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 强制获取指定类的所有字段，包含父类中的私有字段
+     * @param clazz
+     * @return
+     */
+    public static Set<Field> forceAllFields(Class clazz){
+        if(cacheForceFields.containsKey(clazz)){
+            return cacheForceFields.get(clazz);
+        }
+        Set<Field> ret=new HashSet<>();
+        if(null==clazz){
+            return ret;
+        }
+        if(Object.class.equals(clazz)){
+            return ret;
+        }
+        Set<Field> fds=getAllFields(clazz);
+        ret.addAll(fds);
+        Class sclazz=clazz.getSuperclass();
+        Set<Field> sfds=forceAllFields(sclazz);
+        ret.addAll(sfds);
+        cacheForceFields.put(clazz, ret);
+        return ret;
     }
 
 }

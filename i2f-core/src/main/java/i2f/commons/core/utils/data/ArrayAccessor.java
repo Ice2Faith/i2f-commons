@@ -7,12 +7,12 @@ import java.lang.reflect.Array;
  * @date 2022/3/16 19:30
  * @desc
  */
-public class ArrayUtil {
+public class ArrayAccessor {
     protected Object obj;
-    public ArrayUtil(){
+    public ArrayAccessor(){
 
     }
-    public ArrayUtil(Object obj){
+    public ArrayAccessor(Object obj){
         this.obj=obj;
     }
     public boolean isnull(){

@@ -1,7 +1,7 @@
 package i2f.commons.core.utils.reflect.simple.reflect.impl;
 
 
-import i2f.commons.core.utils.reflect.simple.reflect.ValueAccessor;
+import i2f.commons.core.utils.reflect.simple.reflect.PropertyAccessor;
 import i2f.commons.core.utils.reflect.simple.reflect.convert.ConvertResolver;
 import i2f.commons.core.utils.reflect.simple.reflect.exception.FieldAccessException;
 
@@ -12,14 +12,47 @@ import java.lang.reflect.Method;
  * @date 2022/3/14 9:28
  * @desc
  */
-public class MethodValueAccessor implements ValueAccessor {
+public class MethodValueAccessor implements PropertyAccessor {
     public Method getter;
     public Method setter;
     public Object ivkObj;
+    public String name;
+    public Class type;
+    public MethodValueAccessor(Method getter,Method setter,String name,Class type){
+        this.getter = getter;
+        this.setter = setter;
+        this.name=name;
+        this.type=type;
+    }
     public MethodValueAccessor(Method getter,Method setter, Object obj) {
         this.getter = getter;
         this.setter = setter;
         this.ivkObj =obj;
+    }
+
+    @Override
+    public void setInvokeObject(Object ivkObj) {
+        this.ivkObj=ivkObj;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public boolean writable() {
+        return setter!=null;
+    }
+
+    @Override
+    public boolean readable() {
+        return getter!=null;
+    }
+
+    @Override
+    public Class getType() {
+        return type;
     }
 
     @Override

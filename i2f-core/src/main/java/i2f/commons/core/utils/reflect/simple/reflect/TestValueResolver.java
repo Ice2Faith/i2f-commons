@@ -1,8 +1,11 @@
 package i2f.commons.core.utils.reflect.simple.reflect;
 
 
+import i2f.commons.core.utils.reflect.simple.reflect.core.ReflectResolver;
+import i2f.commons.core.utils.reflect.simple.reflect.domain.TestDomain;
 import i2f.commons.core.utils.reflect.simple.reflect.model.TestModel;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -50,5 +53,21 @@ public class TestValueResolver {
 
         ValueResolver.set(obj,"map.model.createUser",12);
         System.out.println(ValueResolver.get(obj,"map.model.createUser"));
+
+        Class clazz= TestDomain.class;
+        List<PropertyAccessor> readers= ReflectResolver.getLogicalReadableFields(clazz);
+        List<PropertyAccessor> writers= ReflectResolver.getLogicalWritableFields(clazz);
+
+        Map<String,Object> dstMap=new HashMap<>();
+        BeanResolver.copy(model,dstMap,false);
+
+        TestDomain dstObj=new TestDomain();
+        BeanResolver.copy(dstMap,dstObj,false);
+
+        TestModel dstModel=new TestModel();
+        BeanResolver.copy(dstObj,dstModel,true);
+
+        Set<Field> force=ReflectResolver.forceAllFields(TestModel.class);
+
     }
 }

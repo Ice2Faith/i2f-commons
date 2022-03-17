@@ -1,7 +1,7 @@
 package i2f.commons.core.utils.reflect.simple.reflect;
 
 
-import i2f.commons.core.utils.reflect.simple.reflect.core.FastReflect;
+import i2f.commons.core.utils.reflect.simple.reflect.core.ReflectResolver;
 import i2f.commons.core.utils.reflect.simple.reflect.exception.FieldAccessException;
 import i2f.commons.core.utils.reflect.simple.reflect.exception.FieldNotFoundException;
 import i2f.commons.core.utils.reflect.simple.reflect.exception.MethodNotFoundException;
@@ -152,8 +152,8 @@ public class ValueVisitor {
      */
     public static ValueAccessor getOnlyObjByMethod(Object obj, String express){
         Class clazz=obj.getClass();
-        Set<Method> setters= FastReflect.findSetters(clazz,express);
-        Set<Method> getters= FastReflect.findGetters(clazz,express);
+        Set<Method> setters= ReflectResolver.findSetters(clazz,express);
+        Set<Method> getters= ReflectResolver.findGetters(clazz,express);
 
         if(getters.size()>0){
             Iterator<Method> it=getters.iterator();
@@ -200,7 +200,7 @@ public class ValueVisitor {
      */
     public static ValueAccessor getOnlyObjByField(Object obj,String express){
         Class clazz=obj.getClass();
-        Field item= FastReflect.findField(clazz,express);
+        Field item= ReflectResolver.findField(clazz,express);
         if(item!=null){
             try{
                 return new FieldValueAccessor(item,obj);
