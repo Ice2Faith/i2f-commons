@@ -1,6 +1,8 @@
 package i2f.commons.core.utils.reflect.simple.reflect;
 
 
+import i2f.commons.core.utils.db.annotations.DBColumn;
+import i2f.commons.core.utils.db.annotations.DBTable;
 import i2f.commons.core.utils.reflect.simple.reflect.core.ReflectResolver;
 import i2f.commons.core.utils.reflect.simple.reflect.domain.TestDomain;
 import i2f.commons.core.utils.reflect.simple.reflect.model.TestModel;
@@ -68,6 +70,11 @@ public class TestValueResolver {
         BeanResolver.copy(dstObj,dstModel,true);
 
         Set<Field> force=ReflectResolver.forceAllFields(TestModel.class);
+
+        Class cls= TestModel.class;
+        Field fld=ReflectResolver.findField(cls,"modifyUser");
+        DBTable dbTable=ReflectResolver.findElementAnnotation(cls,DBTable.class,true,true,true);
+        DBColumn dbColumn=ReflectResolver.findElementAnnotation(fld,DBColumn.class,true,true,true);
 
     }
 }

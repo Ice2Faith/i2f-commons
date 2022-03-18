@@ -16,7 +16,16 @@ LOG_PATH=${LOG_DIR}/${AppName}.log
 
 if [ "$ctrlOption" = "" ];
 then
-    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|status|log} \033[0m"
+    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|status|log|snapshot|backup|recovery|clean} \033[0m"
+    echo "start: to run a jar which called AppName"
+    echo "stop: to stop a jar which called AppName"
+    echo "restart: to stop and run a jar which called AppName"
+    echo "status: to check run status for a jar which called AppName"
+    echo "log: to lookup the log for a jar which called AppName"
+    echo "snapshot: to make a snapshot to ./snapshot for a jar which called AppName"
+    echo "backup: to backup to ./backup a jar which called AppName"
+    echo "recovery: to recovery from ./backup and save current to ./newest for a jar which called AppName"
+    echo "clean: to clean dirs ./backup ./snapshot ./newest ./logs for a jar which called AppName"
     exit 1
 fi
 
@@ -95,6 +104,39 @@ function log()
 	tail -f $LOG_PATH
 }
 
+function snapshot()
+{
+  mkdir ./snapshot
+  TIME_NOW=$(date "+%Y%m%d%H%M%S")
+  cp $AppName ./snapshot/$AppName.$TIME_NOW
+  echo "$AppName has snapshot as $AppName.$TIME_NOW."
+}
+
+function backup()
+{
+  mkdir ./backup
+  cp $AppName ./backup
+  TIME_NOW=$(date "+%Y%m%d%H%M%S")
+  echo $TIME_NOW > ./backup/_time
+  echo "$AppName has backup."
+}
+
+function recovery()
+{
+  mkdir ./newest
+  mv $AppName ./newest
+  TIME_NOW=$(date "+%Y%m%d%H%M%S")
+  echo $TIME_NOW > ./newest/_time
+  cp ./backup/$AppName ./
+  echo "$AppName has recovery."
+}
+
+function clean()
+{
+  rm -rf ./backup ./newest ./snapshot ./logs
+  echo "clean done."
+}
+
 case $ctrlOption in
     start)
     start;;
@@ -106,6 +148,14 @@ case $ctrlOption in
     status;;
 	  log)
     log;;
+    snapshot)
+    snapshot;;
+    backup)
+    backup;;
+    recovery)
+    recovery;;
+    clean)
+    clean;;
     *)
 
 esac
