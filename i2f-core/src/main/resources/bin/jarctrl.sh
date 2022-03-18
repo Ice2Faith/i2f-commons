@@ -175,13 +175,16 @@ function clean()
 
 function unpack()
 {
+  rm -rf ./upk_$AppName
   unzip $AppName ./upk_$AppName
   echo "$AppName has unpack."
 }
 
 function pack()
 {
+  mv $AppName ./src_$AppName
   zip -q -r $AppName ./upk_$AppName
+  rm -rf ./upk_$AppName
   echo "$AppName has pack."
 }
 
