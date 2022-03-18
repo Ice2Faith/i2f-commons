@@ -8,10 +8,10 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="i2f-log" />
-        <module name="i2f-design" />
         <module name="i2f-generator" />
-        <module name="i2f-component" />
+        <module name="i2f-design" />
         <module name="i2f-lan-transfer" />
+        <module name="i2f-component" />
         <module name="i2f-core" />
       </profile>
     </annotationProcessing>
