@@ -173,6 +173,18 @@ function clean()
   echo "clean done."
 }
 
+function unpack()
+{
+  unzip $AppName ./upk_$AppName
+  echo "$AppName has unpack."
+}
+
+function pack()
+{
+  zip -q -r $AppName ./upk_$AppName
+  echo "$AppName has pack."
+}
+
 case $ctrlOption in
     start)
     start;;
@@ -196,6 +208,10 @@ case $ctrlOption in
     recovery;;
     clean)
     clean;;
+    unpack)
+    unpack;;
+    pack)
+    pack;;
     *)
 
 esac
