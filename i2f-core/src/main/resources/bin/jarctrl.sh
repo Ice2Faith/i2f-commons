@@ -20,6 +20,8 @@ then
     echo "start: to run a jar which called AppName"
     echo "stop: to stop a jar which called AppName"
     echo "restart: to stop and run a jar which called AppName"
+    echo "shutdown: to shutdown(force kill) a jar which called AppName"
+    echo "reboot: to shutdown and run a jar which called AppName"
     echo "status: to check run status for a jar which called AppName"
     echo "log: to lookup the log for a jar which called AppName"
     echo "snapshot: to make a snapshot to ./snapshot for a jar which called AppName"
@@ -39,47 +41,81 @@ function start()
 {
     PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
 
-	if [ x"$PID" != x"" ]; then
-	    echo "$AppName is running..."
-	else
-		chmod a+x $AppName
-		mkdir ${LOG_DIR}
-		nohup java -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 &
-		chmod a+r $LOG_DIR/*.log
-		echo "Start $AppName success..."
-	fi
+    if [ x"$PID" != x"" ]; then
+        echo "$AppName is running..."
+    else
+        chmod a+x $AppName
+        mkdir ${LOG_DIR}
+        nohup java -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 &
+        chmod a+r $LOG_DIR/*.log
+        echo "Start $AppName success..."
+    fi
 }
 
 function stop()
 {
     echo "Stop $AppName"
 
-	PID=""
-	query(){
-	  PID=""
-		PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
-	}
+    PID=""
+    query(){
+      PID=""
+        PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
+    }
 
-	query
-	if [ x"$PID" != x"" ]; then
-		kill -TERM $PID
-		echo "$AppName (pid:$PID) exiting..."
-		CUR_WAIT=0
-		while [ x"$PID" != x"" ]
-		do
-			sleep 1
-			query
-			CUR_WAIT=`expr ${CUR_WAIT} + 1`
-			echo "wait $AppName stop timeout $CUR_WAIT..."
-			if [ $CUR_WAIT == $MAX_WAIT ];then
-			  echo "$AppName has timeout of max wait stop,force kill run..."
-			  kill -9 $PID
-			fi
-		done
-		echo "$AppName exited."
-	else
-		echo "$AppName already stopped."
-	fi
+    query
+    if [ x"$PID" != x"" ]; then
+        kill -TERM $PID
+        echo "$AppName (pid:$PID) exiting..."
+        CUR_WAIT=0
+        while [ x"$PID" != x"" ]
+        do
+            sleep 1
+            query
+            CUR_WAIT=`expr ${CUR_WAIT} + 1`
+            echo "wait $AppName stop timeout $CUR_WAIT..."
+            if [ $CUR_WAIT == $MAX_WAIT ];then
+              echo "$AppName has timeout of max wait stop,force kill run..."
+              kill -9 $PID
+            fi
+        done
+        echo "$AppName exited."
+    else
+        echo "$AppName already stopped."
+    fi
+}
+
+
+function shutdown()
+{
+    echo "Shutdown $AppName"
+
+    PID=""
+    query(){
+      PID=""
+        PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
+    }
+
+    query
+    if [ x"$PID" != x"" ]; then
+        kill -9 $PID
+        echo "$AppName (pid:$PID) shutdown..."
+        while [ x"$PID" != x"" ]
+        do
+            sleep 1
+            query
+            kill -9 $PID
+        done
+        echo "$AppName shutdown."
+    else
+        echo "$AppName already shutdown."
+    fi
+}
+
+function reboot()
+{
+    shutdown
+    sleep 2
+    start
 }
 
 function restart()
@@ -101,7 +137,7 @@ function status()
 
 function log()
 {
-	tail -f $LOG_PATH
+    tail -f $LOG_PATH
 }
 
 function snapshot()
@@ -144,9 +180,13 @@ case $ctrlOption in
     stop;;
     restart)
     restart;;
+    shutdown)
+    shutdown;;
+    reboot)
+    reboot;;
     status)
     status;;
-	  log)
+    log)
     log;;
     snapshot)
     snapshot;;
