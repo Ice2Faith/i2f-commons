@@ -28,6 +28,7 @@ public class ReflectResolver {
 
     protected static volatile ConcurrentHashMap<Class, List<PropertyAccessor>> logicalReadableFields = new ConcurrentHashMap<>();
     protected static volatile ConcurrentHashMap<Class, List<PropertyAccessor>> logicalWritableFields = new ConcurrentHashMap<>();
+    protected static volatile ConcurrentHashMap<Class,List<PropertyAccessor>> logicalReadWriteFields=new ConcurrentHashMap<>();
 
     protected static volatile ConcurrentHashMap<Class, Set<Field>> cacheForceFields = new ConcurrentHashMap<>();
 
@@ -116,6 +117,46 @@ public class ReflectResolver {
         }
 
         logicalWritableFields.put(clazz, ret);
+        return ret;
+    }
+
+    public static List<PropertyAccessor> getLogicalReadWriteFields(Class clazz){
+        if(logicalReadWriteFields.containsKey(clazz)){
+            return logicalReadWriteFields.get(clazz);
+        }
+        List<PropertyAccessor> ret=new ArrayList<>();
+        Set<String> set=new HashSet<>();
+        List<PropertyAccessor> writers=getLogicalWritableFields(clazz);
+        List<PropertyAccessor> readers=getLogicalReadableFields(clazz);
+        for(PropertyAccessor witem : writers){
+            String wname=witem.getName();
+            if(witem instanceof FieldValueAccessor){
+                if(!set.contains(wname)){
+                    set.add(wname);
+                    ret.add(witem);
+                    continue;
+                }
+            }
+
+            for(PropertyAccessor ritem : readers){
+                String rname= ritem.getName();
+                if(ritem instanceof FieldValueAccessor){
+                    continue;
+                }
+                if(rname.equals(wname)){
+                    if(set.contains(rname)){
+                        continue;
+                    }
+                    MethodValueAccessor racc=(MethodValueAccessor)ritem;
+                    MethodValueAccessor wacc=(MethodValueAccessor)witem;
+                    PropertyAccessor accessor=new MethodValueAccessor(racc.getGetter(),wacc.getSetter(),rname,ritem.getType());
+                    ret.add(accessor);
+                    set.add(rname);
+                }
+            }
+        }
+
+        logicalReadWriteFields.put(clazz,ret);
         return ret;
     }
 

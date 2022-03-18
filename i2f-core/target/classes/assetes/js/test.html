@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas Painter</title>
+    <script src="JsTool.js" type="text/javascript"></script>
+</head>
+<body style="padding: 20px">
+    <div id="app">
+        <div id="click" style="height: 30px;width: 60px;background: #eee;">画板</div>
+        <canvas id="painter">
+            你的浏览器不支持Canvas
+        </canvas>
+
+    </div>
+</body>
+<script>
+    $canvas.initPainter('painter',{
+        width:720,
+        height:480,
+        border:'solid 1px red',
+    });
+    $canvas.initWaterMark('painter',{
+        text:'这是一个水印',
+        velSpace:20,
+        horSpace: 60,
+        fontSize:12,
+        rotate:-30,
+    });
+    document.getElementById('click').addEventListener('click',function(event){
+       $dlg.inputDialog({
+           type:'checkbox',
+           accept:'image/png',
+       },function(val){
+           alert(JSON.stringify(val));
+       }) ;
+    });
+</script>
+</html>

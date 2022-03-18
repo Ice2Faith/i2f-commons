@@ -200,4 +200,25 @@ public class BeanResolver {
         }
         return ret;
     }
+
+    public static void empty2null(Object obj,boolean trim){
+        if(obj==null){
+            return;
+        }
+        Class clazz = obj.getClass();
+        List<PropertyAccessor> fds=ReflectResolver.getLogicalReadWriteFields(clazz);
+        for(PropertyAccessor item : fds){
+            item.setInvokeObject(obj);
+            Object val=item.get();
+            if(val!=null && val instanceof String){
+                if(trim){
+                    val=((String)val).trim();
+                }
+                if("".equals(val)){
+                    item.set(null);
+                }
+            }
+        }
+    }
+
 }
