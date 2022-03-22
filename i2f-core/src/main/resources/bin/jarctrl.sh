@@ -4,8 +4,14 @@
 AppName=$1
 # control option
 ctrlOption=$2
+
 # max wait timeout
 MAX_WAIT=30
+# enable shortcut shell
+ENUM_SHORTCUT_ENABLE=1
+ENUM_SHORTCUT_DISABLE=0
+
+ENABLE_SHORTCUT=$ENUM_SHORTCUT_DISABLE
 
 #JVM参数
 JVM_OPTS="-Dname=$AppName  -Duser.timezone=Asia/Shanghai -Xms512M -Xmx512M -XX:PermSize=256M -XX:MaxPermSize=512M -XX:+HeapDumpOnOutOfMemoryError -XX:+PrintGCDateStamps  -XX:+PrintGCDetails -XX:NewRatio=1 -XX:SurvivorRatio=30 -XX:+UseParallelGC -XX:+UseParallelOldGC"
@@ -16,7 +22,7 @@ LOG_PATH=${LOG_DIR}/${AppName}.log
 
 if [ "$ctrlOption" = "" ];
 then
-    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean|unpack|pack} \033[0m"
+    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean} \033[0m"
     echo -e "\033[0;34m start \033[0m : to run a jar which called AppName"
     echo -e "\033[0;34m stop \033[0m : to stop a jar which called AppName"
     echo -e "\033[0;34m restart \033[0m : to stop and run a jar which called AppName"
@@ -28,8 +34,6 @@ then
     echo -e "\033[0;34m backup \033[0m : to backup to ./backup a jar which called AppName"
     echo -e "\033[0;34m recovery \033[0m : to recovery from ./backup and save current to ./newest for a jar which called AppName"
     echo -e "\033[0;34m clean \033[0m : to clean dirs ./backup ./snapshot ./newest ./logs for a jar which called AppName"
-    echo -e "\033[0;34m unpack \033[0m : unpack as zip for a jar which called AppName"
-    echo -e "\033[0;34m pack \033[0m : pack as zip for a jar which called AppName"
     exit 1
 fi
 
@@ -38,6 +42,17 @@ then
     echo -e "\033[0;31m please input 1st arg:appName \033[0m"
     exit 1
 fi
+
+CMD=""
+function mkcmd()
+{
+  if [ x"$CMD" != x"" ]; then
+    if [ $ENABLE_SHORTCUT == $ENUM_SHORTCUT_ENABLE ];then
+      echo "./jarctrl.sh $CMD" > ./$CMD.sh
+      chmod a+x ./$CMD.sh
+    fi
+  fi
+}
 
 function start()
 {
@@ -52,6 +67,9 @@ function start()
         chmod a+r $LOG_DIR/*.log
         echo "Start $AppName success..."
     fi
+
+    CMD="start"
+    mkcmd
 }
 
 function stop()
@@ -84,6 +102,9 @@ function stop()
     else
         echo "$AppName already stopped."
     fi
+
+    CMD="stop"
+    mkcmd
 }
 
 
@@ -111,6 +132,9 @@ function shutdown()
     else
         echo "$AppName already shutdown."
     fi
+
+    CMD="shutdown"
+    mkcmd
 }
 
 function reboot()
@@ -118,6 +142,9 @@ function reboot()
     shutdown
     sleep 2
     start
+
+    CMD="reboot"
+    mkcmd
 }
 
 function restart()
@@ -125,6 +152,9 @@ function restart()
     stop
     sleep 2
     start
+
+    CMD="restart"
+    mkcmd
 }
 
 function status()
@@ -135,6 +165,9 @@ function status()
     else
         echo "$AppName is not running..."
     fi
+
+    CMD="status"
+    mkcmd
 }
 
 function log()
@@ -171,14 +204,14 @@ function recovery()
 
 function clean()
 {
-  rm -rf ./backup ./newest ./snapshot ./logs
+  rm -rf ./backup ./newest ./snapshot ./logs ./start.sh ./stop.sh ./reboot.sh ./shutdown.sh ./restart.sh ./status.sh
   echo "clean done."
 }
 
 function unpack()
 {
   rm -rf ./upk_$AppName
-  unzip $AppName ./upk_$AppName
+  unzip $AppName -d ./upk_$AppName
   echo "$AppName has unpack."
 }
 
